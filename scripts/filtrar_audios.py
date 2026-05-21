@@ -1,29 +1,21 @@
 #!/usr/bin/env python3
 """
-filtrar_audios_v2.py
-====================
-Filtro de audios v2 — orientado a clasificación binaria Enojo vs Tristeza,
+filtrar_audios.py
+=================
+Filtro de audios — orientado a clasificación binaria Enojo vs Tristeza,
 con Tranquilidad como bucket para todo lo neutro/ambiguo.
 
-Diferencias con v1 (filtrar_audios.py):
-  • Métricas específicas por emoción objetivo (no solo "expresividad" genérica):
-      - score_enojo:    energía alta, pitch medio-alto, dinámica rápida
-      - score_tristeza: energía baja, pitch bajo, monotonía, ritmo lento
-  • Umbrales absolutos (no percentiles intra-clase) basados en literatura
-    y calibrables por línea de comando.
-  • Decide la etiqueta final por evidencia acústica, no por la carpeta original.
-    Si un audio etiquetado "Enojo" no muestra firma de enojo, va a Tranquilidad.
-  • Soporta --binary para producir solo {Enojo, Tristeza, Tranquilidad}
-    descartando Aburrido (mezclado en Tranquilidad por defecto).
+Estrategia: respeta la etiqueta original (Enojo/Tristeza) y descarta
+a Tranquilidad los audios sin firma emocional suficiente.
+Aburrido siempre va a Tranquilidad (acústicamente indistinguible).
 
-Uso:
-    python3 filtrar_audios_v2.py                  # dry-run, reporta
-    python3 filtrar_audios_v2.py --apply --copy   # copia archivos filtrados
-    python3 filtrar_audios_v2.py --binary         # modo Enojo/Tristeza/Tranquilidad
+Uso (desde la raíz del proyecto):
+    python scripts/filtrar_audios.py                  # dry-run, reporta
+    python scripts/filtrar_audios.py --apply --copy   # copia archivos filtrados
 
 Outputs:
-    - reporte_filtrado_v2.csv
-    - reporte_filtrado_v2.png
+    - outputs/reporte_filtrado_v2.csv
+    - outputs/figuras/reporte_filtrado_v2.png
     - data/AUDIOS_FILTRADOS_V2/  (con --apply)
 """
 
@@ -41,10 +33,11 @@ warnings.filterwarnings('ignore')
 
 # ─── Configuración ────────────────────────────────────────────────
 # Rutas relativas a la raiz del proyecto (ejecutar desde clasificador-audios/)
-DATA_DIR = os.path.join('data', 'AUDIOS MACHINE LEARNING')
-OUT_DIR  = os.path.join('data', 'AUDIOS_FILTRADOS_V2')
-REPORTE_CSV = os.path.join('outputs', 'reporte_filtrado_v2.csv')
-REPORTE_PNG = os.path.join('outputs', 'figuras', 'reporte_filtrado_v2.png')
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR    = os.path.join(_ROOT, 'data', 'AUDIOS MACHINE LEARNING')
+OUT_DIR     = os.path.join(_ROOT, 'data', 'AUDIOS_FILTRADOS_V2')
+REPORTE_CSV = os.path.join(_ROOT, 'outputs', 'reporte_filtrado_v2.csv')
+REPORTE_PNG = os.path.join(_ROOT, 'outputs', 'figuras', 'reporte_filtrado_v2.png')
 CLASES_ORIGEN = ['Aburrido', 'Enojo', 'Tranquilidad', 'Tristeza']
 EXTS = {'.ogg', '.mp3', '.mp4', '.mpeg', '.wav', '.flac', '.m4a'}
 SR   = 22050
