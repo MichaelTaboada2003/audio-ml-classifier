@@ -1,0 +1,14 @@
+# Data files (too large for git)
+data/
+*.npz
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+
+# Outputs regenerables
+outputs/figuras/
