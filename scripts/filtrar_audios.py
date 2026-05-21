@@ -302,6 +302,32 @@ def imprimir_reporte(df):
                 print('    {} (score={:.3f})'.format(r['archivo'], r[score_col]))
     print()
 
+    # --- Listado completo por clase con PASA / NO PASA ---
+    print('=' * 72)
+    print('DETALLE POR CLASE — RANKING COMPLETO')
+    print('=' * 72)
+    for clase, score_col in score_map.items():
+        sub = df[df['clase_original'] == clase].sort_values(score_col, ascending=False)
+        n_pasan = (sub[score_col] > 0.35).sum()
+        print('\n--- {} ({} audios, {} pasan umbral 0.35) ---'.format(
+            clase.upper(), len(sub), n_pasan))
+        print('{:<4} {:<28} {:>6} {:>8}  {}'.format(
+            '#', 'Archivo', 'Recol', 'Score', 'Estado'))
+        print('  ' + '-' * 60)
+        for rank, (_, r) in enumerate(sub.iterrows(), 1):
+            score_val = r[score_col]
+            if score_val > 0.45:
+                estado = 'EXCELENTE'
+            elif score_val > 0.35:
+                estado = 'PASA'
+            elif score_val > 0.30:
+                estado = 'borderline'
+            else:
+                estado = 'NO PASA'
+            print('{:<4} {:<28} {:>6} {:>8.3f}  {}'.format(
+                rank, r['archivo'], r['recolector'], score_val, estado))
+    print()
+
 
 def graficar_reporte(df, output_path):
     cols_score = ['score_enojo', 'score_tristeza', 'score_tranquilidad', 'score_neutro']
