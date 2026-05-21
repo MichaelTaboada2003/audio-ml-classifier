@@ -328,6 +328,34 @@ def imprimir_reporte(df):
                 rank, r['archivo'], r['recolector'], score_val, estado))
     print()
 
+    # --- 15 peores por clase con metricas acusticas para diagnostico ---
+    print('=' * 72)
+    print('DIAGNOSTICO — 15 PEORES POR CLASE (por que no pasaron)')
+    print('=' * 72)
+    metricas_diag = {
+        'Enojo':        ('score_enojo',        ['energy_level_db', 'dynamic_range_db', 'pitch_std_st', 'onset_rate', 'centroid_hz']),
+        'Tristeza':     ('score_tristeza',      ['energy_level_db', 'pitch_mean_st',    'pitch_std_st', 'frac_silencio', 'onset_rate']),
+        'Tranquilidad': ('score_tranquilidad',  ['energy_level_db', 'pitch_std_st',     'frac_silencio','dynamic_range_db','onset_rate']),
+    }
+    # Referencia: que valores esperamos para cada emocion
+    referencia = {
+        'Enojo':        'Esperado: energy_db alto (>-30), dynamic_range alto (>30), pitch_std alto (>4), onsets altos (>2)',
+        'Tristeza':     'Esperado: energy_db bajo (<-35), pitch_mean bajo (<5st), pitch_std bajo (<2), frac_silencio alto (>0.2)',
+        'Tranquilidad': 'Esperado: energy_db medio (-35 a -25), pitch_std medio (1-4), frac_silencio bajo (<0.15)',
+    }
+    for clase, (score_col, metricas) in metricas_diag.items():
+        sub = df[df['clase_original'] == clase].sort_values(score_col, ascending=True).head(15)
+        print('\n--- {} — 15 peores ---'.format(clase.upper()))
+        print('  {}'.format(referencia[clase]))
+        header = '{:<28} {:>6} {:>7}  ' + '  '.join('{:>12}' for _ in metricas)
+        print(header.format('Archivo', 'Recol', 'Score', *metricas))
+        print('  ' + '-' * (28 + 6 + 7 + 14 * len(metricas)))
+        for _, r in sub.iterrows():
+            vals = [r[m] if m in r else float('nan') for m in metricas]
+            row = '{:<28} {:>6} {:>7.3f}  ' + '  '.join('{:>12.3f}' for _ in metricas)
+            print(row.format(r['archivo'], r['recolector'], r[score_col], *vals))
+    print()
+
 
 def graficar_reporte(df, output_path):
     cols_score = ['score_enojo', 'score_tristeza', 'score_tranquilidad', 'score_neutro']
