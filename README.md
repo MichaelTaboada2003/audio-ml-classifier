@@ -30,6 +30,30 @@ A continuación se presentan las figuras generadas a partir del entrenamiento y 
 
 ---
 
+## Aplicación Web Interactiva
+
+Para tangibilizar los resultados del modelo, se desarrolló una aplicación web interactiva (Flask + HTML5 + CSS3 + JS Vanilla) con un diseño moderno y responsivo basado en *Glassmorphism*.
+
+### Características principales:
+* **Entrada de audio dual**: Permite subir archivos de audio (WAV, MP3, OGG, etc.) o grabar directamente desde el micrófono en tiempo real con una animación de onda y temporizador.
+* **Selector interactivo de modelos**: Panel en cuadrícula que permite alternar instantáneamente entre los 6 clasificadores entrenados (SVM lineal, Regresión Logística, SVM RBF, Random Forest, KNN k=3 y KNN k=5) cargados desde archivos binarios `.joblib`.
+* **Medidor de confianza SVG**: Un anillo de progreso vectorial animado que dibuja la confianza de la predicción y adopta colores y halos de brillo neón según la emoción predicha (Rojo para Enojo, Cian para Tristeza).
+* **Explorador interactivo del dataset**: Lista interactiva para reproducir y testear individualmente los 26 mejores audios del dataset.
+* **Análisis de Métricas en Tiempo Real**: Muestra la duración del audio, la energía (RMS), el Pitch medio (Hz) y los cruces por cero (ZCR) extraídos dinámicamente en el backend.
+
+### Capturas de Pantalla de la Interfaz
+
+#### 1. Panel de Control y Selector de Modelos
+![Selector de Modelos](imgs/models.png)
+
+#### 2. Resultado del Análisis y Medidor de Confianza SVG
+![Resultado del Análisis](imgs/result.png)
+
+#### 3. Explorador del Dataset Top-26
+![Explorador del Dataset](imgs/audios.png)
+
+---
+
 ## Dataset
 
 | Parametro | Valor |
@@ -58,17 +82,34 @@ muy variable para ser tristeza).
 
 ```
 clasificador-audios/
+├── app.py                                     # Servidor Flask (Backend API)
+├── templates/
+│   └── index.html                             # Interfaz de la aplicación (Frontend)
+├── static/
+│   ├── css/
+│   │   └── style.css                          # Estilos CSS (Glassmorphism & Grids)
+│   └── js/
+│       └── main.js                            # Lógica interactiva en el cliente
 ├── notebooks/
 │   ├── 01_clasificador_v1_features.ipynb      # Features manuales (144 dims)
 │   ├── 02_clasificador_v1_embeddings.ipynb    # wav2vec2 embeddings (768 dims)
 │   └── 03_clasificador_v2_balanceado.ipynb    # Comparativa final + conclusiones
 ├── scripts/
-│   └── filtrar_audios.py                      # Scoring acustico por audio
+│   ├── filtrar_audios.py                      # Scoring acústico por audio
+│   └── exportar_modelos.py                    # Script de entrenamiento y serialización de modelos
 ├── outputs/
 │   ├── reporte_filtrado_v2.csv                # Scores de los 146 audios
-│   └── figuras/                               # Graficos generados
+│   ├── modelos/                               # Clasificadores serializados (.joblib)
+│   │   ├── knn_k3.joblib
+│   │   ├── knn_k5.joblib
+│   │   ├── svm_lineal.joblib
+│   │   ├── svm_rbf.joblib
+│   │   ├── logreg.joblib
+│   │   └── rf.joblib
+│   └── figuras/                               # Gráficos de resultados y análisis
 ├── data/                                      # (no versionado)
 │   └── AUDIOS MACHINE LEARNING/               # Dataset original (146 audios)
+├── imgs/                                      # Capturas de la interfaz web
 ├── .gitignore
 └── README.md
 ```
@@ -98,20 +139,23 @@ clasificador-audios/
 
 ---
 
-## Uso rapido
+## Uso rápido
 
 ```bash
-# Activar entorno
+# 1. Activar entorno
 source ../.venv/bin/activate
 
-# Calcular scores de todos los audios
+# 2. Calcular scores de todos los audios (opcional)
 python scripts/filtrar_audios.py
 
-# Ver ranking completo, 15 peores y configuraciones sugeridas en terminal
-# El reporte se guarda en outputs/reporte_filtrado_v2.csv
+# 3. Entrenar y exportar modelos serializados (.joblib)
+python scripts/exportar_modelos.py
 
-# Ejecutar notebook principal (comparativa completa)
-jupyter notebook notebooks/03_clasificador_v2_balanceado.ipynb
+# 4. Iniciar la aplicación web interactiva
+python app.py
+
+# 5. Abrir en el navegador
+# La interfaz estará disponible en http://127.0.0.1:5001
 ```
 
 ---
