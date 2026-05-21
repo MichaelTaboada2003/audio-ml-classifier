@@ -9,15 +9,24 @@ de `facebook/wav2vec2-base` (768 dims), ambos con Leave-One-Out CV.
 
 ## Resultado principal
 
-Con el dataset filtrado y balanceado (top-10 por clase, Enojo vs Tristeza):
+Con el dataset filtrado y balanceado (top-13 por clase, Enojo vs Tristeza - 26 audios en total):
 
 | Enfoque | Mejor modelo | Accuracy | Balanced Acc |
 |---|---|---|---|
-| Features manuales (144 dims) | KNN k=5 / SVM / LogReg / RF | **0.85** | **0.85** |
-| wav2vec2 embeddings (768 dims) | KNN k=5 / RF | **0.85** | **0.85** |
+| Features manuales (144 dims) | SVM lineal / Random Forest | **0.85** | **0.8462** |
+| wav2vec2 embeddings (768 dims) | SVM lineal / Regresión Logística | **0.92** | **0.9231** |
 
-Ambos enfoques alcanzan el mismo resultado. El cuello de botella no era
-el modelo ni los features — era la calidad y seleccion de los datos.
+Con la ampliación de la muestra a 13 audios por clase, el modelo de representación profunda (*wav2vec2*) logra extraer mejores descriptores prosódicos y tímbricos, superando a los features acústicos clásicos en un **7.69%** de Balanced Accuracy.
+
+### Gráficos de Resultados y Comparativa
+
+A continuación se presentan las figuras generadas a partir del entrenamiento y evaluación del clasificador (`outputs/figuras/`):
+
+#### 1. Matriz de Confusión y Desempeño (wav2vec2)
+![Resultados v2](outputs/figuras/resultados_v2.png)
+
+#### 2. Comparativa Features Clásicos vs wav2vec2
+![Comparativa Features vs wav2vec2](outputs/figuras/comparativa_features_vs_wav2vec2.png)
 
 ---
 
@@ -118,11 +127,9 @@ variabilidad. Solo Enojo tiene una firma acustica marcada y consistente.
 Al reducir a Enojo vs Tristeza (las dos mas opuestas), el problema se vuelve
 resoluble con cualquier clasificador.
 
-### Por que features manuales = wav2vec2?
+### ¿Por qué wav2vec2 supera a los features manuales?
 
-Con 20 muestras y clases bien separadas, los features clasicos son suficientes.
-wav2vec2 mostraria ventaja con datasets mas grandes (100+ por clase) o audios
-mas ambiguos. Con datos limpios y balanceados, ambos convergen al mismo resultado.
+Al ampliar el dataset a 26 muestras (13 por clase), los embeddings de wav2vec2 logran capitalizar su preentrenamiento en 960h de voz (LibriSpeech) para capturar dinámicas prosódicas y tímbricas de más alto nivel, logrando un **92.31%** de balanced accuracy frente al **84.62%** de los features acústicos tradicionales.
 
 ### Por que el filtrado es importante?
 
