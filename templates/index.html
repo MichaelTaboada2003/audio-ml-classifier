@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmotiSpeech Classifier | Reconocimiento Acústico de Emociones</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="glow-bg"></div>
+    <div class="container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <i class="fa-solid fa-microphone-lines logo-icon"></i>
+                <div class="brand">
+                    <h1>EmotiSpeech</h1>
+                    <span class="subtitle">Speech Emotion Classification (v2)</span>
+                </div>
+            </div>
+            <div class="model-badge">
+                <span class="status-dot"></span>
+                <span>wav2vec2 + SVM (92.3% Acc)</span>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="live-predictor">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Clasificador en Vivo
+            </button>
+            <button class="tab-btn" data-tab="dataset-explorer">
+                <i class="fa-solid fa-database"></i> Explorador del Dataset
+            </button>
+            <button class="tab-btn" data-tab="analytics">
+                <i class="fa-solid fa-chart-line"></i> Análisis y Métricas
+            </button>
+        </nav>
+
+        <!-- Main Content Viewports -->
+        <main class="main-content">
+            <!-- TAB 1: Live Predictor -->
+            <section id="live-predictor" class="tab-pane active">
+                <div class="grid-2col">
+                    <!-- Left: Upload and Record controls -->
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <h2>Entrada de Audio</h2>
+                            <p>Sube un archivo de voz o graba directamente desde tu micrófono para analizar la emoción (Enojo vs Tristeza).</p>
+                        </div>
+                        
+                        <!-- Model Selector (Interactive Cards) -->
+                        <div class="model-select-container">
+                            <label class="model-select-label">
+                                <i class="fa-solid fa-brain"></i> Modelo Clasificador Activo:
+                            </label>
+                            <div class="model-grid" id="model-grid">
+                                <div class="model-option active" data-model="svm_lineal">
+                                    <div class="model-meta">
+                                        <span class="model-name">SVM lineal</span>
+                                        <span class="model-acc">92.3% Acc</span>
+                                    </div>
+                                    <div class="model-desc">Mejor modelo. Excelente separabilidad lineal.</div>
+                                </div>
+                                <div class="model-option" data-model="logreg">
+                                    <div class="model-meta">
+                                        <span class="model-name">Reg. Logística</span>
+                                        <span class="model-acc">92.3% Acc</span>
+                                    </div>
+                                    <div class="model-desc">Clasificador probabilístico de entropía máxima.</div>
+                                </div>
+                                <div class="model-option" data-model="svm_rbf">
+                                    <div class="model-meta">
+                                        <span class="model-name">SVM RBF</span>
+                                        <span class="model-acc">88.5% Acc</span>
+                                    </div>
+                                    <div class="model-desc">Frontera de decisión no lineal (Kernel RBF).</div>
+                                </div>
+                                <div class="model-option" data-model="rf">
+                                    <div class="model-meta">
+                                        <span class="model-name">Random Forest</span>
+                                        <span class="model-acc">80.8% Acc</span>
+                                    </div>
+                                    <div class="model-desc">Ensemble robusto de 200 árboles de decisión.</div>
+                                </div>
+                                <div class="model-option" data-model="knn_k5">
+                                    <div class="model-meta">
+                                        <span class="model-name">KNN (k=5)</span>
+                                        <span class="model-acc">76.9% Acc</span>
+                                    </div>
+                                    <div class="model-desc">Votación por 5 vecinos más cercanos.</div>
+                                </div>
+                                <div class="model-option" data-model="knn_k3">
+                                    <div class="model-meta">
+                                        <span class="model-name">KNN (k=3)</span>
+                                        <span class="model-acc">76.9% Acc</span>
+                                    </div>
+                                    <div class="model-desc">Votación por 3 vecinos más cercanos.</div>
+                                </div>
+                            </div>
+                            <!-- Hidden input to store selected value for backend requests -->
+                            <input type="hidden" id="model-selector" value="svm_lineal">
+                        </div>
+                        
+                        <!-- Upload Box -->
+                        <div class="upload-zone" id="drop-zone">
+                            <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                            <p class="upload-text">Arrastra y suelta tu archivo de audio aquí</p>
+                            <span class="upload-subtext">Soporta WAV, OGG, MP3, MP4 (máx. 10s)</span>
+                            <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">
+                                <i class="fa-solid fa-folder-open"></i> Seleccionar Archivo
+                            </button>
+                            <input type="file" id="file-input" accept="audio/*" style="display: none;">
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="divider">
+                            <span>o graba en vivo</span>
+                        </div>
+
+                        <!-- Recording Controls -->
+                        <div class="recording-container">
+                            <div class="recording-status" id="recording-status">
+                                <span class="pulse-dot"></span>
+                                <span id="record-timer">00:00</span>
+                            </div>
+                            <div class="waveform-anim" id="waveform-anim">
+                                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                            </div>
+                            <div class="record-btn-wrapper">
+                                <button class="record-btn" id="record-btn" title="Grabar audio">
+                                    <i class="fa-solid fa-microphone"></i>
+                                </button>
+                            </div>
+                            <p class="record-instruction" id="record-instruction">Haz clic para empezar a grabar (máx. 10s)</p>
+                        </div>
+                    </div>
+
+                    <!-- Right: Prediction results & metrics -->
+                    <div class="card glass-card results-card" id="results-container">
+                        <div class="empty-state" id="empty-results">
+                            <i class="fa-solid fa-wave-square wave-placeholder"></i>
+                            <h3>Listo para el Análisis</h3>
+                            <p>Sube un audio o realiza una grabación para ver los resultados de clasificación y sus métricas acústicas en tiempo real.</p>
+                        </div>
+
+                        <div class="results-layout" id="active-results" style="display: none;">
+                            <div class="result-header">
+                                <h3>Resultado del Análisis</h3>
+                                <span class="badge" id="predicted-emotion-badge">Enojo</span>
+                            </div>
+
+                            <!-- Big Prediction Meter -->
+                            <div class="prediction-display">
+                                <svg class="progress-ring" width="150" height="150">
+                                    <defs>
+                                        <linearGradient id="gradient-enojo" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#f87171" />
+                                            <stop offset="100%" stop-color="#ef4444" />
+                                        </linearGradient>
+                                        <linearGradient id="gradient-tristeza" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#22d3ee" />
+                                            <stop offset="100%" stop-color="#06b6d4" />
+                                        </linearGradient>
+                                        <linearGradient id="gradient-default" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#c084fc" />
+                                            <stop offset="100%" stop-color="#a855f7" />
+                                        </linearGradient>
+                                    </defs>
+                                    <circle class="progress-ring-bg" stroke="rgba(255,255,255,0.03)" stroke-width="8" fill="transparent" r="64" cx="75" cy="75" />
+                                    <circle id="progress-bar-circle" class="progress-ring-bar" stroke="url(#gradient-default)" stroke-width="8" stroke-linecap="round" fill="transparent" r="64" cx="75" cy="75" />
+                                </svg>
+                                <div class="prediction-center">
+                                    <div class="prediction-value" id="prediction-percentage">0%</div>
+                                    <div class="prediction-label">Confianza</div>
+                                </div>
+                            </div>
+
+                            <!-- Probability progress bars -->
+                            <div class="prob-bars">
+                                <div class="prob-item">
+                                    <div class="prob-meta">
+                                        <span>Enojo (Anger)</span>
+                                        <span id="prob-enojo-val">80%</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div class="progress-fill enojo-fill" id="prob-enojo-bar"></div>
+                                    </div>
+                                </div>
+                                <div class="prob-item">
+                                    <div class="prob-meta">
+                                        <span>Tristeza (Sadness)</span>
+                                        <span id="prob-tristeza-val">20%</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div class="progress-fill tristeza-fill" id="prob-tristeza-bar"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Acoustic Metrics Grid -->
+                            <div class="metrics-grid">
+                                <div class="metric-card">
+                                    <i class="fa-solid fa-clock"></i>
+                                    <span class="metric-val" id="metric-duration">3.4s</span>
+                                    <span class="metric-lbl">Duración</span>
+                                </div>
+                                <div class="metric-card">
+                                    <i class="fa-solid fa-wave-square"></i>
+                                    <span class="metric-val" id="metric-pitch">225 Hz</span>
+                                    <span class="metric-lbl">Pitch Promedio</span>
+                                </div>
+                                <div class="metric-card">
+                                    <i class="fa-solid fa-volume-high"></i>
+                                    <span class="metric-val" id="metric-energy">-24 dB</span>
+                                    <span class="metric-lbl">Energía (RMS)</span>
+                                </div>
+                                <div class="metric-card">
+                                    <i class="fa-solid fa-arrows-left-right"></i>
+                                    <span class="metric-val" id="metric-zcr">0.05</span>
+                                    <span class="metric-lbl">Cruces por Cero (ZCR)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Loader overlay -->
+                        <div class="loader-overlay" id="loader" style="display: none;">
+                            <div class="spinner"></div>
+                            <p>Procesando audio y extrayendo embeddings de wav2vec2...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: Dataset Explorer -->
+            <section id="dataset-explorer" class="tab-pane">
+                <div class="card glass-card">
+                    <div class="card-header flex-header">
+                        <div>
+                            <h2>Dataset de Experimentos (Top-26)</h2>
+                            <p>Explora y reproduce los 26 audios mejor calificados (13 Enojo, 13 Tristeza) de los 4 recolectores originales. Evalúa el clasificador directamente en ellos.</p>
+                        </div>
+                        <div class="filter-controls">
+                            <button class="btn btn-sm btn-filter active" data-filter="all">Todos</button>
+                            <button class="btn btn-sm btn-filter" data-filter="Enojo">Enojo</button>
+                            <button class="btn btn-sm btn-filter" data-filter="Tristeza">Tristeza</button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="dataset-table">
+                            <thead>
+                                <tr>
+                                    <th>Archivo</th>
+                                    <th>Recolector</th>
+                                    <th>Clase Original</th>
+                                    <th>Score de Filtrado</th>
+                                    <th>Reproducir</th>
+                                    <th style="text-align: right;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataset-tbody">
+                                <!-- Loaded dynamically via JS -->
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 3rem;">
+                                        <div class="spinner" style="margin: 0 auto 1rem;"></div>
+                                        Cargando base de datos de audios...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: Analytics & Figures -->
+            <section id="analytics" class="tab-pane">
+                <div class="analytics-grid">
+                    <!-- Figure 1: Comparison -->
+                    <div class="card glass-card img-card">
+                        <div class="card-header">
+                            <h2>1. Comparativa de Modelos</h2>
+                            <p>Resultados finales con CV (Leave-One-Out). Muestra el rendimiento de features manuales vs. wav2vec2.</p>
+                        </div>
+                        <div class="figure-wrapper">
+                            <img src="/outputs/figuras/comparativa_features_vs_wav2vec2.png" alt="Comparativa de Modelos" class="figura-img">
+                        </div>
+                        <div class="card-footer">
+                            <p><strong>Observación:</strong> SVM lineal y Regresión Logística con wav2vec2 superan consistentemente a los features clásicos, logrando hasta un <strong>92.31%</strong> frente a <strong>84.62%</strong>.</p>
+                        </div>
+                    </div>
+
+                    <!-- Figure 2: Confusion matrix -->
+                    <div class="card glass-card img-card">
+                        <div class="card-header">
+                            <h2>2. Desempeño y Matriz de Confusión</h2>
+                            <p>Matriz de confusión detallada para el mejor modelo (wav2vec2 + SVM Lineal) y balanced accuracy por clasificador.</p>
+                        </div>
+                        <div class="figure-wrapper">
+                            <img src="/outputs/figuras/resultados_v2.png" alt="Matriz de Confusión" class="figura-img">
+                        </div>
+                        <div class="card-footer">
+                            <p><strong>Observación:</strong> Con la combinación óptima, solo 2 de 26 muestras son clasificadas erróneamente (1 por clase), validando la estabilidad de la firma prosódica.</p>
+                        </div>
+                    </div>
+
+                    <!-- Figure 3: Separability -->
+                    <div class="card glass-card img-card">
+                        <div class="card-header">
+                            <h2>3. Separabilidad en 2D (PCA vs. t-SNE)</h2>
+                            <p>Proyección bidimensional de los embeddings de 768 dimensiones extraídos de wav2vec2.</p>
+                        </div>
+                        <div class="figure-wrapper">
+                            <img src="/outputs/figuras/separabilidad_v2.png" alt="Separabilidad PCA y t-SNE" class="figura-img">
+                        </div>
+                        <div class="card-footer">
+                            <p><strong>Observación:</strong> Ambas clases se agrupan en clusters bien definidos y separados espacialmente, justificando la alta precisión lineal.</p>
+                        </div>
+                    </div>
+
+                    <!-- Figure 4: Filtering -->
+                    <div class="card glass-card img-card">
+                        <div class="card-header">
+                            <h2>4. Distribución de Calidad Acústica</h2>
+                            <p>Histograma de scores del dataset completo de 146 muestras originales que guió el filtrado inicial.</p>
+                        </div>
+                        <div class="figure-wrapper">
+                            <img src="/outputs/figuras/reporte_filtrado_v2.png" alt="Reporte de Filtrado" class="figura-img">
+                        </div>
+                        <div class="card-footer">
+                            <p><strong>Observación:</strong> La mayoría de los audios de Tristeza quedaron en la zona "borderline" debido a una energía vocal demasiado alta por parte de algunos recolectores.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
