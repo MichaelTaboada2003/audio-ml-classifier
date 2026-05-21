@@ -252,7 +252,7 @@ def imprimir_reporte(df):
     print('\nAudios disponibles por clase (ordenados por su score correspondiente):')
     print('  (Se muestra cuantos audios de cada clase tienen score > umbral)\n')
 
-    umbrales = [0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60]
+    umbrales = [0.30, 0.346, 0.40, 0.45, 0.50, 0.55, 0.60]
     score_map = {
         'Enojo':        'score_enojo',
         'Tristeza':     'score_tristeza',
@@ -290,10 +290,10 @@ def imprimir_reporte(df):
 
     # --- Detalle final: cuantos audios "buenos" por clase ---
     print('\n' + '-' * 72)
-    print('AUDIOS UTILES POR CLASE (score de su emocion > 0.40):')
+    print('AUDIOS UTILES POR CLASE (score de su emocion > 0.346):')
     print('-' * 72)
     for clase, score_col in score_map.items():
-        buenos = df[(df['clase_original'] == clase) & (df[score_col] > 0.40)]
+        buenos = df[(df['clase_original'] == clase) & (df[score_col] > 0.346)]
         total = len(df[df['clase_original'] == clase])
         print('  {:<15} {}/{} audios utiles'.format(clase, len(buenos), total))
         if len(buenos) > 0:
@@ -308,8 +308,8 @@ def imprimir_reporte(df):
     print('=' * 72)
     for clase, score_col in score_map.items():
         sub = df[df['clase_original'] == clase].sort_values(score_col, ascending=False)
-        n_pasan = (sub[score_col] > 0.35).sum()
-        print('\n--- {} ({} audios, {} pasan umbral 0.35) ---'.format(
+        n_pasan = (sub[score_col] > 0.346).sum()
+        print('\n--- {} ({} audios, {} pasan umbral 0.346) ---'.format(
             clase.upper(), len(sub), n_pasan))
         print('{:<4} {:<28} {:>6} {:>8}  {}'.format(
             '#', 'Archivo', 'Recol', 'Score', 'Estado'))
@@ -318,7 +318,7 @@ def imprimir_reporte(df):
             score_val = r[score_col]
             if score_val > 0.45:
                 estado = 'EXCELENTE'
-            elif score_val > 0.35:
+            elif score_val > 0.346:
                 estado = 'PASA'
             elif score_val > 0.30:
                 estado = 'borderline'
@@ -342,7 +342,7 @@ def imprimir_reporte(df):
             score_val = r[score_col]
             if score_val > 0.45:
                 estado = 'EXCELENTE'
-            elif score_val > 0.35:
+            elif score_val > 0.346:
                 estado = 'PASA'
             elif score_val > 0.30:
                 estado = 'borderline'
