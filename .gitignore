@@ -11,4 +11,4 @@ __pycache__/
 .DS_Store
 
 # Outputs regenerables
-outputs/figuras/
+# outputs/figuras/
