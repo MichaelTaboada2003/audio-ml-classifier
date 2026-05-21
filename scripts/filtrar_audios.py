@@ -39,7 +39,7 @@ DATA_DIR    = os.path.join(_ROOT, 'data', 'AUDIOS MACHINE LEARNING')
 REPORTE_CSV = os.path.join(_ROOT, 'outputs', 'reporte_filtrado_v2.csv')
 REPORTE_PNG = os.path.join(_ROOT, 'outputs', 'figuras', 'reporte_filtrado_v2.png')
 
-CLASES = ['Aburrido', 'Enojo', 'Tranquilidad', 'Tristeza']
+CLASES = ['Aburrido', 'Enojo', 'Feliz', 'Tranquilidad', 'Tristeza']
 EXTS   = {'.ogg', '.mp3', '.mp4', '.mpeg', '.wav', '.flac', '.m4a'}
 SR     = 22050
 
@@ -137,14 +137,47 @@ def score_tristeza(m):
     Firma de tristeza: energia baja, pitch bajo y monotono,
     fraccion alta de silencio, ritmo lento, brillo bajo.
     """
-    s_energia_baja = _norm(-m['energy_level_db'],    22.0,  40.0)
-    s_pitch_bajo   = _norm(-m['pitch_mean_st'],      -5.0,  10.0)
-    s_monotonia    = _norm(-m['pitch_std_st'],       -5.0,  -1.5)
-    s_silencios    = _norm(m['frac_silencio'],         0.10,  0.45)
-    s_lentitud     = _norm(-m['onset_rate'],         -3.0,  -1.0)
-    s_brillo_bajo  = _norm(-m['centroid_hz'],     -3000.0, -1200.0)
-    return (0.20 * s_energia_baja + 0.15 * s_pitch_bajo + 0.20 * s_monotonia +
-            0.15 * s_silencios + 0.15 * s_lentitud + 0.15 * s_brillo_bajo)
+    s_energia_baja = 1.0 - _norm(m['energy_level_db'], -38.0, -24.0)
+    s_pitch_bajo = 1.0 - _norm(m['pitch_mean_st'], 2.0, 10.0)
+    s_monotonia = 1.0 - _norm(m['pitch_std_st'], 1.2, 3.5)
+    s_silencios = _norm(m['frac_silencio'], 0.12, 0.45)
+    s_lentitud = 1.0 - _norm(m['onset_rate'], 1.0, 3.0)
+    s_brillo_bajo = 1.0 - _norm(m['centroid_hz'], 1200.0, 2600.0)
+    
+    return (0.22 * s_energia_baja + 0.13 * s_pitch_bajo + 0.22 * s_monotonia +
+            0.13 * s_silencios + 0.15 * s_lentitud + 0.15 * s_brillo_bajo)
+
+
+def score_aburrido(m):
+    """
+    Firma de aburrimiento: habla extremadamente monotona (pitch_std muy bajo),
+    ritmo muy lento (onset_rate bajo), energia media-baja estable,
+    baja variabilidad dinamica y brillo espectral moderadamente bajo.
+    """
+    s_energia_med_baja = 1.0 - min(abs(m['energy_level_db'] - (-32.0)) / 10.0, 1.0) # Pico en -32 dB
+    s_pitch_bajo = 1.0 - _norm(m['pitch_mean_st'], 0.0, 8.0)
+    s_super_monotono = 1.0 - _norm(m['pitch_std_st'], 0.8, 2.2) # Muy exigente con la monotonia
+    s_lentitud = 1.0 - _norm(m['onset_rate'], 0.8, 2.2)
+    s_dinamica_plana = 1.0 - _norm(m['dynamic_range_db'], 18.0, 32.0)
+    s_brillo_moderado = 1.0 - _norm(m['centroid_hz'], 1100.0, 2200.0)
+    
+    return (0.15 * s_energia_med_baja + 0.10 * s_pitch_bajo + 0.30 * s_super_monotono +
+            0.20 * s_lentitud + 0.15 * s_dinamica_plana + 0.10 * s_brillo_moderado)
+
+
+def score_feliz(m):
+    """
+    Firma de felicidad: energia alta, pitch medio-alto y muy variable (entonacion musical),
+    brillo espectral alto (voz sonriente) y dinamica activa.
+    """
+    s_energia = _norm(m['energy_level_db'], -38.0, -22.0)
+    s_pitch_alto = _norm(m['pitch_mean_st'], 6.0, 20.0)
+    s_pitch_variabilidad = _norm(m['pitch_std_st'], 2.5, 7.5) # Muy variable
+    s_brillo = _norm(m['centroid_hz'], 1400.0, 3200.0)
+    s_dinamica = _norm(m['dynamic_range_db'], 22.0, 45.0)
+    
+    return (0.20 * s_energia + 0.25 * s_pitch_alto + 0.25 * s_pitch_variabilidad +
+            0.15 * s_brillo + 0.15 * s_dinamica)
 
 
 def score_tranquilidad(m):
@@ -219,6 +252,8 @@ def analizar_dataset(data_dir):
             'score_enojo':        score_enojo(m),
             'score_tristeza':     score_tristeza(m),
             'score_tranquilidad': score_tranquilidad(m),
+            'score_aburrido':     score_aburrido(m),
+            'score_feliz':        score_feliz(m),
             'score_neutro':       score_neutro(m),
         })
         filas.append(m)
@@ -236,7 +271,7 @@ def imprimir_reporte(df):
     print(df['clase_original'].value_counts().to_string())
 
     print('\nMedia de score por clase original:')
-    cols_score = ['score_enojo', 'score_tristeza', 'score_tranquilidad', 'score_neutro']
+    cols_score = ['score_enojo', 'score_tristeza', 'score_tranquilidad', 'score_aburrido', 'score_feliz', 'score_neutro']
     print(df.groupby('clase_original')[cols_score].mean().round(3).to_string())
 
     # Top-5 por cada score
@@ -257,6 +292,8 @@ def imprimir_reporte(df):
         'Enojo':        'score_enojo',
         'Tristeza':     'score_tristeza',
         'Tranquilidad': 'score_tranquilidad',
+        'Aburrido':     'score_aburrido',
+        'Feliz':        'score_feliz',
     }
 
     print('{:<15} {:>8}  '.format('Clase', 'Total') +
@@ -285,8 +322,8 @@ def imprimir_reporte(df):
         for clase, score_col in score_map.items():
             sub = df[df['clase_original'] == clase].sort_values(score_col, ascending=False)
             scores_min[clase] = sub.iloc[n-1][score_col] if n <= len(sub) else 0
-        print('  Top-{}: Enojo>={:.3f}  Tristeza>={:.3f}  Tranquilidad>={:.3f}'.format(
-            n, scores_min['Enojo'], scores_min['Tristeza'], scores_min['Tranquilidad']))
+        score_str = "  ".join(f"{clase}>={scores_min[clase]:.3f}" for clase in score_map.keys())
+        print(f"  Top-{n}: {score_str}")
 
     # --- Detalle final: cuantos audios "buenos" por clase ---
     print('\n' + '-' * 72)
@@ -354,29 +391,30 @@ def imprimir_reporte(df):
 
 
 def graficar_reporte(df, output_path):
-    cols_score = ['score_enojo', 'score_tristeza', 'score_tranquilidad', 'score_neutro']
+    cols_score = ['score_enojo', 'score_tristeza', 'score_tranquilidad', 'score_aburrido', 'score_feliz', 'score_neutro']
     colores = {
         'Aburrido':     '#4C72B0',
         'Enojo':        '#DD8452',
         'Tranquilidad': '#55A868',
         'Tristeza':     '#C44E52',
+        'Feliz':        '#E377C2',
     }
 
-    fig, axes = plt.subplots(2, 2, figsize=(14, 9))
+    fig, axes = plt.subplots(3, 2, figsize=(14, 12))
     for ax, score in zip(axes.ravel(), cols_score):
         for clase in CLASES:
             sub = df[df['clase_original'] == clase][score].values
             if len(sub) == 0:
                 continue
             ax.hist(sub, bins=15, alpha=0.55, label='{} (n={})'.format(clase, len(sub)),
-                    color=colores[clase], edgecolor='white')
+                    color=colores.get(clase, '#7F7F7F'), edgecolor='white')
         ax.set_xlabel(score)
         ax.set_ylabel('# audios')
         ax.set_title('Distribucion de {}'.format(score))
         ax.legend(fontsize=9)
         ax.spines[['top', 'right']].set_visible(False)
 
-    fig.suptitle('Scores acusticos por clase original (sin reasignar)', fontsize=13)
+    fig.suptitle('Scores acústicos por clase original (sin reasignar)', fontsize=14)
     plt.tight_layout()
     plt.savefig(output_path, dpi=120, bbox_inches='tight')
     print('\nGrafico guardado: {}'.format(output_path))
