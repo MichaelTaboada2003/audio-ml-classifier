@@ -254,97 +254,266 @@
 
             <section id="decisions" class="tab-pane">
                 <div class="decisions-stack">
-                    <div class="card glass-card">
+
+                    <!-- FASE 1: Definicion del Problema -->
+                    <div class="card glass-card decision-phase-card" data-phase="1">
+                        <div class="decision-context-grid">
+                            <div class="decision-context-card">
+                                <span class="decision-problem-kicker">Stakeholder</span>
+                                <h3 id="dec-stakeholder">Coordinador de Operaciones</h3>
+                                <p id="dec-context">Call center que evalúa desplegar un detector acústico de enojo para escalar llamadas críticas a un supervisor senior antes de que el cliente cuelgue molesto.</p>
+                            </div>
+                            <div class="decision-context-card">
+                                <span class="decision-problem-kicker">Decisión a tomar</span>
+                                <h3>GO / NO-GO + configuración óptima</h3>
+                                <p id="dec-decision">¿Conviene desplegar el detector? Y si sí: ¿con escenario de 2 ó 3 emociones, qué modelo y qué umbral operativo?</p>
+                            </div>
+                            <div class="decision-context-card">
+                                <span class="decision-problem-kicker">Métrica de decisión</span>
+                                <h3>Valor neto mensual esperado (USD)</h3>
+                                <p>VPN mensual = volumen × [P(TP)·valor_TP − P(FP)·costo_FP − P(FN)·costo_FN − costo_inferencia] − costos_fijos.</p>
+                            </div>
+                        </div>
+
+                        <div class="cost-matrix-block">
+                            <div class="cost-matrix-header">
+                                <h3>Matriz de costos y beneficios por llamada</h3>
+                                <p>Edita los valores según tu organización. Todos los cálculos se actualizan en vivo.</p>
+                            </div>
+                            <div class="cost-matrix-grid">
+                                <div class="cost-cell cost-tp">
+                                    <div class="cost-label">TP · Escalamiento acertado</div>
+                                    <div class="cost-desc">El supervisor atiende a tiempo y se evita el churn.</div>
+                                    <div class="cost-input">
+                                        <span class="cost-prefix">+ USD</span>
+                                        <input type="number" id="cost-tp" step="1" min="0" value="25">
+                                    </div>
+                                </div>
+                                <div class="cost-cell cost-fp">
+                                    <div class="cost-label">FP · Falsa alarma</div>
+                                    <div class="cost-desc">Se escala una llamada que no era de enojo (tiempo de supervisor).</div>
+                                    <div class="cost-input">
+                                        <span class="cost-prefix">− USD</span>
+                                        <input type="number" id="cost-fp" step="0.5" min="0" value="4">
+                                    </div>
+                                </div>
+                                <div class="cost-cell cost-fn">
+                                    <div class="cost-label">FN · Enojo no detectado</div>
+                                    <div class="cost-desc">Cliente furioso sin escalación: riesgo de queja/churn.</div>
+                                    <div class="cost-input">
+                                        <span class="cost-prefix">− USD</span>
+                                        <input type="number" id="cost-fn" step="1" min="0" value="80">
+                                    </div>
+                                </div>
+                                <div class="cost-cell cost-tn">
+                                    <div class="cost-label">TN · No-escalación correcta</div>
+                                    <div class="cost-desc">Llamada normal, sin intervención. Costo neutro.</div>
+                                    <div class="cost-input">
+                                        <span class="cost-prefix">USD</span>
+                                        <input type="number" id="cost-tn" step="0.5" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cost-ratio-pill">
+                                <span>Ratio costo FN / FP:</span>
+                                <strong id="cost-ratio">20.0x</strong>
+                                <em id="cost-ratio-hint">Errar omitiendo enojo es 20× más caro que escalar de más → favorece umbrales bajos.</em>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FASE 2: Datos para Decidir -->
+                    <div class="card glass-card decision-phase-card" data-phase="2">
                         <div class="card-header">
-                            <h2>Problema de Decisión</h2>
-                            <p>Elegir la configuración de reconocimiento emocional más conveniente según el objetivo del sistema, el riesgo aceptable y la cobertura emocional deseada.</p>
+                            <h2>Datos para Decidir</h2>
+                            <p>Cómo se ve la evidencia que respalda la decisión, escenario por escenario.</p>
                         </div>
-                        <div class="decision-problem-grid">
-                            <div class="decision-problem-card">
-                                <span class="decision-problem-kicker">Pregunta central</span>
-                                <h3>¿Conviene desplegar un sistema más confiable de 2 emociones o uno más completo de 3 emociones?</h3>
-                                <p>La decisión no depende solo de la precisión total: también importa el costo del error, la dificultad de cada clase y la cobertura del problema real.</p>
+                        <div class="evidence-grid" id="evidence-grid"></div>
+                    </div>
+
+                    <!-- FASE 3: Simulador Interactivo -->
+                    <div class="card glass-card decision-phase-card" data-phase="3">
+                        <div class="card-header">
+                            <h2>Simulador de Despliegue</h2>
+                            <p>Configura el escenario, el modelo y los parámetros operativos. La matriz de confusión y el VPN se recalculan en vivo.</p>
+                        </div>
+
+                        <div class="sim-controls-grid">
+                            <div class="sim-control-block">
+                                <label class="sim-control-label">Escenario</label>
+                                <div class="sim-segmented" id="sim-scenario-toggle">
+                                    <button type="button" class="sim-seg-btn active" data-scenario="3clases">3 emociones</button>
+                                    <button type="button" class="sim-seg-btn" data-scenario="2clases">2 emociones</button>
+                                </div>
                             </div>
-                            <div class="decision-problem-card">
-                                <span class="decision-problem-kicker">Criterios usados</span>
-                                <ul class="decision-list">
-                                    <li>Balanced Accuracy del mejor modelo</li>
-                                    <li>Cobertura emocional del escenario</li>
-                                    <li>Robustez frente a clases más difíciles</li>
-                                    <li>Sensibilidad al costo de fallar en Tristeza</li>
-                                </ul>
+                            <div class="sim-control-block">
+                                <label class="sim-control-label">Modelo clasificador</label>
+                                <div class="sim-dropdown" id="sim-model-dropdown" data-value="">
+                                    <button class="sim-dropdown-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                                        <span class="sim-dropdown-current">
+                                            <span class="sim-dropdown-current-label">Seleccionar modelo</span>
+                                            <span class="sim-dropdown-current-meta"></span>
+                                        </span>
+                                        <i class="fa-solid fa-chevron-down sim-dropdown-chevron"></i>
+                                    </button>
+                                    <ul class="sim-dropdown-menu" role="listbox"></ul>
+                                </div>
+                            </div>
+                            <div class="sim-control-block sim-slider-block">
+                                <label class="sim-control-label">
+                                    Umbral de decisión P(Enojo) ≥
+                                    <span class="sim-value" id="sim-threshold-value">0.50</span>
+                                </label>
+                                <input type="range" min="0.05" max="0.95" step="0.01" value="0.50" id="sim-threshold" class="sim-slider">
+                                <div class="sim-slider-scale">
+                                    <span>permisivo</span>
+                                    <span>balanceado</span>
+                                    <span>estricto</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sim-controls-grid">
+                            <div class="sim-control-block sim-slider-block">
+                                <label class="sim-control-label">
+                                    Volumen mensual de llamadas
+                                    <span class="sim-value" id="sim-volume-value">10 000</span>
+                                </label>
+                                <input type="range" min="1000" max="50000" step="500" value="10000" id="sim-volume" class="sim-slider">
+                            </div>
+                            <div class="sim-control-block sim-slider-block">
+                                <label class="sim-control-label">
+                                    Prevalencia esperada de Enojo
+                                    <span class="sim-value" id="sim-prevalence-value">18%</span>
+                                </label>
+                                <input type="range" min="0.05" max="0.40" step="0.01" value="0.18" id="sim-prevalence" class="sim-slider">
+                            </div>
+                            <div class="sim-control-block sim-slider-block">
+                                <label class="sim-control-label">
+                                    Costo de inferencia por llamada
+                                    <span class="sim-value" id="sim-inference-value">USD 0.02</span>
+                                </label>
+                                <input type="range" min="0" max="0.10" step="0.005" value="0.02" id="sim-inference" class="sim-slider">
+                            </div>
+                        </div>
+
+                        <div class="sim-outputs-grid">
+                            <!-- Matriz de confusion en vivo -->
+                            <div class="sim-output-card">
+                                <h3>Matriz de confusión @ umbral activo</h3>
+                                <p class="sim-output-subtitle">Recalculada desde las probabilidades LOO usando tu umbral.</p>
+                                <div class="confusion-matrix" id="confusion-matrix"></div>
+                                <div class="confusion-stats" id="confusion-stats"></div>
+                            </div>
+
+                            <!-- Curva ROC con punto de operacion -->
+                            <div class="sim-output-card">
+                                <h3>Curva ROC + punto óptimo</h3>
+                                <p class="sim-output-subtitle">Verde = umbral actual · Estrella = umbral óptimo en costo.</p>
+                                <svg id="roc-curve" viewBox="0 0 320 240" class="roc-svg"></svg>
+                                <div class="roc-legend">
+                                    <span><i class="dot dot-active"></i> Operación actual</span>
+                                    <span><i class="dot dot-optimal"></i> Óptimo en costo</span>
+                                </div>
+                            </div>
+
+                            <!-- VPN mensual -->
+                            <div class="sim-output-card vpn-card">
+                                <h3>Valor Presente Neto mensual</h3>
+                                <p class="sim-output-subtitle">Suma de beneficios y costos esperados al mes.</p>
+                                <div class="vpn-display" id="vpn-display">
+                                    <span class="vpn-label">VPN esperado</span>
+                                    <span class="vpn-value" id="vpn-value">USD 0</span>
+                                    <span class="vpn-vs-baseline" id="vpn-vs-baseline">vs. no desplegar</span>
+                                </div>
+                                <div class="vpn-breakdown" id="vpn-breakdown"></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card glass-card">
-                        <div class="card-header flex-header">
-                            <div>
-                                <h2>Comparador de Escenarios</h2>
-                                <p>Contrasta las alternativas disponibles antes de recomendar una decisión final.</p>
+                    <!-- FASE 4: Analisis de Decisiones -->
+                    <div class="card glass-card decision-phase-card" data-phase="4">
+                        <div class="card-header">
+                            <h2>Análisis de Decisiones</h2>
+                            <p>Sensibilidad, incertidumbre y break-even para llegar a una recomendación robusta.</p>
+                        </div>
+
+                        <div class="analysis-grid">
+                            <!-- Tornado de sensibilidad -->
+                            <div class="analysis-block">
+                                <div class="analysis-block-header">
+                                    <h3>Análisis de sensibilidad (Tornado)</h3>
+                                    <p>Impacto en el VPN al variar cada parámetro ±30% manteniendo los demás fijos. La barra más larga = el parámetro más crítico.</p>
+                                </div>
+                                <div id="tornado-chart" class="tornado-chart"></div>
                             </div>
-                            <div class="decision-mode-toggle" id="decision-mode-toggle">
-                                <button class="decision-mode-btn active" type="button" data-mode="conservative">Máxima confiabilidad</button>
-                                <button class="decision-mode-btn" type="button" data-mode="balanced">Balanceado</button>
-                                <button class="decision-mode-btn" type="button" data-mode="coverage">Mayor cobertura</button>
+
+                            <!-- Monte Carlo -->
+                            <div class="analysis-block">
+                                <div class="analysis-block-header">
+                                    <h3>Simulación Monte Carlo</h3>
+                                    <p>2 000 escenarios con incertidumbre en costos, volumen y prevalencia. Permite estimar la probabilidad de VPN positivo.</p>
+                                </div>
+                                <svg id="montecarlo-hist" viewBox="0 0 360 200" class="mc-svg"></svg>
+                                <div class="mc-stats" id="mc-stats"></div>
+                            </div>
+
+                            <!-- Break-even -->
+                            <div class="analysis-block analysis-block-wide">
+                                <div class="analysis-block-header">
+                                    <h3>Comparativa de escenarios y break-even</h3>
+                                    <p>VPN óptimo de cada combinación (escenario × modelo), umbral óptimo y prevalencia mínima para que el sistema sea rentable.</p>
+                                </div>
+                                <div class="table-wrapper">
+                                    <table class="breakeven-table" id="breakeven-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Escenario</th>
+                                                <th>Modelo</th>
+                                                <th>Umbral óptimo</th>
+                                                <th>BalAcc</th>
+                                                <th>VPN óptimo (USD/mes)</th>
+                                                <th>Prevalencia break-even</th>
+                                                <th>Recomendación</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                        <div class="decision-scenario-grid" id="decision-scenario-grid"></div>
                     </div>
 
-                    <div class="card glass-card">
-                        <div class="card-header flex-header">
-                            <div>
-                                <h2>Análisis de Sensibilidad</h2>
-                                <p>Ajusta cuánto te importa evitar errores en <strong>Tristeza</strong>. Esto cambia qué escenario resulta más conveniente.</p>
-                            </div>
-                            <div class="decision-weight-display">
-                                <span class="decision-weight-label">Peso actual</span>
-                                <span class="decision-weight-value" id="sadness-weight-value">1.0x</span>
-                            </div>
-                        </div>
-                        <div class="decision-slider-block">
-                            <input type="range" min="1" max="3" step="0.25" value="1" id="sadness-weight-slider" class="decision-slider">
-                            <div class="decision-slider-scale">
-                                <span>1.0x Bajo</span>
-                                <span>2.0x Medio</span>
-                                <span>3.0x Alto</span>
-                            </div>
-                        </div>
-                        <div class="decision-sensitivity-grid">
-                            <div class="decision-sensitivity-card">
-                                <span class="decision-problem-kicker">Interpretación</span>
-                                <p id="sensitivity-interpretation">Con peso bajo, priorizamos rendimiento global y simplicidad operativa.</p>
-                            </div>
-                            <div class="decision-sensitivity-card">
-                                <span class="decision-problem-kicker">Impacto esperado</span>
-                                <p id="sensitivity-impact">El escenario de 2 emociones mantiene ventaja cuando la prioridad principal es reducir incertidumbre y desplegar rápido.</p>
-                            </div>
-                        </div>
-                    </div>
-
+                    <!-- Recomendacion Final -->
                     <div class="card glass-card decision-recommendation-card">
                         <div class="card-header">
-                            <h2>Recomendación Final</h2>
-                            <p>Conclusión ejecutiva basada en el objetivo actual y la sensibilidad elegida.</p>
+                            <h2 id="final-rec-title">Recomendación Final</h2>
+                            <p id="final-rec-subtitle">Basada en costos, datos y sensibilidad actuales.</p>
                         </div>
-                        <div class="decision-recommendation-main">
-                            <div class="decision-badge" id="decision-badge">Escenario recomendado</div>
-                            <h3 id="decision-title">-</h3>
-                            <p id="decision-summary">-</p>
-                        </div>
-                        <div class="decision-reason-grid">
-                            <div class="decision-reason-card">
+                        <div class="final-rec-grid">
+                            <div class="final-rec-main-card">
+                                <div class="final-rec-badge" id="final-rec-badge">GO</div>
+                                <div class="final-rec-vpn">
+                                    <span class="final-rec-vpn-label">VPN esperado</span>
+                                    <span class="final-rec-vpn-value" id="final-rec-vpn">USD 0</span>
+                                </div>
+                                <p id="final-rec-summary">-</p>
+                            </div>
+                            <div class="final-rec-reason-card">
                                 <span class="decision-problem-kicker">Por qué gana</span>
-                                <p id="decision-why">-</p>
+                                <p id="final-rec-why">-</p>
                             </div>
-                            <div class="decision-reason-card">
-                                <span class="decision-problem-kicker">Trade-off</span>
-                                <p id="decision-tradeoff">-</p>
+                            <div class="final-rec-reason-card">
+                                <span class="decision-problem-kicker">Riesgos / Trade-off</span>
+                                <p id="final-rec-tradeoff">-</p>
                             </div>
-                            <div class="decision-reason-card">
+                            <div class="final-rec-reason-card">
+                                <span class="decision-problem-kicker">Condiciones de la decisión</span>
+                                <p id="final-rec-conditions">-</p>
+                            </div>
+                            <div class="final-rec-reason-card">
                                 <span class="decision-problem-kicker">Siguiente acción</span>
-                                <p id="decision-next-step">-</p>
+                                <p id="final-rec-next">-</p>
                             </div>
                         </div>
                     </div>
@@ -474,7 +643,8 @@
             activeClasses: {{ active_classes | tojson }},
             classStyles: {{ class_styles | tojson }},
             topNDataset: {{ top_n_dataset | tojson }},
-            experimentHistory: {{ experiment_history | tojson }}
+            experimentHistory: {{ experiment_history | tojson }},
+            decisionsData: {{ decisions_data | tojson }}
         };
     </script>
 

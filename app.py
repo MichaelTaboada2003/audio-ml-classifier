@@ -20,6 +20,7 @@ CACHE = os.path.join("outputs", "embeddings_v2.npz")
 REPORTE = os.path.join("outputs", "reporte_filtrado_v2.csv")
 MODEL_METRICS_PATH = os.path.join("outputs", "model_metrics.json")
 EXPERIMENT_HISTORY_PATH = os.path.join("outputs", "experiment_history.json")
+DECISIONS_DATA_PATH = os.path.join("outputs", "decisions_data.json")
 
 # Device configuration
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -79,6 +80,13 @@ def load_experiment_history():
     with open(EXPERIMENT_HISTORY_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
+
+def load_decisions_data():
+    if not os.path.exists(DECISIONS_DATA_PATH):
+        return None
+    with open(DECISIONS_DATA_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
+
 def init_models():
     global loaded_models, processor, wav2vec2_model
     
@@ -106,6 +114,7 @@ def init_models():
 def index():
     metrics = load_model_metrics()
     experiment_history = load_experiment_history()
+    decisions_data = load_decisions_data()
     model_metrics = metrics.get("models", {})
     best_model_key = metrics.get("best_model", "svm_lineal")
     best_model_label = MODEL_MAPPING.get(best_model_key, best_model_key)
@@ -122,7 +131,16 @@ def index():
         best_model_label=best_model_label,
         best_bal_acc=best_bal_acc,
         experiment_history=experiment_history,
+        decisions_data=decisions_data,
     )
+
+
+@app.route("/api/decision/data", methods=["GET"])
+def get_decision_data():
+    data = load_decisions_data()
+    if data is None:
+        return jsonify({"error": "decisions_data.json not found. Run scripts/generar_datos_decisiones.py"}), 404
+    return jsonify(data)
 
 @app.route("/data/audio/<clase>/<filename>")
 def serve_audio(clase, filename):
