@@ -1065,7 +1065,7 @@ function startRecording() {
             recordingStatus.style.visibility = 'visible';
             waveformAnim.style.visibility = 'visible';
             recordInstruction.textContent = 'Haz clic para detener';
-            
+
             // Timer logic
             recordDuration = 0;
             recordTimer.textContent = '00:00';
@@ -1074,24 +1074,51 @@ function startRecording() {
                 const mins = String(Math.floor(recordDuration / 60)).padStart(2, '0');
                 const secs = String(recordDuration % 60).padStart(2, '0');
                 recordTimer.textContent = `${mins}:${secs}`;
-                
+
                 // Limit recording to 10 seconds
                 if (recordDuration >= 10) {
                     stopRecording();
                 }
             }, 1000);
 
-            mediaRecorder = new MediaRecorder(stream);
+            // Escoge un MIME soportado por el navegador (Chrome/Firefox graban WebM,
+            // Safari graba MP4). El default suele ser WebM/Opus, que el backend no
+            // puede decodificar sin ffmpeg — por eso convertimos a WAV antes de enviar.
+            const mimeCandidates = [
+                'audio/webm;codecs=opus',
+                'audio/webm',
+                'audio/ogg;codecs=opus',
+                'audio/mp4'
+            ];
+            let pickedMime = '';
+            if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported) {
+                for (const c of mimeCandidates) {
+                    if (MediaRecorder.isTypeSupported(c)) { pickedMime = c; break; }
+                }
+            }
+            try {
+                mediaRecorder = pickedMime ? new MediaRecorder(stream, { mimeType: pickedMime }) : new MediaRecorder(stream);
+            } catch (e) {
+                showToast(`No se pudo iniciar la grabación: ${e.message}`, { type: 'error' });
+                stream.getTracks().forEach(t => t.stop());
+                stopRecording();
+                return;
+            }
+            const recordedMime = mediaRecorder.mimeType || pickedMime || 'audio/webm';
+
             mediaRecorder.addEventListener('dataavailable', event => {
-                audioChunks.push(event.data);
+                if (event.data && event.data.size > 0) audioChunks.push(event.data);
             });
 
             mediaRecorder.addEventListener('stop', () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                sendBlob(audioBlob);
-                
-                // Stop microphone stream tracks
+                const rawBlob = new Blob(audioChunks, { type: recordedMime });
                 stream.getTracks().forEach(track => track.stop());
+                convertBlobToWav(rawBlob)
+                    .then(wavBlob => sendBlob(wavBlob))
+                    .catch(err => {
+                        showLoader(false);
+                        showToast(`No se pudo procesar la grabación: ${err.message}`, { type: 'error' });
+                    });
             });
 
             mediaRecorder.start();
@@ -1099,6 +1126,73 @@ function startRecording() {
         .catch(err => {
             showToast(`Permiso de micrófono denegado o no disponible. ${err.message || ''}`.trim(), { type: 'error' });
         });
+}
+
+// Decodifica el blob grabado (WebM/Opus, OGG, MP4...) y lo re-encodea como WAV
+// PCM 16-bit mono a 16 kHz para que el backend pueda leerlo con soundfile sin
+// depender de ffmpeg.
+async function convertBlobToWav(blob, targetSampleRate = 16000) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) throw new Error('AudioContext no disponible en este navegador');
+    const audioCtx = new AudioContextClass();
+    try {
+        const arrayBuffer = await blob.arrayBuffer();
+        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer.slice(0));
+
+        // Mezcla a mono promediando canales
+        const channelCount = audioBuffer.numberOfChannels;
+        const sourceLength = audioBuffer.length;
+        const mono = new Float32Array(sourceLength);
+        for (let ch = 0; ch < channelCount; ch++) {
+            const data = audioBuffer.getChannelData(ch);
+            for (let i = 0; i < sourceLength; i++) mono[i] += data[i] / channelCount;
+        }
+
+        // Resample con interpolación lineal si la tasa difiere de la objetivo
+        const sourceRate = audioBuffer.sampleRate;
+        let pcm = mono;
+        if (sourceRate !== targetSampleRate) {
+            const ratio = sourceRate / targetSampleRate;
+            const newLength = Math.floor(sourceLength / ratio);
+            pcm = new Float32Array(newLength);
+            for (let i = 0; i < newLength; i++) {
+                const idx = i * ratio;
+                const i0 = Math.floor(idx);
+                const i1 = Math.min(i0 + 1, sourceLength - 1);
+                const frac = idx - i0;
+                pcm[i] = mono[i0] * (1 - frac) + mono[i1] * frac;
+            }
+        }
+
+        // Cabecera WAV (RIFF/WAVE) + PCM 16-bit
+        const numFrames = pcm.length;
+        const dataLength = numFrames * 2;
+        const buffer = new ArrayBuffer(44 + dataLength);
+        const view = new DataView(buffer);
+        let offset = 0;
+        const writeStr = (s) => { for (let i = 0; i < s.length; i++) view.setUint8(offset++, s.charCodeAt(i)); };
+        writeStr('RIFF');
+        view.setUint32(offset, 36 + dataLength, true); offset += 4;
+        writeStr('WAVE');
+        writeStr('fmt ');
+        view.setUint32(offset, 16, true); offset += 4;            // PCM chunk size
+        view.setUint16(offset, 1, true); offset += 2;              // PCM format
+        view.setUint16(offset, 1, true); offset += 2;              // canales = mono
+        view.setUint32(offset, targetSampleRate, true); offset += 4;
+        view.setUint32(offset, targetSampleRate * 2, true); offset += 4; // byte rate
+        view.setUint16(offset, 2, true); offset += 2;              // block align
+        view.setUint16(offset, 16, true); offset += 2;             // bits por sample
+        writeStr('data');
+        view.setUint32(offset, dataLength, true); offset += 4;
+        for (let i = 0; i < numFrames; i++) {
+            const s = Math.max(-1, Math.min(1, pcm[i]));
+            view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+            offset += 2;
+        }
+        return new Blob([buffer], { type: 'audio/wav' });
+    } finally {
+        if (audioCtx.state !== 'closed') audioCtx.close().catch(() => {});
+    }
 }
 
 function stopRecording() {
