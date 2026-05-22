@@ -41,8 +41,10 @@ MODEL_MAPPING = {
     "rf": "Random Forest"
 }
 
-ACTIVE_CLASSES = ["Enojo", "Tristeza", "Feliz"]
-TOP_N_DATASET = 10
+from config import N_PER_CLASS, ACTIVE_CLASSES as _ACTIVE_CLASSES
+
+ACTIVE_CLASSES = _ACTIVE_CLASSES
+TOP_N_DATASET = N_PER_CLASS
 SCORE_COLUMNS = {
     "Enojo": "score_enojo",
     "Tristeza": "score_tristeza",

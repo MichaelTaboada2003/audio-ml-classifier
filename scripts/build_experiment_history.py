@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
@@ -11,8 +12,16 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
+# Importa configuración centralizada desde la raíz del proyecto
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import N_PER_CLASS, ACTIVE_CLASSES
+
 
 OUTPUT_PATH = os.path.join("outputs", "experiment_history.json")
+
+# ID dinámico del experimento actual según N_PER_CLASS
+CURRENT_3CL_ID = f"3clases_{N_PER_CLASS}x{N_PER_CLASS}x{N_PER_CLASS}"
+CURRENT_3CL_SUBTITLE = f"Enojo, Tristeza y Feliz · {N_PER_CLASS}x{N_PER_CLASS}x{N_PER_CLASS}"
 
 MODEL_SPECS = {
     "knn_k3": {
@@ -83,14 +92,14 @@ EXPERIMENTS = [
         ],
     },
     {
-        "id": "3clases_10x10x10",
+        "id": CURRENT_3CL_ID,
         "name": "3 emociones",
-        "subtitle": "Enojo, Tristeza y Feliz · 10x10x10",
+        "subtitle": CURRENT_3CL_SUBTITLE,
         "status": "actual",
-        "classes": ["Enojo", "Tristeza", "Feliz"],
+        "classes": ACTIVE_CLASSES,
         "cache_path": os.path.join("outputs", "embeddings_v2.npz"),
-        "dataset_size": 30,
-        "samples_per_class": 10,
+        "dataset_size": N_PER_CLASS * len(ACTIVE_CLASSES),
+        "samples_per_class": N_PER_CLASS,
         "cards": [
             {
                 "key": "comparison",
@@ -166,7 +175,7 @@ def evaluar_cache(cache_path):
 
 
 def build_history():
-    payload = {"default_experiment_id": "3clases_10x10x10", "experiments": []}
+    payload = {"default_experiment_id": CURRENT_3CL_ID, "experiments": []}
     for experiment in EXPERIMENTS:
         if not os.path.exists(experiment["cache_path"]):
             print(f"[WARN] No existe caché para {experiment['id']}: {experiment['cache_path']}")

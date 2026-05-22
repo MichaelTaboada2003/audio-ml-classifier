@@ -1,5 +1,5 @@
 {
-  "default_experiment_id": "3clases_10x10x10",
+  "default_experiment_id": "3clases_14x14x14",
   "experiments": [
     {
       "id": "2clases_10x10",
@@ -83,17 +83,17 @@
       }
     },
     {
-      "id": "3clases_10x10x10",
+      "id": "3clases_14x14x14",
       "name": "3 emociones",
-      "subtitle": "Enojo, Tristeza y Feliz · 10x10x10",
+      "subtitle": "Enojo, Tristeza y Feliz · 14x14x14",
       "status": "actual",
       "classes": [
         "Enojo",
         "Tristeza",
         "Feliz"
       ],
-      "dataset_size": 30,
-      "samples_per_class": 10,
+      "dataset_size": 42,
+      "samples_per_class": 14,
       "cards": [
         {
           "key": "comparison",
@@ -127,42 +127,42 @@
       "metrics": {
         "knn_k3": {
           "label": "KNN (k=3)",
-          "accuracy": 0.6333,
-          "balanced_accuracy": 0.6333
+          "accuracy": 0.5238,
+          "balanced_accuracy": 0.5238
         },
         "knn_k5": {
           "label": "KNN (k=5)",
-          "accuracy": 0.5667,
-          "balanced_accuracy": 0.5667
+          "accuracy": 0.5952,
+          "balanced_accuracy": 0.5952
         },
         "svm_lineal": {
           "label": "SVM lineal",
-          "accuracy": 0.7667,
-          "balanced_accuracy": 0.7667
+          "accuracy": 0.6905,
+          "balanced_accuracy": 0.6905
         },
         "svm_rbf": {
           "label": "SVM RBF",
-          "accuracy": 0.7,
-          "balanced_accuracy": 0.7
+          "accuracy": 0.6429,
+          "balanced_accuracy": 0.6429
         },
         "logreg": {
           "label": "Reg. Logística",
-          "accuracy": 0.7333,
-          "balanced_accuracy": 0.7333
+          "accuracy": 0.7381,
+          "balanced_accuracy": 0.7381
         },
         "rf": {
           "label": "Random Forest",
-          "accuracy": 0.7,
-          "balanced_accuracy": 0.7
+          "accuracy": 0.5952,
+          "balanced_accuracy": 0.5952
         }
       },
-      "best_model": "svm_lineal",
-      "best_balanced_accuracy": 0.7667,
+      "best_model": "logreg",
+      "best_balanced_accuracy": 0.7381,
       "chance_accuracy": 0.3333,
       "class_counts": {
-        "Enojo": 10,
-        "Feliz": 10,
-        "Tristeza": 10
+        "Enojo": 14,
+        "Feliz": 14,
+        "Tristeza": 14
       }
     }
   ]

@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import time
 
 import joblib
@@ -16,6 +17,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from transformers import Wav2Vec2Model, Wav2Vec2Processor
 
+# Importa configuración centralizada desde la raíz del proyecto
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import N_PER_CLASS, ACTIVE_CLASSES
+
 
 DATA_DIR = os.path.join("data", "AUDIOS MACHINE LEARNING")
 REPORTE = os.path.join("outputs", "reporte_filtrado_v2.csv")
@@ -23,13 +28,11 @@ CACHE = os.path.join("outputs", "embeddings_v2.npz")
 MODEL_DIR = os.path.join("outputs", "modelos")
 METRICS_PATH = os.path.join("outputs", "model_metrics.json")
 
-ACTIVE_CLASSES = ["Enojo", "Tristeza", "Feliz"]
 SCORE_COLUMNS = {
     "Enojo": "score_enojo",
     "Tristeza": "score_tristeza",
     "Feliz": "score_feliz",
 }
-N_PER_CLASS = 10
 TARGET_SR = 16000
 DURATION = 10.0
 DEVICE = "mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu"
