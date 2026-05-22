@@ -8,6 +8,51 @@ let datasetLoaded = false;
 let currentPlayingBtn = null;
 const globalAudio = new Audio();
 const appConfig = window.APP_CONFIG || { activeClasses: [], classStyles: {} };
+
+// =========================================================================
+// Sistema de notificaciones toast (reemplaza alert() nativos)
+// =========================================================================
+const TOAST_ICONS = {
+    error: 'fa-circle-exclamation',
+    success: 'fa-circle-check',
+    warning: 'fa-triangle-exclamation',
+    info: 'fa-circle-info'
+};
+const TOAST_TITLES = { error: 'Error', success: 'Listo', warning: 'Atención', info: 'Información' };
+
+function showToast(message, options = {}) {
+    const { type = 'info', title = null, duration = 5000 } = options;
+    const container = document.getElementById('toast-container');
+    if (!container) {
+        console[type === 'error' ? 'error' : 'log'](message);
+        return null;
+    }
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.style.setProperty('--toast-duration', `${duration}ms`);
+    const iconClass = TOAST_ICONS[type] || TOAST_ICONS.info;
+    const finalTitle = title !== null ? title : (TOAST_TITLES[type] || '');
+    toast.innerHTML = `
+        <div class="toast-icon"><i class="fa-solid ${iconClass}"></i></div>
+        <div class="toast-body">
+            ${finalTitle ? `<div class="toast-title">${finalTitle}</div>` : ''}
+            <div class="toast-message"></div>
+        </div>
+        <button class="toast-close" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+    `;
+    toast.querySelector('.toast-message').textContent = message;
+    container.appendChild(toast);
+
+    let timeoutId = null;
+    const remove = () => {
+        if (timeoutId) clearTimeout(timeoutId);
+        toast.classList.add('removing');
+        setTimeout(() => toast.remove(), 250);
+    };
+    toast.querySelector('.toast-close').addEventListener('click', remove);
+    if (duration > 0) timeoutId = setTimeout(remove, duration);
+    return remove;
+}
 const classStyles = appConfig.classStyles || {};
 const experimentHistory = appConfig.experimentHistory || { experiments: [], default_experiment_id: null };
 
@@ -962,7 +1007,7 @@ if (fileInput) {
 
 function handleFileUpload(file) {
     if (!file.type.startsWith('audio/')) {
-        alert('Por favor, selecciona un archivo de audio válido.');
+        showToast('Por favor, selecciona un archivo de audio válido (WAV, MP3, OGG, etc.).', { type: 'warning' });
         return;
     }
     
@@ -981,14 +1026,14 @@ function handleFileUpload(file) {
     .then(data => {
         showLoader(false);
         if (data.error) {
-            alert('Error: ' + data.error);
+            showToast(data.error, { type: 'error' });
         } else {
             displayResults(data);
         }
     })
     .catch(err => {
         showLoader(false);
-        alert('Ocurrió un error al procesar el audio: ' + err.message);
+        showToast(`No se pudo procesar el audio: ${err.message}`, { type: 'error' });
     });
 }
 
@@ -1007,7 +1052,7 @@ function toggleRecording() {
 
 function startRecording() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert('Tu navegador no soporta grabación de audio por micrófono.');
+        showToast('Tu navegador no soporta grabación de audio por micrófono.', { type: 'error' });
         return;
     }
 
@@ -1052,7 +1097,7 @@ function startRecording() {
             mediaRecorder.start();
         })
         .catch(err => {
-            alert('Permiso de micrófono denegado o no disponible: ' + err.message);
+            showToast(`Permiso de micrófono denegado o no disponible. ${err.message || ''}`.trim(), { type: 'error' });
         });
 }
 
@@ -1088,14 +1133,14 @@ function sendBlob(blob) {
     .then(data => {
         showLoader(false);
         if (data.error) {
-            alert('Error: ' + data.error);
+            showToast(data.error, { type: 'error' });
         } else {
             displayResults(data);
         }
     })
     .catch(err => {
         showLoader(false);
-        alert('Ocurrió un error al enviar la grabación: ' + err.message);
+        showToast(`No se pudo enviar la grabación: ${err.message}`, { type: 'error' });
     });
 }
 
@@ -1273,14 +1318,14 @@ function setupDatasetInteractions() {
             .then(data => {
                 showLoader(false);
                 if (data.error) {
-                    alert('Error: ' + data.error);
+                    showToast(data.error, { type: 'error' });
                 } else {
                     displayResults(data);
                 }
             })
             .catch(err => {
                 showLoader(false);
-                alert('Ocurrió un error al consultar el clasificador: ' + err.message);
+                showToast(`No se pudo consultar el clasificador: ${err.message}`, { type: 'error' });
             });
         });
     });
