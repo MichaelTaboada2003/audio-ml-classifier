@@ -14,7 +14,8 @@ La capa de Toma de Decisiones se agregó **sin modificar la capa de ML**: solo c
 - [Resumen rápido](#resumen-rápido)
 - [Aplicación web — pestañas disponibles](#aplicación-web--pestañas-disponibles)
 - [Capa 1 · Machine Learning](#capa-1--machine-learning)
-  - [Trade-off tamaño del dataset (N=10 vs N=14)](#trade-off-tamaño-del-dataset-n10-vs-n14)
+  - [Decisiones de diseño verificadas empíricamente](#decisiones-de-diseño-verificadas-empíricamente)
+  - [Caveat sobre generalización a hablantes nuevos](#caveat-sobre-generalización-a-hablantes-nuevos)
 - [Capa 2 · Toma de Decisiones](#capa-2--toma-de-decisiones)
   - [Problema de decisión](#problema-de-decisión)
   - [Estructura del módulo](#estructura-del-módulo)
@@ -38,7 +39,7 @@ La capa de Toma de Decisiones se agregó **sin modificar la capa de ML**: solo c
 | ML | Clasifica audio en Enojo / Tristeza / Feliz con 6 modelos clásicos sobre embeddings wav2vec2 (768 dims) | Predicción + probabilidades + métricas acústicas |
 | Decisiones | Convierte las matrices de confusión y probabilidades LOO en una decisión de negocio (GO / NO-GO, umbral óptimo, VPN esperado) | Recomendación justificada con sensibilidad y Monte Carlo |
 
-**Mejor modelo actual:** Regresión Logística con **73.8 %** de balanced accuracy en el escenario de 3 emociones con 14 audios por clase (chance = 33.3 %). Ver [trade-off N=10 vs N=14](#trade-off-tamaño-del-dataset-n10-vs-n14) para entender por qué la cifra es más baja —y más confiable— que en versiones previas del proyecto.
+**Mejor modelo actual:** Regresión Logística con **67.2 %** de balanced accuracy LOOCV en el escenario de 3 emociones, training cap a 20 por clase con `class_weight='balanced'` (Enojo 20 + Tristeza 20 + Feliz 15; Feliz limitado por el dataset). Pipeline: wav2vec2-base sobre los primeros 10 segundos de cada audio (sweet spot empírico). El "Explorador del Dataset" muestra **solo audios holdout** (no usados en training) para permitir validación honesta out-of-sample desde la app. En holdout, **SVM lineal alcanza ~59% recall en Enojo** vs solo 9% con N=14 (ver [Decisiones de diseño](#decisiones-de-diseño-verificadas-empíricamente)).
 
 ---
 
@@ -47,8 +48,8 @@ La capa de Toma de Decisiones se agregó **sin modificar la capa de ML**: solo c
 La app Flask (`app.py`) levanta una interfaz con 4 pestañas:
 
 1. **Clasificador en Vivo** — sube o graba audio y obtén predicción con confianza y métricas acústicas.
-2. **Explorador del Dataset** — reproduce los audios mejor calificados por clase y prueba el modelo sobre ellos.
-3. **Decisiones** *(nuevo módulo)* — el corazón de la capa de Toma de Decisiones, descrito en detalle abajo.
+2. **Explorador del Dataset** — reproduce audios **holdout** (excluye los usados en training del modelo desplegado) y prueba el modelo sobre ellos. Cada predicción es genuinamente out-of-sample.
+3. **Decisiones** *(módulo de Toma de Decisiones)* — descrito en detalle abajo.
 4. **Análisis y Métricas** — figuras del entrenamiento (matriz de confusión, separabilidad, comparativa).
 
 ---
@@ -57,53 +58,92 @@ La app Flask (`app.py`) levanta una interfaz con 4 pestañas:
 
 ### Resultado principal
 
-| Enfoque | Mejor modelo | Accuracy | Balanced Acc |
-|---|---|---|---|
-| Features manuales (144 dims, 3 clases · 14 muestras) | SVM lineal | 0.643 | 0.643 |
-| wav2vec2 embeddings (768 dims, 3 clases · 14 muestras) | **Reg. Logística** | **0.738** | **0.738** |
-| wav2vec2 embeddings (768 dims, 2 clases · 10 muestras, archivado) | KNN k=5 / SVM RBF / RF | 0.85 | 0.85 |
+**LOOCV (Leave-One-Audio-Out)** sobre training Enojo=20, Tristeza=20, Feliz=15, con `class_weight='balanced'`:
 
-### Trade-off tamaño del dataset (N=10 vs N=14)
-
-Históricamente este proyecto se entrenó con `N_PER_CLASS = 10` (los audios EXCELENTE, score ≥ 0.45) y alcanzaba **76.7 %** de balanced accuracy. Al ampliar a `N_PER_CLASS = 14` se incluyen audios PASA (score 0.35-0.45), menos expresivos pero más representativos. El resultado:
-
-| Aspecto | N=10 (cherry-picked) | N=14 (más realista) |
+| Modelo | Accuracy | Balanced Acc |
 |---|---|---|
-| Mejor BalAcc reportada | 76.7 % | **73.8 %** |
-| Muestras totales | 30 | 42 |
-| Audios "EXCELENTE" en Tristeza | 10/10 | 7/14 (resto PASA) |
-| Audios "EXCELENTE" en Feliz | 10/10 | 11/14 (resto PASA) |
-| Intervalo de confianza | más amplio | ~17 % más estrecho |
-| Riesgo de cherry-picking | alto | bajo |
+| **Regresión Logística** | **0.691** | **0.672** |
+| SVM lineal | 0.618 | 0.606 |
+| SVM RBF | 0.618 | 0.589 |
+| Random Forest | 0.564 | 0.533 |
+| KNN (k=5) | 0.491 | 0.478 |
+| KNN (k=3) | 0.491 | 0.478 |
+| Baseline (chance) | — | 0.333 |
 
-**¿Por qué N=14 a pesar de la cifra más baja?** El número más alto del top-10 estaba inflado por seleccionar solo los audios más expresivos; al usar el modelo en producción con audios "normales" (la mayoría son PASA), el desempeño esperado se acerca más al 73.8 % que al 76.7 %. Reportar 73.8 % es más honesto y menos vulnerable a sobreajuste por muestreo selectivo.
+**Holdout** (audios no usados en training, 17 Enojo + 17 Tristeza + 0 Feliz):
 
-`config.py` controla este parámetro con `N_PER_CLASS = 14` (override vía `N_PER_CLASS=20 python ...`); todo el pipeline se adapta automáticamente.
+| Modelo | Recall Enojo | Recall Tristeza | BalAcc holdout |
+|---|---|---|---|
+| **SVM lineal** | **10/17 (59%)** | 7/17 (41%) | **50.0%** |
+| LogReg | 8/17 (47%) | 6/17 (35%) | 41.2% |
+| SVM RBF | 5/17 (29%) | 10/17 (59%) | 44.1% |
+| KNN k=5 | 9/17 (53%) | 4/17 (24%) | 38.2% |
+
+Antes (N=14 sin class_weight), SVM lineal acertaba solo 2/23 = 9% Enojo en holdout. El salto a 59% con N=20 confirma que **el problema previo era el rango de expresividad del training**, no el modelo.
 
 ### Dataset
 
 | Parámetro | Valor |
 |---|---|
-| Total de audios | 146 |
-| Clases originales | Aburrido (36), Enojo (37), Tranquilidad (36), Tristeza (37) |
+| Total de audios disponibles | 89 (Enojo 37, Tristeza 37, Feliz **15**) + 36 Tranquilidad (no activos) |
+| Clases activas | Enojo, Tristeza, Feliz |
+| Audios usados en training | 20+20+15 = 55 (top por `score_clase`, Feliz cap a 15) |
+| Audios disponibles en holdout (dashboard) | 17 Enojo + 17 Tristeza + 0 Feliz |
 | Recolectores | MT, VZ, VA, ED |
-| Duración por audio | ~10-30 segundos |
+| Duración por audio | 21-64 segundos (mediana 34.6s; se usan los primeros 10s) |
+
+**Limitación reconocida del dataset:**
+- **Feliz solo tiene 15 grabaciones** vs 37 de Enojo/Tristeza. Se usan todas para training; no quedan holdout Feliz. La métrica holdout no incluye Feliz por esta razón.
+- **Cada audio es de un hablante distinto** (los prefijos MT/VZ/VA/ED identifican al *recolector* del audio, no al hablante). Esto significa que LOOCV ya es efectivamente leave-one-speaker-out: cada audio held-out es una persona que el modelo nunca escuchó. El número reportado refleja generalización razonable a nuevos hablantes.
+- **Solo 4 recolectores = 4 condiciones de grabación** (mic, ambiente). El modelo podría haber aprendido huellas técnicas del recolector. Nuevos recolectores en futuras grabaciones probarían robustez a hardware/ambiente distintos.
 
 ### Pipeline ML
 
 ```
 1. Scoring acústico (scripts/filtrar_audios.py)
-   → Calcula 5 scores por audio (Enojo, Tristeza, Tranquilidad, Aburrido, Feliz)
+   → Calcula score_enojo, score_tristeza, score_feliz sobre los primeros 10s
    → Genera outputs/reporte_filtrado_v2.csv
 
-2. Selección por ranking (top-N por clase)
+2. Selección por ranking (top-N_PER_CLASS por clase, ordenado por su score)
 
 3. Extracción de embeddings con wav2vec2 (cache: outputs/embeddings_v2.npz)
+   → librosa.load(..., duration=10.0) + wav2vec2-base + mean-pool
+   → un embedding 768-d por audio
 
 4. Entrenamiento LOOCV + serialización (scripts/exportar_modelos.py)
-   → outputs/modelos/*.joblib (6 modelos)
-   → outputs/model_metrics.json
+   → outputs/modelos/*.joblib (6 modelos entrenados con TODOS los 42 audios)
+   → outputs/model_metrics.json (métricas LOOCV honestas, no del modelo final)
+   → outputs/predicciones_loocv.{csv,json} (qué audios falló cada modelo)
 ```
+
+### Decisiones de diseño verificadas empíricamente
+
+**Ventana de audio (MAX_DURATION):**
+
+| Variante probada | BalAcc LogReg LOOCV | Decisión |
+|---|---|---|
+| **0-10s** (actual) | 67-69% | ✓ Adoptado |
+| Audio completo, 1 embedding | 0% (lineales colapsan) | Rechazado |
+| 0-15s | 62% | Rechazado |
+| Warm-up 1-2s + 10s | 67% | Rechazado |
+| Chunks 8s + agregación RMS | 60% | Rechazado |
+
+**Por qué 10s gana:** wav2vec2 hace mean-pool internamente sobre los frames del input. Audios largos diluyen la firma emocional al promediar contenido neutro/transicional. 10s es suficiente para capturar la prosodia emocional sin caer en dilución. Chunks introducen ruido de etiqueta y rompen modelos basados en distancia (KNN cae a 38%).
+
+**Tamaño y composición del training (N_PER_CLASS):**
+
+| Configuración | LOOCV LogReg | Holdout Enojo (SVM lineal) | Decisión |
+|---|---|---|---|
+| N=14 (solo EXCELENTE) | 69% | 9% (2/23) | Rechazado |
+| **N=20 + class_weight balanced** | 67% | **59% (10/17)** | ✓ Adoptado |
+
+**Por qué N=20 gana:** N=14 seleccionaba solo audios con score muy alto, creando un training set homogéneo en expresividad. El modelo aprendía "Enojo = audio muy gritado" y fallaba en holdout porque los audios mid-score caían geométricamente cerca del centroide de Tristeza en el espacio de embeddings wav2vec2. Expandir a N=20 incluye audios mid-score que cubren la curva completa de expresividad → modelo generaliza dramáticamente mejor (+50pp en recall holdout). El LOOCV baja levemente porque ahora hay audios más difíciles dentro del training, pero esa caída es honesta — refleja la dificultad real del problema. Feliz queda en 15 (todos los disponibles) y se compensa la asimetría con `class_weight='balanced'`.
+
+### Caveat sobre generalización: hablantes vs condiciones de grabación
+
+Cada audio del dataset es de un hablante **distinto** — el prefijo MT/VZ/VA/ED identifica quién recolectó la grabación, no quién habla. Esto hace que el LOOCV ya sea efectivamente leave-one-speaker-out: el 67% reportado es generalización a personas que el modelo nunca escuchó.
+
+Lo que sí persiste es **condición-de-grabación overlap**: solo hay 4 recolectores, así que solo 4 configuraciones de micrófono/ambiente. El modelo podría haber capturado señal técnica del recolector. La forma rigurosa de medirlo sería leave-one-*recolector*-out (dejar fuera todos los audios de MT, etc.): probablemente daría algo menor que 67% pero no se puede estimar a priori. Una mejora futura sería incorporar audios de más recolectores.
 
 ---
 
