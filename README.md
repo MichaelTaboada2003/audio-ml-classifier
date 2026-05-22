@@ -23,6 +23,7 @@ La capa de Toma de Decisiones se agregó **sin modificar la capa de ML**: solo c
   - [Sección 4 · Análisis de decisiones](#sección-4--análisis-de-decisiones)
   - [Recomendación final](#recomendación-final)
   - [Modelo matemático](#modelo-matemático)
+  - [Origen y validez de los valores económicos](#origen-y-validez-de-los-valores-económicos)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Uso rápido](#uso-rápido)
 - [Dependencias](#dependencias)
@@ -277,6 +278,27 @@ VPN(p) = V·[ p·(TPR·v_TP − FNR·c_FN) + (1−p)·(−FPR·c_FP − TNR·c_T
 **Monte Carlo**
 
 Distribución triangular (low, mode, high) sobre cada input financiero. Mode = valor actual, low = mode×0.7, high = mode×1.3-1.6 según el parámetro. 2 000 muestras → cuantiles p5/p50/p95 y P(VPN > 0).
+
+### Origen y validez de los valores económicos
+
+Los valores de costo por defecto **no provienen de datos confidenciales de una empresa real** — un proyecto académico no tiene acceso a esa información. En lugar de eso, son **valores ilustrativos calibrados con benchmarks de industria publicados**, elegidos para que el orden de magnitud y las relaciones entre ellos sean defendibles. La interfaz permite al usuario reemplazarlos con datos propios en cualquier momento.
+
+| Parámetro | Default | Razonamiento | Fuente / benchmark |
+|---|---|---|---|
+| **Costo FN** (Enojo no detectado) | USD 80 | Costo aproximado de churn de un cliente molesto que no recibió escalación. | Reichheld & Sasser, *"Zero Defections: Quality Comes to Services"*, Harvard Business Review (1990) — adquirir un cliente cuesta 5-7× más que retenerlo. Reportes Salesforce State of the Connected Customer (2023): 80% de los clientes considera la experiencia tan importante como el producto. |
+| **Costo FP** (falsa alarma) | USD 4 | ~5 minutos de tiempo de un supervisor con costo cargado de ≈ USD 48/hora. | U.S. Bureau of Labor Statistics — *Customer Service Supervisors* OEWS 2023: salario mediano USD 25/hora + ~80% de costos de empleo cargado (impuestos, beneficios, facilities). |
+| **Valor TP** (escalación acertada) | USD 25 | Aproximadamente 30% del costo de FN, asumiendo que la escalación a tiempo no garantiza retención total. | Bain & Company — *Prescription for cutting costs*: clientes cuyos problemas se resuelven bien tienen 70% probabilidad de quedarse. |
+| **Costo de inferencia** | USD 0.02/llamada | Pricing público de servicios cloud de reconocimiento de voz para audio de ~10 segundos. | AWS Transcribe (USD 0.024/min, 2024); Azure Cognitive Services Speech (USD 0.016/min); Google Cloud Speech-to-Text (USD 0.024/min, primer tier). |
+| **Costo fijo mensual** | USD 1 200 | Hosting de un servicio ML pequeño: instancia GPU + monitoring + parte proporcional de ingeniería. | AWS EC2 `g4dn.xlarge` ≈ USD 380/mes on-demand; AWS CloudWatch + S3 ≈ USD 50/mes; resto en mantenimiento prorrateado. |
+| **Volumen 10 000 llamadas/mes** | — | Tamaño típico de un call center mediano (pyme). | ContactBabel — *The US Contact Center Decision-Makers' Guide* (anual); ICMI benchmarks 2023. |
+| **Prevalencia 18% de Enojo** | — | Proporción de llamadas con expresión clara de enojo en operaciones de servicio. | NICE inContact CX Transformation Benchmark (2023): ~15-25% de llamadas escaladas por insatisfacción. Calabrio Sentiment Analysis benchmarks. |
+
+**Validez de la decisión bajo incertidumbre.** El módulo no depende de que estos números sean exactos. Las dos herramientas críticas de Fase 4 — **análisis de sensibilidad (tornado)** y **simulación Monte Carlo** — están diseñadas precisamente para responder *"¿qué tan robusta es la recomendación si estos valores se mueven?"*:
+
+- El **tornado** muestra qué parámetro tiene más impacto en el VPN si se varía ±30%. En la mayoría de configuraciones, prevalencia y costo FN dominan; el resto son secundarios.
+- **Monte Carlo** samplea ±30-60% sobre cada parámetro y devuelve **P(VPN > 0)**: la probabilidad de que la decisión siga siendo rentable bajo incertidumbre.
+
+> **Cómo leer esto en un informe.** Los valores por defecto **fijan un punto de partida razonable**; el análisis de sensibilidad y Monte Carlo **validan que la recomendación sobrevive a errores grandes en la calibración**. Para una implementación real, los valores deberían reemplazarse con datos del área de Finanzas / Operaciones del cliente concreto — la matriz de costos editable de Sección 1 fue construida con ese flujo de trabajo en mente.
 
 ---
 
