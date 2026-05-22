@@ -924,6 +924,216 @@ body {
     line-height: 1.5;
 }
 
+.decisions-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.decision-problem-grid,
+.decision-sensitivity-grid,
+.decision-reason-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.decision-reason-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.decision-problem-card,
+.decision-sensitivity-card,
+.decision-reason-card,
+.decision-scenario-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
+    padding: 1.1rem 1.15rem;
+}
+
+.decision-problem-kicker,
+.decision-scenario-kicker {
+    display: inline-block;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+}
+
+.decision-problem-card h3,
+.decision-recommendation-main h3,
+.decision-scenario-card h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.decision-problem-card p,
+.decision-sensitivity-card p,
+.decision-reason-card p,
+.decision-scenario-note,
+.decision-recommendation-main p {
+    color: var(--text-muted);
+    line-height: 1.55;
+}
+
+.decision-list {
+    padding-left: 1.1rem;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.decision-mode-toggle {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+.decision-mode-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    transition: all var(--transition-speed) ease;
+}
+
+.decision-mode-btn.active,
+.decision-mode-btn:hover {
+    background: rgba(147, 51, 234, 0.12);
+    border-color: rgba(147, 51, 234, 0.35);
+    color: var(--text-main);
+}
+
+.decision-scenario-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.decision-scenario-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.decision-scenario-card.recommended {
+    border-color: rgba(16, 185, 129, 0.35);
+    box-shadow: 0 14px 32px rgba(16, 185, 129, 0.08);
+}
+
+.decision-scenario-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.decision-score-chip {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #d8b4fe;
+    background: rgba(147, 51, 234, 0.14);
+    border: 1px solid rgba(147, 51, 234, 0.2);
+    border-radius: 999px;
+    padding: 0.35rem 0.7rem;
+}
+
+.decision-scenario-subtitle {
+    color: var(--text-main);
+    font-size: 0.92rem;
+    margin-bottom: 0.9rem;
+}
+
+.decision-scenario-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 0.9rem;
+}
+
+.decision-scenario-metrics span {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.25rem;
+}
+
+.decision-scenario-metrics strong {
+    font-size: 0.92rem;
+    line-height: 1.35;
+}
+
+.decision-weight-display {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.2rem;
+}
+
+.decision-weight-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.decision-weight-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.decision-slider-block {
+    margin-top: 0.4rem;
+    margin-bottom: 1rem;
+}
+
+.decision-slider {
+    width: 100%;
+    accent-color: #9333ea;
+}
+
+.decision-slider-scale {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.decision-recommendation-card {
+    background:
+        radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 35%),
+        var(--bg-card);
+}
+
+.decision-recommendation-main {
+    margin-bottom: 1rem;
+}
+
+.decision-badge {
+    display: inline-block;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.28);
+    border-radius: 999px;
+    color: #a7f3d0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 0.38rem 0.75rem;
+    text-transform: uppercase;
+    margin-bottom: 0.7rem;
+}
+
 /* Footer Styling */
 .app-footer {
     text-align: center;
@@ -943,6 +1153,12 @@ body {
     .analytics-grid {
         grid-template-columns: 1fr;
     }
+
+    .decision-problem-grid,
+    .decision-sensitivity-grid,
+    .decision-reason-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 600px) {
@@ -960,6 +1176,18 @@ body {
     .tab-btn {
         width: 100%;
         justify-content: center;
+    }
+
+    .decision-mode-toggle {
+        width: 100%;
+    }
+
+    .decision-mode-btn {
+        width: 100%;
+    }
+
+    .decision-weight-display {
+        align-items: flex-start;
     }
 }
 

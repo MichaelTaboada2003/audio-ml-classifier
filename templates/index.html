@@ -44,6 +44,9 @@
             <button class="tab-btn" data-tab="dataset-explorer">
                 <i class="fa-solid fa-database"></i> Explorador del Dataset
             </button>
+            <button class="tab-btn" data-tab="decisions">
+                <i class="fa-solid fa-scale-balanced"></i> Decisiones
+            </button>
             <button class="tab-btn" data-tab="analytics">
                 <i class="fa-solid fa-chart-line"></i> Análisis y Métricas
             </button>
@@ -245,6 +248,105 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="decisions" class="tab-pane">
+                <div class="decisions-stack">
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <h2>Problema de Decisión</h2>
+                            <p>Elegir la configuración de reconocimiento emocional más conveniente según el objetivo del sistema, el riesgo aceptable y la cobertura emocional deseada.</p>
+                        </div>
+                        <div class="decision-problem-grid">
+                            <div class="decision-problem-card">
+                                <span class="decision-problem-kicker">Pregunta central</span>
+                                <h3>¿Conviene desplegar un sistema más confiable de 2 emociones o uno más completo de 3 emociones?</h3>
+                                <p>La decisión no depende solo de la precisión total: también importa el costo del error, la dificultad de cada clase y la cobertura del problema real.</p>
+                            </div>
+                            <div class="decision-problem-card">
+                                <span class="decision-problem-kicker">Criterios usados</span>
+                                <ul class="decision-list">
+                                    <li>Balanced Accuracy del mejor modelo</li>
+                                    <li>Cobertura emocional del escenario</li>
+                                    <li>Robustez frente a clases más difíciles</li>
+                                    <li>Sensibilidad al costo de fallar en Tristeza</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card glass-card">
+                        <div class="card-header flex-header">
+                            <div>
+                                <h2>Comparador de Escenarios</h2>
+                                <p>Contrasta las alternativas disponibles antes de recomendar una decisión final.</p>
+                            </div>
+                            <div class="decision-mode-toggle" id="decision-mode-toggle">
+                                <button class="decision-mode-btn active" type="button" data-mode="conservative">Máxima confiabilidad</button>
+                                <button class="decision-mode-btn" type="button" data-mode="balanced">Balanceado</button>
+                                <button class="decision-mode-btn" type="button" data-mode="coverage">Mayor cobertura</button>
+                            </div>
+                        </div>
+                        <div class="decision-scenario-grid" id="decision-scenario-grid"></div>
+                    </div>
+
+                    <div class="card glass-card">
+                        <div class="card-header flex-header">
+                            <div>
+                                <h2>Análisis de Sensibilidad</h2>
+                                <p>Ajusta cuánto te importa evitar errores en <strong>Tristeza</strong>. Esto cambia qué escenario resulta más conveniente.</p>
+                            </div>
+                            <div class="decision-weight-display">
+                                <span class="decision-weight-label">Peso actual</span>
+                                <span class="decision-weight-value" id="sadness-weight-value">1.0x</span>
+                            </div>
+                        </div>
+                        <div class="decision-slider-block">
+                            <input type="range" min="1" max="3" step="0.25" value="1" id="sadness-weight-slider" class="decision-slider">
+                            <div class="decision-slider-scale">
+                                <span>1.0x Bajo</span>
+                                <span>2.0x Medio</span>
+                                <span>3.0x Alto</span>
+                            </div>
+                        </div>
+                        <div class="decision-sensitivity-grid">
+                            <div class="decision-sensitivity-card">
+                                <span class="decision-problem-kicker">Interpretación</span>
+                                <p id="sensitivity-interpretation">Con peso bajo, priorizamos rendimiento global y simplicidad operativa.</p>
+                            </div>
+                            <div class="decision-sensitivity-card">
+                                <span class="decision-problem-kicker">Impacto esperado</span>
+                                <p id="sensitivity-impact">El escenario de 2 emociones mantiene ventaja cuando la prioridad principal es reducir incertidumbre y desplegar rápido.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card glass-card decision-recommendation-card">
+                        <div class="card-header">
+                            <h2>Recomendación Final</h2>
+                            <p>Conclusión ejecutiva basada en el objetivo actual y la sensibilidad elegida.</p>
+                        </div>
+                        <div class="decision-recommendation-main">
+                            <div class="decision-badge" id="decision-badge">Escenario recomendado</div>
+                            <h3 id="decision-title">-</h3>
+                            <p id="decision-summary">-</p>
+                        </div>
+                        <div class="decision-reason-grid">
+                            <div class="decision-reason-card">
+                                <span class="decision-problem-kicker">Por qué gana</span>
+                                <p id="decision-why">-</p>
+                            </div>
+                            <div class="decision-reason-card">
+                                <span class="decision-problem-kicker">Trade-off</span>
+                                <p id="decision-tradeoff">-</p>
+                            </div>
+                            <div class="decision-reason-card">
+                                <span class="decision-problem-kicker">Siguiente acción</span>
+                                <p id="decision-next-step">-</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

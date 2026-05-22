@@ -42,6 +42,11 @@ const metricPitch = document.getElementById('metric-pitch');
 const metricEnergy = document.getElementById('metric-energy');
 const metricZcr = document.getElementById('metric-zcr');
 const experimentOptions = document.querySelectorAll('.experiment-option');
+const decisionModeButtons = document.querySelectorAll('.decision-mode-btn');
+const sadnessWeightSlider = document.getElementById('sadness-weight-slider');
+
+let decisionMode = 'conservative';
+let sadnessWeight = 1;
 
 function getExperimentById(experimentId) {
     return (experimentHistory.experiments || []).find((exp) => exp.id === experimentId);
@@ -49,6 +54,133 @@ function getExperimentById(experimentId) {
 
 function formatPercent(value) {
     return `${(value * 100).toFixed(1)}%`;
+}
+
+function getScenarioDecisionScore(experiment, mode, sadnessPriority) {
+    const coverageScore = experiment.classes.length / 3;
+    const accuracyScore = experiment.best_balanced_accuracy || 0;
+    const complexityPenalty = (experiment.classes.length - 2) * 0.08;
+    const sadnessFactor = experiment.classes.includes('Tristeza') ? 1 : 0.75;
+
+    const profiles = {
+        conservative: { acc: 0.7, cov: 0.15, sad: 0.15, penalty: 1.1 },
+        balanced: { acc: 0.5, cov: 0.3, sad: 0.2, penalty: 1.0 },
+        coverage: { acc: 0.35, cov: 0.5, sad: 0.15, penalty: 0.8 }
+    };
+
+    const profile = profiles[mode] || profiles.balanced;
+    return (
+        accuracyScore * profile.acc
+        + coverageScore * profile.cov
+        + sadnessFactor * (sadnessPriority / 3) * profile.sad
+        - complexityPenalty * profile.penalty
+    );
+}
+
+function getDecisionExperiments() {
+    return (experimentHistory.experiments || []).filter(exp =>
+        exp.id === '2clases_10x10' || exp.id === '3clases_10x10x10'
+    );
+}
+
+function renderDecisionScenarios() {
+    const container = document.getElementById('decision-scenario-grid');
+    if (!container) return;
+
+    const scenarios = getDecisionExperiments();
+    const ranked = scenarios
+        .map((exp) => ({
+            ...exp,
+            decisionScore: getScenarioDecisionScore(exp, decisionMode, sadnessWeight)
+        }))
+        .sort((a, b) => b.decisionScore - a.decisionScore);
+
+    container.innerHTML = ranked.map((exp, index) => {
+        const bestMetric = (exp.metrics || {})[exp.best_model] || {};
+        return `
+            <article class="decision-scenario-card ${index === 0 ? 'recommended' : ''}">
+                <div class="decision-scenario-header">
+                    <div>
+                        <span class="decision-scenario-kicker">${index === 0 ? 'Recomendado ahora' : 'Alternativa'}</span>
+                        <h3>${exp.name}</h3>
+                    </div>
+                    <span class="decision-score-chip">${(exp.decisionScore * 100).toFixed(1)}</span>
+                </div>
+                <p class="decision-scenario-subtitle">${exp.subtitle}</p>
+                <div class="decision-scenario-metrics">
+                    <div><span>Clases</span><strong>${exp.classes.join(' / ')}</strong></div>
+                    <div><span>Dataset</span><strong>${exp.dataset_size} audios</strong></div>
+                    <div><span>Mejor modelo</span><strong>${bestMetric.label || exp.best_model}</strong></div>
+                    <div><span>BalAcc</span><strong>${formatPercent(exp.best_balanced_accuracy || 0)}</strong></div>
+                </div>
+                <p class="decision-scenario-note">${
+                    exp.classes.length === 2
+                        ? 'Escenario más simple y robusto para despliegue temprano.'
+                        : 'Escenario con mayor cobertura emocional, pero más propenso a confusiones entre clases activas.'
+                }</p>
+            </article>
+        `;
+    }).join('');
+
+    renderDecisionRecommendation(ranked);
+}
+
+function renderDecisionRecommendation(rankedScenarios) {
+    if (!rankedScenarios || rankedScenarios.length === 0) return;
+
+    const winner = rankedScenarios[0];
+    const runnerUp = rankedScenarios[1];
+    const bestMetric = (winner.metrics || {})[winner.best_model] || {};
+
+    const badge = document.getElementById('decision-badge');
+    const title = document.getElementById('decision-title');
+    const summary = document.getElementById('decision-summary');
+    const why = document.getElementById('decision-why');
+    const tradeoff = document.getElementById('decision-tradeoff');
+    const nextStep = document.getElementById('decision-next-step');
+    const interpretation = document.getElementById('sensitivity-interpretation');
+    const impact = document.getElementById('sensitivity-impact');
+    const weightValue = document.getElementById('sadness-weight-value');
+
+    if (weightValue) weightValue.textContent = `${sadnessWeight.toFixed(2)}x`;
+
+    const modeLabels = {
+        conservative: 'modo de máxima confiabilidad',
+        balanced: 'modo balanceado',
+        coverage: 'modo de mayor cobertura'
+    };
+
+    const sadnessMsg = sadnessWeight < 1.5
+        ? 'Con peso bajo, priorizamos rendimiento global y simplicidad operativa.'
+        : sadnessWeight < 2.5
+            ? 'Con peso medio, la detección estable de Tristeza empieza a influir más en la decisión.'
+            : 'Con peso alto, la decisión penaliza más los escenarios donde Tristeza pueda degradarse o confundirse.';
+
+    const impactMsg = winner.classes.length === 2
+        ? 'El escenario de 2 emociones conserva ventaja cuando importa más desplegar con menos incertidumbre y menor complejidad.'
+        : 'El escenario de 3 emociones gana cuando la cobertura emocional y el valor analítico adicional justifican aceptar más riesgo de error.';
+
+    if (interpretation) interpretation.textContent = sadnessMsg;
+    if (impact) impact.textContent = impactMsg;
+
+    if (badge) badge.textContent = `Recomendación para ${modeLabels[decisionMode]}`;
+    if (title) title.textContent = `${winner.name} · ${winner.subtitle}`;
+    if (summary) {
+        summary.textContent = `${winner.name} obtiene la mejor puntuación de decisión en este contexto, combinando ${formatPercent(winner.best_balanced_accuracy || 0)} de balanced accuracy con ${winner.classes.length} clases de cobertura.`;
+    }
+    if (why) {
+        why.textContent = `${bestMetric.label || winner.best_model} lidera este escenario y su relación entre precisión, cobertura y complejidad es superior a ${runnerUp ? runnerUp.name.toLowerCase() : 'las demás alternativas'} bajo el criterio actual.`;
+    }
+    if (tradeoff) {
+        tradeoff.textContent = winner.classes.length === 2
+            ? 'Pierdes cobertura emocional frente al escenario de 3 emociones, pero ganas estabilidad y una decisión de despliegue más conservadora.'
+            : 'Ganas cobertura emocional y valor narrativo para el dashboard, pero aceptas una caída frente al escenario binario y más confusión entre clases activas.';
+    }
+    if (nextStep) {
+        nextStep.textContent = winner.classes.length === 2
+            ? 'Usar 2 emociones para una fase operativa inicial y recolectar más audios de Feliz o clases ambiguas antes de ampliar el sistema.'
+            : 'Mantener 3 emociones como escenario analítico ampliado y priorizar nuevas grabaciones o recolección dirigida para reducir la confusión entre Enojo y Feliz.';
+    }
 }
 
 function renderAnalyticsExperiment(experimentId) {
@@ -173,6 +305,9 @@ tabButtons.forEach(button => {
         // Auto-load dataset if clicking on dataset explorer
         if (targetTab === 'dataset-explorer' && !datasetLoaded) {
             loadDataset();
+        }
+        if (targetTab === 'decisions') {
+            renderDecisionScenarios();
         }
         if (targetTab === 'analytics') {
             renderAnalyticsExperiment(
@@ -572,3 +707,24 @@ if (experimentOptions.length > 0) {
         || experimentHistory.default_experiment_id
     );
 }
+
+if (decisionModeButtons.length > 0) {
+    decisionModeButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            decisionModeButtons.forEach((btn) => btn.classList.remove('active'));
+            button.classList.add('active');
+            decisionMode = button.getAttribute('data-mode') || 'balanced';
+            renderDecisionScenarios();
+        });
+    });
+}
+
+if (sadnessWeightSlider) {
+    sadnessWeightSlider.addEventListener('input', (event) => {
+        sadnessWeight = Number(event.target.value || 1);
+        renderDecisionScenarios();
+    });
+    sadnessWeight = Number(sadnessWeightSlider.value || 1);
+}
+
+renderDecisionScenarios();
