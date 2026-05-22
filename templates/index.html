@@ -22,12 +22,17 @@
                 <i class="fa-solid fa-microphone-lines logo-icon"></i>
                 <div class="brand">
                     <h1>EmotiSpeech</h1>
-                    <span class="subtitle">Speech Emotion Classification (v2)</span>
+                    <span class="subtitle">Speech Emotion Classification</span>
                 </div>
             </div>
             <div class="model-badge">
                 <span class="status-dot"></span>
-                <span>wav2vec2 + SVM (92.3% Acc)</span>
+                <span>
+                    wav2vec2 + {{ best_model_label }}
+                    {% if best_bal_acc is not none %}
+                    ({{ '%.1f'|format(best_bal_acc * 100) }}% BalAcc)
+                    {% endif %}
+                </span>
             </div>
         </header>
 
@@ -53,7 +58,7 @@
                     <div class="card glass-card">
                         <div class="card-header">
                             <h2>Entrada de Audio</h2>
-                            <p>Sube un archivo de voz o graba directamente desde tu micrófono para analizar la emoción (Enojo vs Tristeza).</p>
+                            <p>Sube un archivo de voz o graba directamente desde tu micrófono para analizar la emoción con las clases activas del experimento.</p>
                         </div>
                         
                         <!-- Model Selector (Interactive Cards) -->
@@ -62,51 +67,27 @@
                                 <i class="fa-solid fa-brain"></i> Modelo Clasificador Activo:
                             </label>
                             <div class="model-grid" id="model-grid">
-                                <div class="model-option active" data-model="svm_lineal">
+                                {% for model_key, model_label in model_mapping.items() %}
+                                {% set metric = model_metrics.get(model_key, {}) %}
+                                <div class="model-option {% if model_key == best_model_key %}active{% endif %}" data-model="{{ model_key }}">
                                     <div class="model-meta">
-                                        <span class="model-name">SVM lineal</span>
-                                        <span class="model-acc">92.3% Acc</span>
+                                        <span class="model-name">{{ metric.get('label', model_label) }}</span>
+                                        <span class="model-acc">
+                                            {% if metric %}
+                                            {{ '%.1f'|format(metric.get('balanced_accuracy', 0) * 100) }}% BalAcc
+                                            {% else %}
+                                            Sin métricas
+                                            {% endif %}
+                                        </span>
                                     </div>
-                                    <div class="model-desc">Mejor modelo. Excelente separabilidad lineal.</div>
-                                </div>
-                                <div class="model-option" data-model="logreg">
-                                    <div class="model-meta">
-                                        <span class="model-name">Reg. Logística</span>
-                                        <span class="model-acc">92.3% Acc</span>
+                                    <div class="model-desc">
+                                        {% if model_key == best_model_key %}Mejor modelo actual. {% endif %}{{ metric.get('description', 'Clasificador exportado para inferencia.') }}
                                     </div>
-                                    <div class="model-desc">Clasificador probabilístico de entropía máxima.</div>
                                 </div>
-                                <div class="model-option" data-model="svm_rbf">
-                                    <div class="model-meta">
-                                        <span class="model-name">SVM RBF</span>
-                                        <span class="model-acc">88.5% Acc</span>
-                                    </div>
-                                    <div class="model-desc">Frontera de decisión no lineal (Kernel RBF).</div>
-                                </div>
-                                <div class="model-option" data-model="rf">
-                                    <div class="model-meta">
-                                        <span class="model-name">Random Forest</span>
-                                        <span class="model-acc">80.8% Acc</span>
-                                    </div>
-                                    <div class="model-desc">Ensemble robusto de 200 árboles de decisión.</div>
-                                </div>
-                                <div class="model-option" data-model="knn_k5">
-                                    <div class="model-meta">
-                                        <span class="model-name">KNN (k=5)</span>
-                                        <span class="model-acc">76.9% Acc</span>
-                                    </div>
-                                    <div class="model-desc">Votación por 5 vecinos más cercanos.</div>
-                                </div>
-                                <div class="model-option" data-model="knn_k3">
-                                    <div class="model-meta">
-                                        <span class="model-name">KNN (k=3)</span>
-                                        <span class="model-acc">76.9% Acc</span>
-                                    </div>
-                                    <div class="model-desc">Votación por 3 vecinos más cercanos.</div>
-                                </div>
+                                {% endfor %}
                             </div>
                             <!-- Hidden input to store selected value for backend requests -->
-                            <input type="hidden" id="model-selector" value="svm_lineal">
+                            <input type="hidden" id="model-selector" value="{{ best_model_key }}">
                         </div>
                         
                         <!-- Upload Box -->
@@ -171,6 +152,10 @@
                                             <stop offset="0%" stop-color="#22d3ee" />
                                             <stop offset="100%" stop-color="#06b6d4" />
                                         </linearGradient>
+                                        <linearGradient id="gradient-feliz" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#fbbf24" />
+                                            <stop offset="100%" stop-color="#f59e0b" />
+                                        </linearGradient>
                                         <linearGradient id="gradient-default" x1="0%" y1="0%" x2="100%" y2="100%">
                                             <stop offset="0%" stop-color="#c084fc" />
                                             <stop offset="100%" stop-color="#a855f7" />
@@ -186,26 +171,7 @@
                             </div>
 
                             <!-- Probability progress bars -->
-                            <div class="prob-bars">
-                                <div class="prob-item">
-                                    <div class="prob-meta">
-                                        <span>Enojo (Anger)</span>
-                                        <span id="prob-enojo-val">80%</span>
-                                    </div>
-                                    <div class="progress-track">
-                                        <div class="progress-fill enojo-fill" id="prob-enojo-bar"></div>
-                                    </div>
-                                </div>
-                                <div class="prob-item">
-                                    <div class="prob-meta">
-                                        <span>Tristeza (Sadness)</span>
-                                        <span id="prob-tristeza-val">20%</span>
-                                    </div>
-                                    <div class="progress-track">
-                                        <div class="progress-fill tristeza-fill" id="prob-tristeza-bar"></div>
-                                    </div>
-                                </div>
-                            </div>
+                            <div class="prob-bars" id="prob-bars"></div>
 
                             <!-- Acoustic Metrics Grid -->
                             <div class="metrics-grid">
@@ -246,13 +212,14 @@
                 <div class="card glass-card">
                     <div class="card-header flex-header">
                         <div>
-                            <h2>Dataset de Experimentos (Top-26)</h2>
-                            <p>Explora y reproduce los 26 audios mejor calificados (13 Enojo, 13 Tristeza) de los 4 recolectores originales. Evalúa el clasificador directamente en ellos.</p>
+                            <h2>Dataset de Experimentos</h2>
+                            <p>Explora y reproduce los audios mejor calificados por clase y evalúa el clasificador directamente sobre ellos.</p>
                         </div>
                         <div class="filter-controls">
                             <button class="btn btn-sm btn-filter active" data-filter="all">Todos</button>
-                            <button class="btn btn-sm btn-filter" data-filter="Enojo">Enojo</button>
-                            <button class="btn btn-sm btn-filter" data-filter="Tristeza">Tristeza</button>
+                            {% for clase in active_classes %}
+                            <button class="btn btn-sm btn-filter" data-filter="{{ clase }}">{{ clase }}</button>
+                            {% endfor %}
                         </div>
                     </div>
 
@@ -284,66 +251,130 @@
 
             <!-- TAB 3: Analytics & Figures -->
             <section id="analytics" class="tab-pane">
+                <div class="card glass-card analytics-selector-card">
+                    <div class="card-header flex-header">
+                        <div>
+                            <h2>Experimento Seleccionado</h2>
+                            <p>Cambia entre resultados archivados para comparar métricas antiguas y nuevas.</p>
+                        </div>
+                    </div>
+                    <div class="experiment-switcher" id="experiment-switcher">
+                        {% for experiment in experiment_history.experiments %}
+                        <button
+                            class="experiment-option {% if experiment.id == experiment_history.default_experiment_id %}active{% endif %}"
+                            data-experiment-id="{{ experiment.id }}"
+                            type="button"
+                        >
+                            <span class="experiment-option-topline">
+                                <span class="experiment-option-name">{{ experiment.name }}</span>
+                                <span class="experiment-option-status {{ experiment.status }}">{{ experiment.status }}</span>
+                            </span>
+                            <span class="experiment-option-subtitle">{{ experiment.subtitle }}</span>
+                            <span class="experiment-option-meta">
+                                <span>{{ experiment.dataset_size }} audios</span>
+                                <span>{{ experiment.classes|length }} clases</span>
+                                <span>
+                                    {% if experiment.best_balanced_accuracy is not none %}
+                                    {{ '%.1f'|format(experiment.best_balanced_accuracy * 100) }}% BalAcc
+                                    {% endif %}
+                                </span>
+                            </span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                    <div class="analytics-summary" id="analytics-summary">
+                        <div class="analytics-pill">
+                            <span class="analytics-pill-label">Clases</span>
+                            <span class="analytics-pill-value" id="summary-classes">-</span>
+                        </div>
+                        <div class="analytics-pill">
+                            <span class="analytics-pill-label">Muestras</span>
+                            <span class="analytics-pill-value" id="summary-dataset">-</span>
+                        </div>
+                        <div class="analytics-pill">
+                            <span class="analytics-pill-label">Chance</span>
+                            <span class="analytics-pill-value" id="summary-chance">-</span>
+                        </div>
+                        <div class="analytics-pill">
+                            <span class="analytics-pill-label">Mejor modelo</span>
+                            <span class="analytics-pill-value" id="summary-best-model">-</span>
+                        </div>
+                        <div class="analytics-pill">
+                            <span class="analytics-pill-label">BalAcc</span>
+                            <span class="analytics-pill-value" id="summary-best-balacc">-</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="analytics-grid">
                     <!-- Figure 1: Comparison -->
                     <div class="card glass-card img-card">
                         <div class="card-header">
-                            <h2>1. Comparativa de Modelos</h2>
-                            <p>Resultados finales con CV (Leave-One-Out). Muestra el rendimiento de features manuales vs. wav2vec2.</p>
+                            <h2 id="analytics-card-1-title">1. Comparativa de Modelos</h2>
+                            <p id="analytics-card-1-description">Resultados finales con CV (Leave-One-Out). Muestra el rendimiento de features manuales vs. wav2vec2 para las clases activas.</p>
                         </div>
                         <div class="figure-wrapper">
-                            <img src="/outputs/figuras/comparativa_features_vs_wav2vec2.png" alt="Comparativa de Modelos" class="figura-img">
+                            <img src="/outputs/figuras/comparativa_features_vs_wav2vec2.png" alt="Comparativa de Modelos" class="figura-img" id="analytics-card-1-image">
                         </div>
                         <div class="card-footer">
-                            <p><strong>Observación:</strong> SVM lineal y Regresión Logística con wav2vec2 superan consistentemente a los features clásicos, logrando hasta un <strong>92.31%</strong> frente a <strong>84.62%</strong>.</p>
+                            <p id="analytics-card-1-observation"><strong>Observación:</strong> Esta comparativa resume el rendimiento final del experimento actual y ayuda a contrastar embeddings profundos frente a features manuales.</p>
                         </div>
                     </div>
 
                     <!-- Figure 2: Confusion matrix -->
                     <div class="card glass-card img-card">
                         <div class="card-header">
-                            <h2>2. Desempeño y Matriz de Confusión</h2>
-                            <p>Matriz de confusión detallada para el mejor modelo (wav2vec2 + SVM Lineal) y balanced accuracy por clasificador.</p>
+                            <h2 id="analytics-card-2-title">2. Desempeño y Matriz de Confusión</h2>
+                            <p id="analytics-card-2-description">Matriz de confusión detallada para el mejor modelo del experimento y balanced accuracy por clasificador.</p>
                         </div>
                         <div class="figure-wrapper">
-                            <img src="/outputs/figuras/resultados_v2.png" alt="Matriz de Confusión" class="figura-img">
+                            <img src="/outputs/figuras/resultados_v2.png" alt="Matriz de Confusión" class="figura-img" id="analytics-card-2-image">
                         </div>
                         <div class="card-footer">
-                            <p><strong>Observación:</strong> Con la combinación óptima, solo 2 de 26 muestras son clasificadas erróneamente (1 por clase), validando la estabilidad de la firma prosódica.</p>
+                            <p id="analytics-card-2-observation"><strong>Observación:</strong> La matriz permite identificar en qué emociones sigue habiendo mayor confusión y qué tan estable es la separación entre clases.</p>
                         </div>
                     </div>
 
                     <!-- Figure 3: Separability -->
                     <div class="card glass-card img-card">
                         <div class="card-header">
-                            <h2>3. Separabilidad en 2D (PCA vs. t-SNE)</h2>
-                            <p>Proyección bidimensional de los embeddings de 768 dimensiones extraídos de wav2vec2.</p>
+                            <h2 id="analytics-card-3-title">3. Separabilidad en 2D (PCA vs. t-SNE)</h2>
+                            <p id="analytics-card-3-description">Proyección bidimensional de los embeddings de 768 dimensiones extraídos de wav2vec2.</p>
                         </div>
                         <div class="figure-wrapper">
-                            <img src="/outputs/figuras/separabilidad_v2.png" alt="Separabilidad PCA y t-SNE" class="figura-img">
+                            <img src="/outputs/figuras/separabilidad_v2.png" alt="Separabilidad PCA y t-SNE" class="figura-img" id="analytics-card-3-image">
                         </div>
                         <div class="card-footer">
-                            <p><strong>Observación:</strong> Ambas clases se agrupan en clusters bien definidos y separados espacialmente, justificando la alta precisión lineal.</p>
+                            <p id="analytics-card-3-observation"><strong>Observación:</strong> Esta proyección muestra si las emociones activas forman grupos diferenciables en el espacio de embeddings.</p>
                         </div>
                     </div>
 
                     <!-- Figure 4: Filtering -->
                     <div class="card glass-card img-card">
                         <div class="card-header">
-                            <h2>4. Distribución de Calidad Acústica</h2>
-                            <p>Histograma de scores del dataset completo de 146 muestras originales que guió el filtrado inicial.</p>
+                            <h2 id="analytics-card-4-title">4. Distribución de Calidad Acústica</h2>
+                            <p id="analytics-card-4-description">Histograma de scores del dataset completo que guió el filtrado inicial.</p>
                         </div>
                         <div class="figure-wrapper">
-                            <img src="/outputs/figuras/reporte_filtrado_v2.png" alt="Reporte de Filtrado" class="figura-img">
+                            <img src="/outputs/figuras/reporte_filtrado_v2.png" alt="Reporte de Filtrado" class="figura-img" id="analytics-card-4-image">
                         </div>
                         <div class="card-footer">
-                            <p><strong>Observación:</strong> La mayoría de los audios de Tristeza quedaron en la zona "borderline" debido a una energía vocal demasiado alta por parte de algunos recolectores.</p>
+                            <p id="analytics-card-4-observation"><strong>Observación:</strong> Esta vista ayuda a detectar qué clases siguen siendo cuello de botella por calidad de actuación o consistencia acústica.</p>
                         </div>
                     </div>
                 </div>
             </section>
         </main>
     </div>
+
+    <script>
+        window.APP_CONFIG = {
+            activeClasses: {{ active_classes | tojson }},
+            classStyles: {{ class_styles | tojson }},
+            topNDataset: {{ top_n_dataset | tojson }},
+            experimentHistory: {{ experiment_history | tojson }}
+        };
+    </script>
 
     <!-- Custom JavaScript -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>

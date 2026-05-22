@@ -7,6 +7,9 @@ let isRecording = false;
 let datasetLoaded = false;
 let currentPlayingBtn = null;
 const globalAudio = new Audio();
+const appConfig = window.APP_CONFIG || { activeClasses: [], classStyles: {} };
+const classStyles = appConfig.classStyles || {};
+const experimentHistory = appConfig.experimentHistory || { experiments: [], default_experiment_id: null };
 
 // DOM Elements
 const tabButtons = document.querySelectorAll('.tab-btn');
@@ -26,7 +29,7 @@ const activeResults = document.getElementById('active-results');
 const predictedEmotionBadge = document.getElementById('predicted-emotion-badge');
 const predictionPercentage = document.getElementById('prediction-percentage');
 const progressCircle = document.getElementById('progress-bar-circle');
-const probEnojoVal = document.getElementById('prob-enojo-val');
+const probBars = document.getElementById('prob-bars');
 
 // Initialize SVG circular progress bar circumference
 const progressCircumference = 2 * Math.PI * 64; // r=64 -> 402.12
@@ -34,13 +37,120 @@ if (progressCircle) {
     progressCircle.style.strokeDasharray = `${progressCircumference}`;
     progressCircle.style.strokeDashoffset = `${progressCircumference}`;
 }
-const probEnojoBar = document.getElementById('prob-enojo-bar');
-const probTristezaVal = document.getElementById('prob-tristeza-val');
-const probTristezaBar = document.getElementById('prob-tristeza-bar');
 const metricDuration = document.getElementById('metric-duration');
 const metricPitch = document.getElementById('metric-pitch');
 const metricEnergy = document.getElementById('metric-energy');
 const metricZcr = document.getElementById('metric-zcr');
+const experimentOptions = document.querySelectorAll('.experiment-option');
+
+function getExperimentById(experimentId) {
+    return (experimentHistory.experiments || []).find((exp) => exp.id === experimentId);
+}
+
+function formatPercent(value) {
+    return `${(value * 100).toFixed(1)}%`;
+}
+
+function renderAnalyticsExperiment(experimentId) {
+    const experiment = getExperimentById(experimentId)
+        || getExperimentById(experimentHistory.default_experiment_id)
+        || (experimentHistory.experiments || [])[0];
+
+    if (!experiment) return;
+
+    experimentOptions.forEach((option) => {
+        option.classList.toggle('active', option.getAttribute('data-experiment-id') === experiment.id);
+    });
+
+    const summaryClasses = document.getElementById('summary-classes');
+    const summaryDataset = document.getElementById('summary-dataset');
+    const summaryChance = document.getElementById('summary-chance');
+    const summaryBestModel = document.getElementById('summary-best-model');
+    const summaryBestBalAcc = document.getElementById('summary-best-balacc');
+
+    if (summaryClasses) summaryClasses.textContent = experiment.classes.join(' / ');
+    if (summaryDataset) summaryDataset.textContent = `${experiment.dataset_size} audios`;
+    if (summaryChance) summaryChance.textContent = formatPercent(experiment.chance_accuracy || 0);
+
+    const bestMetric = (experiment.metrics || {})[experiment.best_model] || {};
+    if (summaryBestModel) summaryBestModel.textContent = bestMetric.label || experiment.best_model || '-';
+    if (summaryBestBalAcc) summaryBestBalAcc.textContent = formatPercent(experiment.best_balanced_accuracy || 0);
+
+    (experiment.cards || []).forEach((card, index) => {
+        const cardNum = index + 1;
+        const titleEl = document.getElementById(`analytics-card-${cardNum}-title`);
+        const descEl = document.getElementById(`analytics-card-${cardNum}-description`);
+        const imgEl = document.getElementById(`analytics-card-${cardNum}-image`);
+        const obsEl = document.getElementById(`analytics-card-${cardNum}-observation`);
+
+        if (titleEl) titleEl.textContent = `${cardNum}. ${card.title}`;
+        if (descEl) descEl.textContent = card.description;
+        if (imgEl) {
+            imgEl.src = card.image;
+            imgEl.alt = card.title;
+        }
+        if (obsEl) obsEl.innerHTML = `<strong>Observación:</strong> ${card.observation}`;
+    });
+}
+
+function slugifyEmotion(name) {
+    return (name || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/\s+/g, '-');
+}
+
+function getClassStyle(name) {
+    return classStyles[name] || {
+        slug: slugifyEmotion(name),
+        label: name,
+        accent: '#a855f7',
+        accent_dark: '#7e22ce'
+    };
+}
+
+function getRingVisual(name) {
+    const slug = getClassStyle(name).slug;
+    if (slug === 'enojo') {
+        return { stroke: 'url(#gradient-enojo)', glow: 'drop-shadow(0 0 10px rgba(239, 68, 68, 0.5))' };
+    }
+    if (slug === 'tristeza') {
+        return { stroke: 'url(#gradient-tristeza)', glow: 'drop-shadow(0 0 10px rgba(6, 182, 212, 0.5))' };
+    }
+    if (slug === 'feliz') {
+        return { stroke: 'url(#gradient-feliz)', glow: 'drop-shadow(0 0 10px rgba(245, 158, 11, 0.45))' };
+    }
+    return { stroke: 'url(#gradient-default)', glow: 'none' };
+}
+
+function renderProbabilityBars(probabilities) {
+    if (!probBars) return;
+
+    const orderedClasses = [
+        ...appConfig.activeClasses.filter(name => Object.prototype.hasOwnProperty.call(probabilities, name)),
+        ...Object.keys(probabilities).filter(name => !appConfig.activeClasses.includes(name))
+    ];
+
+    probBars.innerHTML = orderedClasses.map((name) => {
+        const style = getClassStyle(name);
+        const pct = Math.round((probabilities[name] || 0) * 100);
+        return `
+            <div class="prob-item">
+                <div class="prob-meta">
+                    <span>${style.label}</span>
+                    <span>${pct}%</span>
+                </div>
+                <div class="progress-track">
+                    <div
+                        class="progress-fill"
+                        style="width: ${pct}%; --emotion-color: ${style.accent}; --emotion-color-dark: ${style.accent_dark};"
+                    ></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
 // 1. Tab Navigation
 tabButtons.forEach(button => {
@@ -63,6 +173,12 @@ tabButtons.forEach(button => {
         // Auto-load dataset if clicking on dataset explorer
         if (targetTab === 'dataset-explorer' && !datasetLoaded) {
             loadDataset();
+        }
+        if (targetTab === 'analytics') {
+            renderAnalyticsExperiment(
+                document.querySelector('.experiment-option.active')?.getAttribute('data-experiment-id')
+                || experimentHistory.default_experiment_id
+            );
         }
     });
 });
@@ -250,37 +366,23 @@ function displayResults(data) {
     
     const pred = data.prediction;
     const confidence = Math.round(data.probabilities[pred] * 100);
+    const predStyle = getClassStyle(pred);
     
     predictedEmotionBadge.textContent = pred;
-    predictedEmotionBadge.className = 'badge ' + pred.toLowerCase();
+    predictedEmotionBadge.className = `badge ${predStyle.slug}`;
     
     predictionPercentage.textContent = `${confidence}%`;
     
     // Set dynamic SVG progress ring and glow
     if (progressCircle) {
         const offset = progressCircumference - (confidence / 100) * progressCircumference;
-        if (pred === 'Enojo') {
-            progressCircle.setAttribute('stroke', 'url(#gradient-enojo)');
-            progressCircle.style.filter = 'drop-shadow(0 0 10px rgba(239, 68, 68, 0.5))';
-        } else if (pred === 'Tristeza') {
-            progressCircle.setAttribute('stroke', 'url(#gradient-tristeza)');
-            progressCircle.style.filter = 'drop-shadow(0 0 10px rgba(6, 182, 212, 0.5))';
-        } else {
-            progressCircle.setAttribute('stroke', 'url(#gradient-default)');
-            progressCircle.style.filter = 'none';
-        }
+        const ringVisual = getRingVisual(pred);
+        progressCircle.setAttribute('stroke', ringVisual.stroke);
+        progressCircle.style.filter = ringVisual.glow;
         progressCircle.style.strokeDashoffset = offset;
     }
     
-    // Set probability bars
-    const enojoProb = Math.round(data.probabilities['Enojo'] * 100);
-    const tristezaProb = Math.round(data.probabilities['Tristeza'] * 100);
-    
-    probEnojoVal.textContent = `${enojoProb}%`;
-    probEnojoBar.style.width = `${enojoProb}%`;
-    
-    probTristezaVal.textContent = `${tristezaProb}%`;
-    probTristezaBar.style.width = `${tristezaProb}%`;
+    renderProbabilityBars(data.probabilities);
     
     // Set acoustic metrics
     metricDuration.textContent = `${data.metrics.duration.toFixed(1)}s`;
@@ -301,12 +403,12 @@ function loadDataset() {
             
             data.forEach(item => {
                 const tr = document.createElement('tr');
-                tr.className = `audio-row class-${item.clase}`;
+                tr.className = `audio-row class-${item.slug || slugifyEmotion(item.clase)}`;
                 
                 tr.innerHTML = `
                     <td><strong>${item.archivo}</strong></td>
                     <td><span class="recolector-tag">${item.recolector}</span></td>
-                    <td><span class="badge ${item.clase.toLowerCase()}">${item.clase}</span></td>
+                    <td><span class="badge ${item.slug || slugifyEmotion(item.clase)}">${item.clase}</span></td>
                     <td><code>${item.score.toFixed(4)}</code></td>
                     <td class="audio-cell">
                         <button class="custom-audio-btn" data-url="${item.url}">
@@ -350,7 +452,7 @@ function setupDatasetInteractions() {
             rows.forEach(row => {
                 if (filterValue === 'all') {
                     row.classList.remove('hidden');
-                } else if (row.classList.contains(`class-${filterValue}`)) {
+                } else if (row.classList.contains(`class-${slugifyEmotion(filterValue)}`)) {
                     row.classList.remove('hidden');
                 } else {
                     row.classList.add('hidden');
@@ -457,4 +559,16 @@ if (modelOptions.length > 0 && hiddenModelInput) {
             hiddenModelInput.value = opt.getAttribute('data-model');
         });
     });
+}
+
+if (experimentOptions.length > 0) {
+    experimentOptions.forEach((option) => {
+        option.addEventListener('click', () => {
+            renderAnalyticsExperiment(option.getAttribute('data-experiment-id'));
+        });
+    });
+    renderAnalyticsExperiment(
+        document.querySelector('.experiment-option.active')?.getAttribute('data-experiment-id')
+        || experimentHistory.default_experiment_id
+    );
 }

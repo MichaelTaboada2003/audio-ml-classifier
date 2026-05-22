@@ -1,6 +1,7 @@
 import os
 import time
 import tempfile
+import json
 import numpy as np
 import pandas as pd
 import librosa
@@ -17,6 +18,8 @@ DURATION = 10.0
 DATA_DIR = os.path.join("data", "AUDIOS MACHINE LEARNING")
 CACHE = os.path.join("outputs", "embeddings_v2.npz")
 REPORTE = os.path.join("outputs", "reporte_filtrado_v2.csv")
+MODEL_METRICS_PATH = os.path.join("outputs", "model_metrics.json")
+EXPERIMENT_HISTORY_PATH = os.path.join("outputs", "experiment_history.json")
 
 # Device configuration
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -36,6 +39,45 @@ MODEL_MAPPING = {
     "logreg": "Regresión Logística",
     "rf": "Random Forest"
 }
+
+ACTIVE_CLASSES = ["Enojo", "Tristeza", "Feliz"]
+TOP_N_DATASET = 10
+SCORE_COLUMNS = {
+    "Enojo": "score_enojo",
+    "Tristeza": "score_tristeza",
+    "Feliz": "score_feliz",
+}
+CLASS_STYLES = {
+    "Enojo": {"slug": "enojo", "label": "Enojo", "accent": "#ef4444", "accent_dark": "#b91c1c"},
+    "Tristeza": {"slug": "tristeza", "label": "Tristeza", "accent": "#06b6d4", "accent_dark": "#0891b2"},
+    "Feliz": {"slug": "feliz", "label": "Feliz", "accent": "#f59e0b", "accent_dark": "#d97706"},
+}
+
+
+def get_class_style(clase):
+    return CLASS_STYLES.get(
+        clase,
+        {
+            "slug": clase.lower(),
+            "label": clase,
+            "accent": "#a855f7",
+            "accent_dark": "#7e22ce",
+        },
+    )
+
+
+def load_model_metrics():
+    if not os.path.exists(MODEL_METRICS_PATH):
+        return {}
+    with open(MODEL_METRICS_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def load_experiment_history():
+    if not os.path.exists(EXPERIMENT_HISTORY_PATH):
+        return {"default_experiment_id": None, "experiments": []}
+    with open(EXPERIMENT_HISTORY_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 def init_models():
     global loaded_models, processor, wav2vec2_model
@@ -62,7 +104,25 @@ def init_models():
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    metrics = load_model_metrics()
+    experiment_history = load_experiment_history()
+    model_metrics = metrics.get("models", {})
+    best_model_key = metrics.get("best_model", "svm_lineal")
+    best_model_label = MODEL_MAPPING.get(best_model_key, best_model_key)
+    best_bal_acc = model_metrics.get(best_model_key, {}).get("balanced_accuracy")
+
+    return render_template(
+        "index.html",
+        active_classes=ACTIVE_CLASSES,
+        class_styles={clase: get_class_style(clase) for clase in ACTIVE_CLASSES},
+        top_n_dataset=TOP_N_DATASET,
+        model_mapping=MODEL_MAPPING,
+        model_metrics=model_metrics,
+        best_model_key=best_model_key,
+        best_model_label=best_model_label,
+        best_bal_acc=best_bal_acc,
+        experiment_history=experiment_history,
+    )
 
 @app.route("/data/audio/<clase>/<filename>")
 def serve_audio(clase, filename):
@@ -80,28 +140,37 @@ def get_dataset():
         
     df_rep = pd.read_csv(REPORTE)
     
-    top_enojo = (df_rep[df_rep["clase_original"] == "Enojo"]
-                 .sort_values("score_enojo", ascending=False)
-                 .head(13))
-                 
-    top_tristeza = (df_rep[df_rep["clase_original"] == "Tristeza"]
-                    .sort_values("score_tristeza", ascending=False)
-                    .head(13))
-                    
-    df_balanced = pd.concat([top_enojo, top_tristeza])
+    frames = []
+    for clase in ACTIVE_CLASSES:
+        score_col = SCORE_COLUMNS.get(clase)
+        if not score_col or score_col not in df_rep.columns:
+            continue
+        frames.append(
+            df_rep[df_rep["clase_original"] == clase]
+            .sort_values(score_col, ascending=False)
+            .head(TOP_N_DATASET)
+        )
+
+    if not frames:
+        return jsonify({"error": "No active classes available in report"}), 500
+
+    df_balanced = pd.concat(frames, ignore_index=True)
     
     records = []
     for _, row in df_balanced.iterrows():
         archivo = row["archivo"]
         clase = row["clase_original"]
-        score = row["score_enojo"] if clase == "Enojo" else row["score_tristeza"]
+        score_col = SCORE_COLUMNS.get(clase)
+        score = row[score_col] if score_col in row else None
         recolector = archivo[:2]
+        style = get_class_style(clase)
         
         records.append({
             "archivo": archivo,
             "clase": clase,
+            "slug": style["slug"],
             "recolector": recolector,
-            "score": float(score),
+            "score": float(score) if score is not None else 0.0,
             "url": f"/data/audio/{clase}/{archivo}"
         })
         
