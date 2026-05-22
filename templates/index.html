@@ -578,31 +578,31 @@
                 </div>
 
                 <div class="analytics-grid">
-                    <!-- Figure 1: Comparison -->
+                    <!-- Figure 1: Confusion matrix + LOOCV comparison -->
                     <div class="card glass-card img-card">
                         <div class="card-header">
-                            <h2 id="analytics-card-1-title">1. Comparativa de Modelos</h2>
-                            <p id="analytics-card-1-description">Resultados finales con CV (Leave-One-Out). Muestra el rendimiento de features manuales vs. wav2vec2 para las clases activas.</p>
+                            <h2 id="analytics-card-1-title">1. Desempeño y Matriz de Confusión (LOOCV)</h2>
+                            <p id="analytics-card-1-description">Matriz de confusión del mejor modelo y comparativa Balanced Accuracy por clasificador, evaluados con Leave-One-Audio-Out.</p>
                         </div>
                         <div class="figure-wrapper">
-                            <img src="/outputs/figuras/comparativa_features_vs_wav2vec2.png" alt="Comparativa de Modelos" class="figura-img" id="analytics-card-1-image">
+                            <img src="/outputs/figuras/resultados_v2.png" alt="Matriz de Confusión" class="figura-img" id="analytics-card-1-image">
                         </div>
                         <div class="card-footer">
-                            <p id="analytics-card-1-observation"><strong>Observación:</strong> Esta comparativa resume el rendimiento final del experimento actual y ayuda a contrastar embeddings profundos frente a features manuales.</p>
+                            <p id="analytics-card-1-observation"><strong>Observación:</strong> Esta cifra mide generalización a audios nuevos del mismo recolector. Para audios menos expresivos, ver la tarjeta de holdout.</p>
                         </div>
                     </div>
 
-                    <!-- Figure 2: Confusion matrix -->
+                    <!-- Figure 2: Holdout generalization -->
                     <div class="card glass-card img-card">
                         <div class="card-header">
-                            <h2 id="analytics-card-2-title">2. Desempeño y Matriz de Confusión</h2>
-                            <p id="analytics-card-2-description">Matriz de confusión detallada para el mejor modelo del experimento y balanced accuracy por clasificador.</p>
+                            <h2 id="analytics-card-2-title">2. Generalización a holdout</h2>
+                            <p id="analytics-card-2-description">Recall por modelo y clase sobre audios que el modelo desplegado NUNCA vio en training.</p>
                         </div>
                         <div class="figure-wrapper">
-                            <img src="/outputs/figuras/resultados_v2.png" alt="Matriz de Confusión" class="figura-img" id="analytics-card-2-image">
+                            <img src="/outputs/figuras/holdout_por_modelo.png" alt="Generalización a holdout" class="figura-img" id="analytics-card-2-image">
                         </div>
                         <div class="card-footer">
-                            <p id="analytics-card-2-observation"><strong>Observación:</strong> La matriz permite identificar en qué emociones sigue habiendo mayor confusión y qué tan estable es la separación entre clases.</p>
+                            <p id="analytics-card-2-observation"><strong>Observación:</strong> Métrica honestamente out-of-sample. Caída vs LOOCV refleja distribution shift entre training (audios top-score) y holdout (audios mid-score).</p>
                         </div>
                     </div>
 

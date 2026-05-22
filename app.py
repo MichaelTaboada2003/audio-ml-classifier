@@ -14,13 +14,17 @@ app = Flask(__name__, static_folder="static", template_folder="templates")
 
 # Paths and Constants
 TARGET_SR = 16000
-DURATION = 10.0
+MIN_AUDIO_DURATION = 4.0
+MAX_DURATION = 10.0        # debe coincidir con scripts/exportar_modelos.py
 DATA_DIR = os.path.join("data", "AUDIOS MACHINE LEARNING")
 CACHE = os.path.join("outputs", "embeddings_v2.npz")
 REPORTE = os.path.join("outputs", "reporte_filtrado_v2.csv")
 MODEL_METRICS_PATH = os.path.join("outputs", "model_metrics.json")
 EXPERIMENT_HISTORY_PATH = os.path.join("outputs", "experiment_history.json")
 DECISIONS_DATA_PATH = os.path.join("outputs", "decisions_data.json")
+
+# Audios usados en training (se cargan desde el cache al arrancar)
+TRAINING_FILES = set()
 
 # Device configuration
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -90,8 +94,8 @@ def load_decisions_data():
         return json.load(f)
 
 def init_models():
-    global loaded_models, processor, wav2vec2_model
-    
+    global loaded_models, processor, wav2vec2_model, TRAINING_FILES
+
     # 1. Load pre-trained models from joblib files
     model_dir = os.path.join("outputs", "modelos")
     print(f"Loading pre-trained classifiers from {model_dir}...")
@@ -102,7 +106,14 @@ def init_models():
             print(f"  Loaded model: {MODEL_MAPPING[model_key]}")
         else:
             print(f"  WARNING: Model binary not found at {path}")
-            
+
+    # 1b. Cargar lista de archivos usados en training (para excluir del dashboard)
+    if os.path.exists(CACHE):
+        c = np.load(CACHE, allow_pickle=True)
+        if "files" in c.files:
+            TRAINING_FILES = set(str(f) for f in c["files"])
+            print(f"  Training set: {len(TRAINING_FILES)} archivos únicos cargados del cache.")
+
     # 2. Load wav2vec2 for inference
     from transformers import Wav2Vec2Processor, Wav2Vec2Model
     print("Loading facebook/wav2vec2-base...")
@@ -155,11 +166,17 @@ def serve_figuras(filename):
 
 @app.route("/api/dataset", methods=["GET"])
 def get_dataset():
+    """Sirve audios HOLDOUT: los que NO entraron al training del modelo desplegado.
+
+    Excluye explícitamente los archivos en TRAINING_FILES (cargados desde el cache).
+    Predecir cualquiera de estos audios es una evaluación honesta out-of-sample.
+    """
     if not os.path.exists(REPORTE):
         return jsonify({"error": "Report CSV not found"}), 404
-        
+
     df_rep = pd.read_csv(REPORTE)
-    
+    df_rep = df_rep[~df_rep["archivo"].isin(TRAINING_FILES)]  # holdout puro
+
     frames = []
     for clase in ACTIVE_CLASSES:
         score_col = SCORE_COLUMNS.get(clase)
@@ -172,10 +189,10 @@ def get_dataset():
         )
 
     if not frames:
-        return jsonify({"error": "No active classes available in report"}), 500
+        return jsonify([])
 
     df_balanced = pd.concat(frames, ignore_index=True)
-    
+
     records = []
     for _, row in df_balanced.iterrows():
         archivo = row["archivo"]
@@ -184,7 +201,7 @@ def get_dataset():
         score = row[score_col] if score_col in row else None
         recolector = archivo[:2]
         style = get_class_style(clase)
-        
+
         records.append({
             "archivo": archivo,
             "clase": clase,
@@ -193,48 +210,41 @@ def get_dataset():
             "score": float(score) if score is not None else 0.0,
             "url": f"/data/audio/{clase}/{archivo}"
         })
-        
+
     return jsonify(records)
 
+
 def extract_features_and_predict(y, sr, model_key="svm_lineal"):
+    """Procesa el audio COMPLETO con wav2vec2 (mean-pool sobre todos los frames)
+    y predice con el clasificador seleccionado. Misma lógica que el training."""
     global loaded_models, processor, wav2vec2_model
-    
-    # Fallback to svm_lineal if key is invalid
+
     if model_key not in loaded_models:
         model_key = "svm_lineal" if "svm_lineal" in loaded_models else list(loaded_models.keys())[0]
-        
     clf = loaded_models[model_key]
-    
-    # 1. Extract wav2vec2 embedding
+    classes = list(clf.classes_)
+
+    # 1. Embedding wav2vec2 sobre el audio completo (mean-pool)
     inputs = processor(y, sampling_rate=sr, return_tensors="pt", padding=True)
     with torch.no_grad():
         out = wav2vec2_model(inputs.input_values.to(DEVICE))
     emb = out.last_hidden_state.mean(dim=1).squeeze().cpu().numpy().astype(np.float32)
-    
-    # 2. Predict with selected model
+
+    # 2. Predicción
     prediction = clf.predict([emb])[0]
     probs = clf.predict_proba([emb])[0]
-    classes = clf.classes_
-    
     prob_dict = {classes[i]: float(probs[i]) for i in range(len(classes))}
-    
-    # 3. Extract acoustic metrics for display
-    # Pitch estimation using pyin (bounded for speech)
-    f0, voiced_flag, voiced_probs = librosa.pyin(
-        y, fmin=50, fmax=400, sr=sr
-    )
+
+    # 3. Métricas acústicas para mostrar contexto en el frontend
+    f0, _, _ = librosa.pyin(y, fmin=50, fmax=400, sr=sr)
     f0_mean = float(np.nanmean(f0)) if not np.all(np.isnan(f0)) else 0.0
     f0_std = float(np.nanstd(f0)) if not np.all(np.isnan(f0)) else 0.0
-    
-    # RMS/Energy
-    rms = librosa.feature.rms(y=y)
-    rms_mean = float(np.mean(rms))
+    rms_global = librosa.feature.rms(y=y)
+    rms_mean = float(np.mean(rms_global))
     rms_db = float(librosa.amplitude_to_db(np.array([rms_mean]))[0])
-    
-    # Zero Crossing Rate
     zcr = librosa.feature.zero_crossing_rate(y=y)
     zcr_mean = float(np.mean(zcr))
-    
+
     return {
         "prediction": prediction,
         "probabilities": prob_dict,
@@ -262,7 +272,7 @@ def predict_dataset():
         return jsonify({"error": "Audio file not found"}), 404
         
     try:
-        y, sr = librosa.load(ruta, sr=TARGET_SR, mono=True, duration=DURATION)
+        y, sr = librosa.load(ruta, sr=TARGET_SR, mono=True, duration=MAX_DURATION)
         result = extract_features_and_predict(y, sr, model_key)
         return jsonify(result)
     except Exception as e:
@@ -286,10 +296,12 @@ def predict_upload():
             audio_file.save(temp_path)
             
         try:
-            y, sr = librosa.load(temp_path, sr=TARGET_SR, mono=True, duration=DURATION)
-            if len(y) < TARGET_SR * 0.3:
-                return jsonify({"error": "Audio is too short (minimum 0.3 seconds)"}), 400
-                
+            y, sr = librosa.load(temp_path, sr=TARGET_SR, mono=True, duration=MAX_DURATION)
+            if len(y) < TARGET_SR * MIN_AUDIO_DURATION:
+                return jsonify({
+                    "error": f"Audio demasiado corto (mínimo {MIN_AUDIO_DURATION}s)."
+                }), 400
+
             result = extract_features_and_predict(y, sr, model_key)
             return jsonify(result)
         finally:
