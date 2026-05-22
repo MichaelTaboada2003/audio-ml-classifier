@@ -34,19 +34,19 @@ TARGET_CLASS = "Enojo"  # clase positiva para la decision de "flag/escalar"
 MODEL_SPECS = {
     "svm_lineal": ("SVM lineal", lambda: Pipeline([
         ("s", StandardScaler()),
-        ("c", SVC(kernel="linear", C=1, probability=True, random_state=42)),
+        ("c", SVC(kernel="linear", C=1, probability=True, class_weight="balanced", random_state=42)),
     ])),
     "logreg": ("Reg. Logistica", lambda: Pipeline([
         ("s", StandardScaler()),
-        ("c", LogisticRegression(max_iter=2000, C=1, random_state=42)),
+        ("c", LogisticRegression(max_iter=2000, C=1, class_weight="balanced", random_state=42)),
     ])),
     "svm_rbf": ("SVM RBF", lambda: Pipeline([
         ("s", StandardScaler()),
-        ("c", SVC(kernel="rbf", C=10, gamma="scale", probability=True, random_state=42)),
+        ("c", SVC(kernel="rbf", C=10, gamma="scale", probability=True, class_weight="balanced", random_state=42)),
     ])),
     "rf": ("Random Forest", lambda: Pipeline([
         ("s", StandardScaler()),
-        ("c", RandomForestClassifier(n_estimators=200, random_state=42)),
+        ("c", RandomForestClassifier(n_estimators=200, class_weight="balanced", random_state=42)),
     ])),
     "knn_k5": ("KNN (k=5)", lambda: Pipeline([
         ("s", StandardScaler()),

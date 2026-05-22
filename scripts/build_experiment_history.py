@@ -19,9 +19,20 @@ from config import N_PER_CLASS, ACTIVE_CLASSES
 
 OUTPUT_PATH = os.path.join("outputs", "experiment_history.json")
 
-# ID dinámico del experimento actual según N_PER_CLASS
-CURRENT_3CL_ID = f"3clases_{N_PER_CLASS}x{N_PER_CLASS}x{N_PER_CLASS}"
-CURRENT_3CL_SUBTITLE = f"Enojo, Tristeza y Feliz · {N_PER_CLASS}x{N_PER_CLASS}x{N_PER_CLASS}"
+# ID y subtítulo derivados de los conteos REALES del cache (Feliz puede tener menos)
+def _derive_3cl_id_and_subtitle():
+    cache_path = os.path.join("outputs", "embeddings_v2.npz")
+    if not os.path.exists(cache_path):
+        return f"3clases_{N_PER_CLASS}cap", f"Enojo / Tristeza / Feliz · cap a {N_PER_CLASS} por clase"
+    c = np.load(cache_path, allow_pickle=True)
+    y = c["y"]
+    counts = [int(np.sum(y == clase)) for clase in ACTIVE_CLASSES]
+    parts = "x".join(str(c) for c in counts)
+    label_parts = ", ".join(f"{clase} {n}" for clase, n in zip(ACTIVE_CLASSES, counts))
+    return f"3clases_{parts}", f"Enojo / Tristeza / Feliz · {label_parts}"
+
+
+CURRENT_3CL_ID, CURRENT_3CL_SUBTITLE = _derive_3cl_id_and_subtitle()
 
 MODEL_SPECS = {
     "knn_k3": {
@@ -34,19 +45,19 @@ MODEL_SPECS = {
     },
     "svm_lineal": {
         "label": "SVM lineal",
-        "builder": lambda: Pipeline([("s", StandardScaler()), ("c", SVC(kernel="linear", C=1, probability=True, random_state=42))]),
+        "builder": lambda: Pipeline([("s", StandardScaler()), ("c", SVC(kernel="linear", C=1, probability=True, class_weight="balanced", random_state=42))]),
     },
     "svm_rbf": {
         "label": "SVM RBF",
-        "builder": lambda: Pipeline([("s", StandardScaler()), ("c", SVC(kernel="rbf", C=10, gamma="scale", probability=True, random_state=42))]),
+        "builder": lambda: Pipeline([("s", StandardScaler()), ("c", SVC(kernel="rbf", C=10, gamma="scale", probability=True, class_weight="balanced", random_state=42))]),
     },
     "logreg": {
         "label": "Reg. Logística",
-        "builder": lambda: Pipeline([("s", StandardScaler()), ("c", LogisticRegression(max_iter=2000, C=1, random_state=42))]),
+        "builder": lambda: Pipeline([("s", StandardScaler()), ("c", LogisticRegression(max_iter=2000, C=1, class_weight="balanced", random_state=42))]),
     },
     "rf": {
         "label": "Random Forest",
-        "builder": lambda: Pipeline([("s", StandardScaler()), ("c", RandomForestClassifier(n_estimators=200, random_state=42))]),
+        "builder": lambda: Pipeline([("s", StandardScaler()), ("c", RandomForestClassifier(n_estimators=200, class_weight="balanced", random_state=42))]),
     },
 }
 
@@ -98,36 +109,35 @@ EXPERIMENTS = [
         "status": "actual",
         "classes": ACTIVE_CLASSES,
         "cache_path": os.path.join("outputs", "embeddings_v2.npz"),
-        "dataset_size": N_PER_CLASS * len(ACTIVE_CLASSES),
-        "samples_per_class": N_PER_CLASS,
+        "samples_per_class": N_PER_CLASS,  # cap deseado; cache real puede tener menos en alguna clase
         "cards": [
             {
-                "key": "comparison",
-                "title": "Comparativa de modelos",
-                "description": "Comparación de rendimiento entre features manuales y wav2vec2 en el escenario multiclase.",
-                "image": "/outputs/figuras/comparativa_features_vs_wav2vec2.png",
-                "observation": "Agregar Feliz vuelve más difícil la separación y reduce el margen respecto al caso binario.",
+                "key": "performance",
+                "title": "Desempeño y matriz de confusión (LOOCV)",
+                "description": "Matriz de confusión y comparativa LOOCV del mejor modelo. Entrenado con cap N=20 por clase (Feliz limitado a 15 por disponibilidad) y class_weight='balanced'.",
+                "image": "/outputs/figuras/resultados_v2.png",
+                "observation": "La mayor confusión persiste entre Enojo↔Feliz por su activación acústica similar. Tristeza se separa mejor. Esta cifra LOOCV (~67% LogReg) mide generalización a audios nuevos del mismo recolector — ver tarjeta de holdout para generalización a audios de menor expresividad.",
             },
             {
-                "key": "performance",
-                "title": "Desempeño y matriz de confusión",
-                "description": "Matriz de confusión y balanced accuracy del mejor modelo en el experimento de 3 emociones.",
-                "image": "/outputs/figuras/resultados_3clases_10x10x10.png",
-                "observation": "La mayor confusión aparece entre Enojo y Feliz por su activación acústica similar.",
+                "key": "holdout",
+                "title": "Generalización a holdout (NUEVA)",
+                "description": "Recall por modelo y clase sobre audios que el modelo desplegado NUNCA vio en training (excluidos del cache de embeddings).",
+                "image": "/outputs/figuras/holdout_por_modelo.png",
+                "observation": "Antes de expandir el training a N=20, SVM lineal acertaba solo 9% de los Enojo holdout. Con N=20 sube a 59%. La mejora confirma que el training previo (N=14, solo audios EXCELENTE) era demasiado homogéneo en expresividad. Feliz holdout=0 porque los 15 audios disponibles ya están todos en training.",
             },
             {
                 "key": "separability",
                 "title": "Separabilidad en 2D",
-                "description": "Proyección de embeddings wav2vec2 para las 3 emociones activas.",
+                "description": "Proyección PCA y t-SNE de los embeddings wav2vec2 actualmente en cache.",
                 "image": "/outputs/figuras/separabilidad_v2.png",
-                "observation": "Tristeza tiende a separarse mejor; Feliz y Enojo comparten una región más cercana.",
+                "observation": "Tristeza tiende a separarse mejor del resto. Feliz y Enojo comparten una región más cercana, consistente con la confusión observada en la matriz de confusión y con la sobreposición de scores acústicos (score_enojo a menudo > score_feliz en los audios Feliz del dataset).",
             },
             {
                 "key": "filtering",
                 "title": "Distribución de calidad acústica",
-                "description": "Distribución de scores que guía el filtrado del dataset completo.",
+                "description": "Distribución de scores por clase calculados sobre los primeros 10s de cada audio. Guía la selección del training set.",
                 "image": "/outputs/figuras/reporte_filtrado_v2.png",
-                "observation": "Esta vista ayuda a ver qué clases siguen limitadas por calidad de actuación o solapamiento acústico.",
+                "observation": "Visualiza por qué Feliz es el cuello de botella (solo 15 audios totales) y muestra el rango de scores que el modelo ve en training vs el que aparece en producción.",
             },
         ],
     },
@@ -171,6 +181,7 @@ def evaluar_cache(cache_path):
         "best_balanced_accuracy": round(best_bal_acc, 4),
         "chance_accuracy": round(1.0 / len(np.unique(y)), 4),
         "class_counts": {clase: int(np.sum(y == clase)) for clase in sorted(np.unique(y).tolist())},
+        "dataset_size": int(len(y)),
     }
 
 

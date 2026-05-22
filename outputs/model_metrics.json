@@ -4,45 +4,45 @@
     "Tristeza",
     "Feliz"
   ],
-  "samples_per_class": 14,
-  "dataset_size": 42,
+  "samples_per_class": 20,
+  "dataset_size": 55,
   "chance_accuracy": 0.3333,
   "models": {
     "svm_lineal": {
       "label": "SVM lineal",
       "description": "Excelente separabilidad lineal en el espacio de embeddings.",
-      "accuracy": 0.6905,
-      "balanced_accuracy": 0.6905
+      "accuracy": 0.6182,
+      "balanced_accuracy": 0.6056
     },
     "logreg": {
       "label": "Reg. Logística",
       "description": "Clasificador probabilístico de entropía máxima.",
-      "accuracy": 0.7381,
-      "balanced_accuracy": 0.7381
+      "accuracy": 0.6909,
+      "balanced_accuracy": 0.6722
     },
     "svm_rbf": {
       "label": "SVM RBF",
       "description": "Captura fronteras no lineales entre emociones.",
-      "accuracy": 0.6429,
-      "balanced_accuracy": 0.6429
+      "accuracy": 0.6182,
+      "balanced_accuracy": 0.5889
     },
     "rf": {
       "label": "Random Forest",
       "description": "Ensemble robusto basado en árboles de decisión.",
-      "accuracy": 0.5952,
-      "balanced_accuracy": 0.5952
+      "accuracy": 0.5636,
+      "balanced_accuracy": 0.5333
     },
     "knn_k5": {
       "label": "KNN (k=5)",
       "description": "Votación por 5 vecinos más cercanos.",
-      "accuracy": 0.5952,
-      "balanced_accuracy": 0.5952
+      "accuracy": 0.4909,
+      "balanced_accuracy": 0.4778
     },
     "knn_k3": {
       "label": "KNN (k=3)",
       "description": "Votación por 3 vecinos más cercanos.",
-      "accuracy": 0.5238,
-      "balanced_accuracy": 0.5238
+      "accuracy": 0.4909,
+      "balanced_accuracy": 0.4778
     }
   },
   "best_model": "logreg"

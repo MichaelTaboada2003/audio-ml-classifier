@@ -1,5 +1,5 @@
 {
-  "default_experiment_id": "3clases_14x14x14",
+  "default_experiment_id": "3clases_20x20x15",
   "experiments": [
     {
       "id": "2clases_10x10",
@@ -83,87 +83,87 @@
       }
     },
     {
-      "id": "3clases_14x14x14",
+      "id": "3clases_20x20x15",
       "name": "3 emociones",
-      "subtitle": "Enojo, Tristeza y Feliz · 14x14x14",
+      "subtitle": "Enojo / Tristeza / Feliz · Enojo 20, Tristeza 20, Feliz 15",
       "status": "actual",
       "classes": [
         "Enojo",
         "Tristeza",
         "Feliz"
       ],
-      "dataset_size": 42,
-      "samples_per_class": 14,
+      "samples_per_class": 20,
       "cards": [
         {
-          "key": "comparison",
-          "title": "Comparativa de modelos",
-          "description": "Comparación de rendimiento entre features manuales y wav2vec2 en el escenario multiclase.",
-          "image": "/outputs/figuras/comparativa_features_vs_wav2vec2.png",
-          "observation": "Agregar Feliz vuelve más difícil la separación y reduce el margen respecto al caso binario."
+          "key": "performance",
+          "title": "Desempeño y matriz de confusión (LOOCV)",
+          "description": "Matriz de confusión y comparativa LOOCV del mejor modelo. Entrenado con cap N=20 por clase (Feliz limitado a 15 por disponibilidad) y class_weight='balanced'.",
+          "image": "/outputs/figuras/resultados_v2.png",
+          "observation": "La mayor confusión persiste entre Enojo↔Feliz por su activación acústica similar. Tristeza se separa mejor. Esta cifra LOOCV (~67% LogReg) mide generalización a audios nuevos del mismo recolector — ver tarjeta de holdout para generalización a audios de menor expresividad."
         },
         {
-          "key": "performance",
-          "title": "Desempeño y matriz de confusión",
-          "description": "Matriz de confusión y balanced accuracy del mejor modelo en el experimento de 3 emociones.",
-          "image": "/outputs/figuras/resultados_3clases_10x10x10.png",
-          "observation": "La mayor confusión aparece entre Enojo y Feliz por su activación acústica similar."
+          "key": "holdout",
+          "title": "Generalización a holdout (NUEVA)",
+          "description": "Recall por modelo y clase sobre audios que el modelo desplegado NUNCA vio en training (excluidos del cache de embeddings).",
+          "image": "/outputs/figuras/holdout_por_modelo.png",
+          "observation": "Antes de expandir el training a N=20, SVM lineal acertaba solo 9% de los Enojo holdout. Con N=20 sube a 59%. La mejora confirma que el training previo (N=14, solo audios EXCELENTE) era demasiado homogéneo en expresividad. Feliz holdout=0 porque los 15 audios disponibles ya están todos en training."
         },
         {
           "key": "separability",
           "title": "Separabilidad en 2D",
-          "description": "Proyección de embeddings wav2vec2 para las 3 emociones activas.",
+          "description": "Proyección PCA y t-SNE de los embeddings wav2vec2 actualmente en cache.",
           "image": "/outputs/figuras/separabilidad_v2.png",
-          "observation": "Tristeza tiende a separarse mejor; Feliz y Enojo comparten una región más cercana."
+          "observation": "Tristeza tiende a separarse mejor del resto. Feliz y Enojo comparten una región más cercana, consistente con la confusión observada en la matriz de confusión y con la sobreposición de scores acústicos (score_enojo a menudo > score_feliz en los audios Feliz del dataset)."
         },
         {
           "key": "filtering",
           "title": "Distribución de calidad acústica",
-          "description": "Distribución de scores que guía el filtrado del dataset completo.",
+          "description": "Distribución de scores por clase calculados sobre los primeros 10s de cada audio. Guía la selección del training set.",
           "image": "/outputs/figuras/reporte_filtrado_v2.png",
-          "observation": "Esta vista ayuda a ver qué clases siguen limitadas por calidad de actuación o solapamiento acústico."
+          "observation": "Visualiza por qué Feliz es el cuello de botella (solo 15 audios totales) y muestra el rango de scores que el modelo ve en training vs el que aparece en producción."
         }
       ],
       "metrics": {
         "knn_k3": {
           "label": "KNN (k=3)",
-          "accuracy": 0.5238,
-          "balanced_accuracy": 0.5238
+          "accuracy": 0.4909,
+          "balanced_accuracy": 0.4778
         },
         "knn_k5": {
           "label": "KNN (k=5)",
-          "accuracy": 0.5952,
-          "balanced_accuracy": 0.5952
+          "accuracy": 0.4909,
+          "balanced_accuracy": 0.4778
         },
         "svm_lineal": {
           "label": "SVM lineal",
-          "accuracy": 0.6905,
-          "balanced_accuracy": 0.6905
+          "accuracy": 0.6182,
+          "balanced_accuracy": 0.6056
         },
         "svm_rbf": {
           "label": "SVM RBF",
-          "accuracy": 0.6429,
-          "balanced_accuracy": 0.6429
+          "accuracy": 0.6182,
+          "balanced_accuracy": 0.5889
         },
         "logreg": {
           "label": "Reg. Logística",
-          "accuracy": 0.7381,
-          "balanced_accuracy": 0.7381
+          "accuracy": 0.6909,
+          "balanced_accuracy": 0.6722
         },
         "rf": {
           "label": "Random Forest",
-          "accuracy": 0.5952,
-          "balanced_accuracy": 0.5952
+          "accuracy": 0.5636,
+          "balanced_accuracy": 0.5333
         }
       },
       "best_model": "logreg",
-      "best_balanced_accuracy": 0.7381,
+      "best_balanced_accuracy": 0.6722,
       "chance_accuracy": 0.3333,
       "class_counts": {
-        "Enojo": 14,
-        "Feliz": 14,
-        "Tristeza": 14
-      }
+        "Enojo": 20,
+        "Feliz": 15,
+        "Tristeza": 20
+      },
+      "dataset_size": 55
     }
   ]
 }

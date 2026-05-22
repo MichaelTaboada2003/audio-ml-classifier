@@ -16,7 +16,7 @@ import os
 #
 # Puedes override puntualmente vía variable de entorno:
 #   N_PER_CLASS=20 python scripts/exportar_modelos.py
-N_PER_CLASS = int(os.environ.get("N_PER_CLASS", 14))
+N_PER_CLASS = int(os.environ.get("N_PER_CLASS", 20))
 
 # Score mínimo para considerar un audio válido por su clase
 MIN_SCORE = 0.35
