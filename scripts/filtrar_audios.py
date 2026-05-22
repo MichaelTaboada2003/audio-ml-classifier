@@ -2,23 +2,23 @@
 """
 filtrar_audios.py
 =================
-Calcula scores acusticos por emocion para cada audio del dataset.
+Calcula scores acusticos por emocion para las clases activas del experimento.
 NO reasigna etiquetas — cada audio mantiene su clase original con su score.
 
-Los notebooks luego seleccionan los top-N audios por clase para entrenar,
-o filtran por umbral de score si lo necesitan.
+Los scripts del pipeline (exportar_modelos.py) seleccionan los top-N audios por
+clase usando estos scores como filtro de calidad: solo entran al training audios
+que SUENAN como su etiqueta.
 
 Scores calculados (cada uno en [0, 1]):
-  - score_enojo:        firma de enojo (energia alta, pitch variable, dinamica rapida)
-  - score_tristeza:     firma de tristeza (energia baja, pitch grave, monotonia)
-  - score_tranquilidad: firma de calma (energia media-baja estable, pitch suave)
-  - score_neutro:       ausencia de firma emocional (audio plano)
+  - score_enojo:    firma de enojo (energia alta, pitch variable, dinamica rapida)
+  - score_tristeza: firma de tristeza (energia baja, pitch grave, monotonia)
+  - score_feliz:    firma de felicidad (brillo espectral alto, entonacion melodica amplia)
 
 Uso (desde la raiz del proyecto):
     python scripts/filtrar_audios.py
 
 Output:
-    - outputs/reporte_filtrado_v2.csv       (una fila por audio, todos los scores)
+    - outputs/reporte_filtrado_v2.csv       (una fila por audio con sus scores)
     - outputs/figuras/reporte_filtrado_v2.png
 """
 
@@ -33,13 +33,17 @@ import librosa
 
 warnings.filterwarnings('ignore')
 
+# Importa configuración centralizada
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import ACTIVE_CLASSES
+
 # Rutas relativas a la raiz del proyecto
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR    = os.path.join(_ROOT, 'data', 'AUDIOS MACHINE LEARNING')
 REPORTE_CSV = os.path.join(_ROOT, 'outputs', 'reporte_filtrado_v2.csv')
 REPORTE_PNG = os.path.join(_ROOT, 'outputs', 'figuras', 'reporte_filtrado_v2.png')
 
-CLASES = ['Aburrido', 'Enojo', 'Feliz', 'Tranquilidad', 'Tristeza']
+CLASES = list(ACTIVE_CLASSES)  # [Enojo, Tristeza, Feliz] desde config.py
 EXTS   = {'.ogg', '.mp3', '.mp4', '.mpeg', '.wav', '.flac', '.m4a'}
 SR     = 22050
 
@@ -143,88 +147,34 @@ def score_tristeza(m):
     s_silencios = _norm(m['frac_silencio'], 0.12, 0.45)
     s_lentitud = 1.0 - _norm(m['onset_rate'], 1.0, 3.0)
     s_brillo_bajo = 1.0 - _norm(m['centroid_hz'], 1200.0, 2600.0)
-    
+
     return (0.22 * s_energia_baja + 0.13 * s_pitch_bajo + 0.22 * s_monotonia +
             0.13 * s_silencios + 0.15 * s_lentitud + 0.15 * s_brillo_bajo)
 
 
-def score_aburrido(m):
-    """
-    Firma de aburrimiento: habla extremadamente monotona (pitch_std muy bajo),
-    ritmo muy lento (onset_rate bajo), energia media-baja estable,
-    baja variabilidad dinamica y brillo espectral moderadamente bajo.
-    """
-    s_energia_med_baja = 1.0 - min(abs(m['energy_level_db'] - (-32.0)) / 10.0, 1.0) # Pico en -32 dB
-    s_pitch_bajo = 1.0 - _norm(m['pitch_mean_st'], 0.0, 8.0)
-    s_super_monotono = 1.0 - _norm(m['pitch_std_st'], 0.8, 2.2) # Muy exigente con la monotonia
-    s_lentitud = 1.0 - _norm(m['onset_rate'], 0.8, 2.2)
-    s_dinamica_plana = 1.0 - _norm(m['dynamic_range_db'], 18.0, 32.0)
-    s_brillo_moderado = 1.0 - _norm(m['centroid_hz'], 1100.0, 2200.0)
-    
-    return (0.15 * s_energia_med_baja + 0.10 * s_pitch_bajo + 0.30 * s_super_monotono +
-            0.20 * s_lentitud + 0.15 * s_dinamica_plana + 0.10 * s_brillo_moderado)
-
-
 def score_feliz(m):
     """
-    Firma de felicidad: energia alta, pitch medio-alto y muy variable (entonacion musical),
-    brillo espectral alto (voz sonriente) y dinamica activa.
+    Firma de felicidad: brillo espectral alto (sonrisa al hablar) y
+    entonacion melodica amplia (pitch_range) son los rasgos *unicos* que
+    separan Feliz de Enojo. Energia y pitch alto son compartidos con
+    Enojo, asi que reciben menos peso.
     """
-    s_energia = _norm(m['energy_level_db'], -38.0, -22.0)
-    s_pitch_alto = _norm(m['pitch_mean_st'], 6.0, 20.0)
-    s_pitch_variabilidad = _norm(m['pitch_std_st'], 2.5, 7.5) # Muy variable
-    s_brillo = _norm(m['centroid_hz'], 1400.0, 3200.0)
-    s_dinamica = _norm(m['dynamic_range_db'], 22.0, 45.0)
-    
-    return (0.20 * s_energia + 0.25 * s_pitch_alto + 0.25 * s_pitch_variabilidad +
-            0.15 * s_brillo + 0.15 * s_dinamica)
+    s_brillo              = _norm(m['centroid_hz'],      1400.0, 3200.0)
+    s_pitch_rango         = _norm(m['pitch_range_st'],      6.0,   18.0)
+    s_pitch_variabilidad  = _norm(m['pitch_std_st'],        2.5,    7.5)
+    s_pitch_alto          = _norm(m['pitch_mean_st'],       6.0,   20.0)
+    s_energia             = _norm(m['energy_level_db'],   -38.0,  -22.0)
+    s_dinamica            = _norm(m['dynamic_range_db'],   22.0,   45.0)
 
-
-def score_tranquilidad(m):
-    """
-    Firma de calma activa: energia media estable, pitch en rango medio
-    sin extremos, pocas variaciones bruscas, brillo medio.
-    Diferencia clave con neutro: la tranquilidad es "voz hablada normal",
-    no ausencia de senal.
-    """
-    # Energia en rango medio (no muy alta, no muy baja)
-    e = m['energy_level_db']
-    s_energia_media = 1.0 - min(abs(e - (-30.0)) / 12.0, 1.0)  # pico en -30 dB
-
-    # Pitch en rango medio (no extremo)
-    p = m['pitch_mean_st']
-    s_pitch_medio = 1.0 - min(abs(p - 6.0) / 8.0, 1.0)  # pico en 6 st
-
-    # Variabilidad de pitch baja-media (estable pero no plano como tristeza)
-    s_pitch_estable = _norm(m['pitch_std_st'], 1.0, 3.5)
-    s_pitch_estable = min(s_pitch_estable, 1.0 - max(m['pitch_std_st'] - 4.5, 0) / 3.5)
-    s_pitch_estable = max(s_pitch_estable, 0.0)
-
-    # Pocos silencios largos (habla continua)
-    s_continuidad = 1.0 - _norm(m['frac_silencio'], 0.10, 0.35)
-
-    # Dinamica moderada
-    d = m['dynamic_range_db']
-    s_dinamica_mod = 1.0 - min(abs(d - 28.0) / 18.0, 1.0)
-
-    # Onsets moderados
-    o = m['onset_rate']
-    s_ritmo_mod = 1.0 - min(abs(o - 2.0) / 1.5, 1.0)
-
-    return (0.20 * s_energia_media + 0.15 * s_pitch_medio +
-            0.20 * s_pitch_estable + 0.15 * s_continuidad +
-            0.15 * s_dinamica_mod + 0.15 * s_ritmo_mod)
-
-
-def score_neutro(m):
-    """
-    Score de audio plano/sin firma emocional clara. Util para detectar
-    audios de baja calidad o sin expresividad.
-    """
-    s_pitch_plano   = _norm(-m['pitch_std_st'],     -4.0, -1.5)
-    s_dinamica_baja = _norm(-m['dynamic_range_db'], -35.0, -20.0)
-    s_energia_med   = 1.0 - abs(_norm(m['energy_level_db'], -40.0, -22.0) - 0.5) * 2
-    return 0.4 * s_pitch_plano + 0.4 * s_dinamica_baja + 0.2 * s_energia_med
+    # Pesos: 45% para rasgos unicos vs Enojo (brillo + pitch_range);
+    #        35% para rasgos parcialmente compartidos (variabilidad + pitch alto);
+    #        20% para rasgos compartidos con Enojo (energia + dinamica).
+    return (0.30 * s_brillo +
+            0.15 * s_pitch_rango +
+            0.20 * s_pitch_variabilidad +
+            0.15 * s_pitch_alto +
+            0.10 * s_energia +
+            0.10 * s_dinamica)
 
 
 # --- Analisis del dataset ---
@@ -246,15 +196,12 @@ def analizar_dataset(data_dir):
         if m is None:
             continue
         m.update({
-            'archivo':            nombre,
-            'clase_original':     clase,
-            'recolector':         nombre[:2],
-            'score_enojo':        score_enojo(m),
-            'score_tristeza':     score_tristeza(m),
-            'score_tranquilidad': score_tranquilidad(m),
-            'score_aburrido':     score_aburrido(m),
-            'score_feliz':        score_feliz(m),
-            'score_neutro':       score_neutro(m),
+            'archivo':        nombre,
+            'clase_original': clase,
+            'recolector':     nombre[:2],
+            'score_enojo':    score_enojo(m),
+            'score_tristeza': score_tristeza(m),
+            'score_feliz':    score_feliz(m),
         })
         filas.append(m)
     return pd.DataFrame(filas)
@@ -271,7 +218,7 @@ def imprimir_reporte(df):
     print(df['clase_original'].value_counts().to_string())
 
     print('\nMedia de score por clase original:')
-    cols_score = ['score_enojo', 'score_tristeza', 'score_tranquilidad', 'score_aburrido', 'score_feliz', 'score_neutro']
+    cols_score = ['score_enojo', 'score_tristeza', 'score_feliz']
     print(df.groupby('clase_original')[cols_score].mean().round(3).to_string())
 
     # Top-5 por cada score
@@ -289,11 +236,9 @@ def imprimir_reporte(df):
 
     umbrales = [0.30, 0.346, 0.40, 0.45, 0.50, 0.55, 0.60]
     score_map = {
-        'Enojo':        'score_enojo',
-        'Tristeza':     'score_tristeza',
-        'Tranquilidad': 'score_tranquilidad',
-        'Aburrido':     'score_aburrido',
-        'Feliz':        'score_feliz',
+        'Enojo':    'score_enojo',
+        'Tristeza': 'score_tristeza',
+        'Feliz':    'score_feliz',
     }
 
     print('{:<15} {:>8}  '.format('Clase', 'Total') +
@@ -391,16 +336,14 @@ def imprimir_reporte(df):
 
 
 def graficar_reporte(df, output_path):
-    cols_score = ['score_enojo', 'score_tristeza', 'score_tranquilidad', 'score_aburrido', 'score_feliz', 'score_neutro']
+    cols_score = ['score_enojo', 'score_tristeza', 'score_feliz']
     colores = {
-        'Aburrido':     '#4C72B0',
-        'Enojo':        '#DD8452',
-        'Tranquilidad': '#55A868',
-        'Tristeza':     '#C44E52',
-        'Feliz':        '#E377C2',
+        'Enojo':    '#DD8452',
+        'Tristeza': '#C44E52',
+        'Feliz':    '#E377C2',
     }
 
-    fig, axes = plt.subplots(3, 2, figsize=(14, 12))
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
     for ax, score in zip(axes.ravel(), cols_score):
         for clase in CLASES:
             sub = df[df['clase_original'] == clase][score].values
