@@ -14,6 +14,7 @@ La capa de Toma de Decisiones se agregó **sin modificar la capa de ML**: solo c
 - [Resumen rápido](#resumen-rápido)
 - [Aplicación web — pestañas disponibles](#aplicación-web--pestañas-disponibles)
 - [Capa 1 · Machine Learning](#capa-1--machine-learning)
+  - [Trade-off tamaño del dataset (N=10 vs N=14)](#trade-off-tamaño-del-dataset-n10-vs-n14)
 - [Capa 2 · Toma de Decisiones](#capa-2--toma-de-decisiones)
   - [Problema de decisión](#problema-de-decisión)
   - [Estructura del módulo](#estructura-del-módulo)
@@ -37,7 +38,7 @@ La capa de Toma de Decisiones se agregó **sin modificar la capa de ML**: solo c
 | ML | Clasifica audio en Enojo / Tristeza / Feliz con 6 modelos clásicos sobre embeddings wav2vec2 (768 dims) | Predicción + probabilidades + métricas acústicas |
 | Decisiones | Convierte las matrices de confusión y probabilidades LOO en una decisión de negocio (GO / NO-GO, umbral óptimo, VPN esperado) | Recomendación justificada con sensibilidad y Monte Carlo |
 
-**Mejor modelo actual:** SVM lineal con **76.7 %** de balanced accuracy en el escenario de 3 emociones (chance = 33.3 %).
+**Mejor modelo actual:** Regresión Logística con **73.8 %** de balanced accuracy en el escenario de 3 emociones con 14 audios por clase (chance = 33.3 %). Ver [trade-off N=10 vs N=14](#trade-off-tamaño-del-dataset-n10-vs-n14) para entender por qué la cifra es más baja —y más confiable— que en versiones previas del proyecto.
 
 ---
 
@@ -58,9 +59,26 @@ La app Flask (`app.py`) levanta una interfaz con 4 pestañas:
 
 | Enfoque | Mejor modelo | Accuracy | Balanced Acc |
 |---|---|---|---|
-| Features manuales (144 dims) | SVM lineal / Random Forest | 0.85 | 0.8462 |
-| wav2vec2 embeddings (768 dims, 3 clases) | SVM lineal | **0.7667** | **0.7667** |
-| wav2vec2 embeddings (768 dims, 2 clases) | KNN k=5 / SVM RBF / RF | 0.85 | 0.85 |
+| Features manuales (144 dims, 3 clases · 14 muestras) | SVM lineal | 0.643 | 0.643 |
+| wav2vec2 embeddings (768 dims, 3 clases · 14 muestras) | **Reg. Logística** | **0.738** | **0.738** |
+| wav2vec2 embeddings (768 dims, 2 clases · 10 muestras, archivado) | KNN k=5 / SVM RBF / RF | 0.85 | 0.85 |
+
+### Trade-off tamaño del dataset (N=10 vs N=14)
+
+Históricamente este proyecto se entrenó con `N_PER_CLASS = 10` (los audios EXCELENTE, score ≥ 0.45) y alcanzaba **76.7 %** de balanced accuracy. Al ampliar a `N_PER_CLASS = 14` se incluyen audios PASA (score 0.35-0.45), menos expresivos pero más representativos. El resultado:
+
+| Aspecto | N=10 (cherry-picked) | N=14 (más realista) |
+|---|---|---|
+| Mejor BalAcc reportada | 76.7 % | **73.8 %** |
+| Muestras totales | 30 | 42 |
+| Audios "EXCELENTE" en Tristeza | 10/10 | 7/14 (resto PASA) |
+| Audios "EXCELENTE" en Feliz | 10/10 | 11/14 (resto PASA) |
+| Intervalo de confianza | más amplio | ~17 % más estrecho |
+| Riesgo de cherry-picking | alto | bajo |
+
+**¿Por qué N=14 a pesar de la cifra más baja?** El número más alto del top-10 estaba inflado por seleccionar solo los audios más expresivos; al usar el modelo en producción con audios "normales" (la mayoría son PASA), el desempeño esperado se acerca más al 73.8 % que al 76.7 %. Reportar 73.8 % es más honesto y menos vulnerable a sobreajuste por muestreo selectivo.
+
+`config.py` controla este parámetro con `N_PER_CLASS = 14` (override vía `N_PER_CLASS=20 python ...`); todo el pipeline se adapta automáticamente.
 
 ### Dataset
 
