@@ -16,10 +16,15 @@ import os
 #
 # Puedes override puntualmente vía variable de entorno:
 #   N_PER_CLASS=20 python scripts/exportar_modelos.py
-N_PER_CLASS = int(os.environ.get("N_PER_CLASS", 20))
+N_PER_CLASS = int(os.environ.get("N_PER_CLASS", 15))
 
-# Score mínimo para considerar un audio válido por su clase
-MIN_SCORE = 0.35
+# Score minimo para considerar un audio "valido" en su clase.
+# 0.0 = filtro acustico desactivado: el score sigue siendo el criterio de
+# ranking (top-N por score) pero NO se descartan audios por umbral.
+# Confiamos en que wav2vec2 captura senal que las 7 metricas globales no ven.
+MIN_SCORE = 0.0
 
-# Clases activas del experimento actual
-ACTIVE_CLASSES = ["Enojo", "Tristeza", "Feliz"]
+# Clases activas del experimento actual.
+# Arrancamos con 2 clases (Enojo vs Tristeza) como baseline limpio. Chance=50%.
+# Despues escalamos a 3 (+ Feliz) y a 4 (+ Tranquilidad).
+ACTIVE_CLASSES = ["Enojo", "Tranquilidad"]

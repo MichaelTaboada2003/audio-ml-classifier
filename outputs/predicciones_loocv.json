@@ -1,29 +1,26 @@
 {
   "classes_active": [
     "Enojo",
-    "Tristeza",
-    "Feliz"
+    "Tranquilidad"
   ],
-  "n_audios": 55,
+  "n_audios": 30,
   "models": {
     "svm_lineal": {
       "label": "SVM lineal",
       "classes_order": [
         "Enojo",
-        "Feliz",
-        "Tristeza"
+        "Tranquilidad"
       ],
       "predictions": [
         {
           "archivo": "ED_03_ENO_S.ogg",
           "recolector": "ED",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.4183,
-            "Feliz": 0.4167,
-            "Tristeza": 0.165
+            "Enojo": 0.9929,
+            "Tranquilidad": 0.0071
           }
         },
         {
@@ -33,9 +30,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.5488,
-            "Feliz": 0.3544,
-            "Tristeza": 0.0968
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
@@ -45,21 +41,19 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.4942,
-            "Feliz": 0.4471,
-            "Tristeza": 0.0587
+            "Enojo": 0.9999,
+            "Tranquilidad": 0.0001
           }
         },
         {
           "archivo": "MT_05_ENO.ogg",
           "recolector": "MT",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.1984,
-            "Feliz": 0.6666,
-            "Tristeza": 0.135
+            "Enojo": 0.9643,
+            "Tranquilidad": 0.0357
           }
         },
         {
@@ -69,9 +63,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6743,
-            "Feliz": 0.2944,
-            "Tristeza": 0.0313
+            "Enojo": 0.9531,
+            "Tranquilidad": 0.0469
           }
         },
         {
@@ -81,9 +74,30 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.5836,
-            "Feliz": 0.3666,
-            "Tristeza": 0.0497
+            "Enojo": 0.9582,
+            "Tranquilidad": 0.0418
+          }
+        },
+        {
+          "archivo": "SG_01_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Enojo",
+          "prediccion": "Enojo",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.9412,
+            "Tranquilidad": 0.0588
+          }
+        },
+        {
+          "archivo": "SG_06_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Enojo",
+          "prediccion": "Enojo",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.9412,
+            "Tranquilidad": 0.0588
           }
         },
         {
@@ -93,57 +107,19 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6188,
-            "Feliz": 0.2732,
-            "Tristeza": 0.108
-          }
-        },
-        {
-          "archivo": "VA_03_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.7364,
-            "Feliz": 0.1927,
-            "Tristeza": 0.0709
-          }
-        },
-        {
-          "archivo": "MT_06_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.5412,
-            "Feliz": 0.2295,
-            "Tristeza": 0.2293
-          }
-        },
-        {
-          "archivo": "VA_11_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.4086,
-            "Feliz": 0.2254,
-            "Tristeza": 0.3661
+            "Enojo": 0.8782,
+            "Tranquilidad": 0.1218
           }
         },
         {
           "archivo": "MT_07_ENO.ogg",
           "recolector": "MT",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.3848,
-            "Feliz": 0.5274,
-            "Tristeza": 0.0878
+            "Enojo": 0.9364,
+            "Tranquilidad": 0.0636
           }
         },
         {
@@ -153,93 +129,41 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.4836,
-            "Feliz": 0.2984,
-            "Tristeza": 0.218
+            "Enojo": 0.9168,
+            "Tranquilidad": 0.0832
           }
         },
         {
-          "archivo": "VA_10_ENO.ogg",
-          "recolector": "VA",
+          "archivo": "SG_07_ENO.mp4",
+          "recolector": "SG",
           "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.3467,
-            "Feliz": 0.2704,
-            "Tristeza": 0.3828
-          }
-        },
-        {
-          "archivo": "VA_08_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.4617,
-            "Feliz": 0.2144,
-            "Tristeza": 0.3239
-          }
-        },
-        {
-          "archivo": "MT_09_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Tristeza",
+          "prediccion": "Tranquilidad",
           "correcto": false,
           "probabilidades": {
-            "Enojo": 0.333,
-            "Feliz": 0.1447,
-            "Tristeza": 0.5223
+            "Enojo": 0.4566,
+            "Tranquilidad": 0.5434
           }
         },
         {
-          "archivo": "VA_02_ENO.ogg",
+          "archivo": "VA_13_ENO.mpeg",
           "recolector": "VA",
           "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.4505,
-            "Feliz": 0.3236,
-            "Tristeza": 0.2259
-          }
-        },
-        {
-          "archivo": "VA_05_ENO.mp4",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Tristeza",
+          "prediccion": "Tranquilidad",
           "correcto": false,
           "probabilidades": {
-            "Enojo": 0.0638,
-            "Feliz": 0.2174,
-            "Tristeza": 0.7188
+            "Enojo": 0.4262,
+            "Tranquilidad": 0.5738
           }
         },
         {
           "archivo": "VZ_08_ENO.ogg",
           "recolector": "VZ",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.335,
-            "Feliz": 0.6009,
-            "Tristeza": 0.0641
-          }
-        },
-        {
-          "archivo": "MT_01_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.3983,
-            "Feliz": 0.4411,
-            "Tristeza": 0.1606
+            "Enojo": 0.565,
+            "Tranquilidad": 0.435
           }
         },
         {
@@ -249,429 +173,173 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.5288,
-            "Feliz": 0.296,
-            "Tristeza": 0.1752
+            "Enojo": 0.6529,
+            "Tranquilidad": 0.3471
           }
         },
         {
-          "archivo": "VZ_01_TRI.mp4",
+          "archivo": "VZ_10_TRA.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0181,
-            "Feliz": 0.0608,
-            "Tristeza": 0.9211
+            "Enojo": 0.0191,
+            "Tranquilidad": 0.9809
           }
         },
         {
-          "archivo": "VZ_04_TRI.ogg",
+          "archivo": "VZ_10_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0947,
-            "Feliz": 0.0506,
-            "Tristeza": 0.8547
+            "Enojo": 0.0309,
+            "Tranquilidad": 0.9691
           }
         },
         {
-          "archivo": "MT_11.mp3_TRI.mpeg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.202,
-            "Feliz": 0.0871,
-            "Tristeza": 0.7109
-          }
-        },
-        {
-          "archivo": "VZ_07_TRI.ogg",
+          "archivo": "VZ_07_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.1772,
-            "Feliz": 0.2191,
-            "Tristeza": 0.6037
+            "Enojo": 0.0883,
+            "Tranquilidad": 0.9117
           }
         },
         {
-          "archivo": "MT_06_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.3342,
-            "Feliz": 0.1488,
-            "Tristeza": 0.517
-          }
-        },
-        {
-          "archivo": "VA_11_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.4072,
-            "Feliz": 0.1881,
-            "Tristeza": 0.4046
-          }
-        },
-        {
-          "archivo": "VZ_09_TRI.ogg",
+          "archivo": "VZ_03_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0285,
-            "Feliz": 0.1895,
-            "Tristeza": 0.782
+            "Enojo": 0.1952,
+            "Tranquilidad": 0.8048
           }
         },
         {
-          "archivo": "MT_05_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.132,
-            "Feliz": 0.1531,
-            "Tristeza": 0.7149
-          }
-        },
-        {
-          "archivo": "MT_04_TRI.mp4",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.0639,
-            "Feliz": 0.642,
-            "Tristeza": 0.2941
-          }
-        },
-        {
-          "archivo": "VZ_08_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.1226,
-            "Feliz": 0.1661,
-            "Tristeza": 0.7112
-          }
-        },
-        {
-          "archivo": "MT_03_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.2158,
-            "Feliz": 0.1022,
-            "Tristeza": 0.6819
-          }
-        },
-        {
-          "archivo": "MT_07_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.5347,
-            "Feliz": 0.1635,
-            "Tristeza": 0.3017
-          }
-        },
-        {
-          "archivo": "MT_09_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.2503,
-            "Feliz": 0.2971,
-            "Tristeza": 0.4526
-          }
-        },
-        {
-          "archivo": "VA_07_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.195,
-            "Feliz": 0.195,
-            "Tristeza": 0.61
-          }
-        },
-        {
-          "archivo": "VZ_02_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.455,
-            "Feliz": 0.4074,
-            "Tristeza": 0.1376
-          }
-        },
-        {
-          "archivo": "VZ_05_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.1387,
-            "Feliz": 0.2411,
-            "Tristeza": 0.6201
-          }
-        },
-        {
-          "archivo": "VA_04_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.1911,
-            "Feliz": 0.3014,
-            "Tristeza": 0.5076
-          }
-        },
-        {
-          "archivo": "VA_08_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.5199,
-            "Feliz": 0.1065,
-            "Tristeza": 0.3736
-          }
-        },
-        {
-          "archivo": "ED_01_TRI.ogg",
+          "archivo": "ED_02_TRA_S.ogg",
           "recolector": "ED",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.1943,
-            "Feliz": 0.1992,
-            "Tristeza": 0.6065
+            "Enojo": 0.224,
+            "Tranquilidad": 0.776
           }
         },
         {
-          "archivo": "VA_10_TRI.ogg",
+          "archivo": "SG_04_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0133,
+            "Tranquilidad": 0.9867
+          }
+        },
+        {
+          "archivo": "ED_01_TRA.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0848,
+            "Tranquilidad": 0.9152
+          }
+        },
+        {
+          "archivo": "ED_05_TRA.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.2304,
+            "Tranquilidad": 0.7696
+          }
+        },
+        {
+          "archivo": "VA_07_ENO.ogg",
           "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.4013,
-            "Feliz": 0.1299,
-            "Tristeza": 0.4688
+            "Enojo": 0.1181,
+            "Tranquilidad": 0.8819
           }
         },
         {
-          "archivo": "ED_02_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.5009,
-            "Feliz": 0.2011,
-            "Tristeza": 0.2981
-          }
-        },
-        {
-          "archivo": "VZ_07_FEL.ogg",
+          "archivo": "VZ_03_TRA.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.3515,
-            "Feliz": 0.4933,
-            "Tristeza": 0.1552
+            "Enojo": 0.1169,
+            "Tranquilidad": 0.8831
           }
         },
         {
-          "archivo": "MT_01_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.3164,
-            "Feliz": 0.3277,
-            "Tristeza": 0.3559
-          }
-        },
-        {
-          "archivo": "MT_03_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6703,
-            "Feliz": 0.2781,
-            "Tristeza": 0.0517
-          }
-        },
-        {
-          "archivo": "ED_01_FEL.ogg",
+          "archivo": "ED_02_TRI_S.ogg",
           "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.5864,
-            "Feliz": 0.3723,
-            "Tristeza": 0.0413
+            "Enojo": 0.0042,
+            "Tranquilidad": 0.9958
           }
         },
         {
-          "archivo": "VZ_02_FEL.ogg",
+          "archivo": "VZ_09_TRA.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.7133,
-            "Feliz": 0.1281,
-            "Tristeza": 0.1586
-          }
-        },
-        {
-          "archivo": "ED_04_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.245,
-            "Feliz": 0.6951,
-            "Tristeza": 0.0599
+            "Enojo": 0.0072,
+            "Tranquilidad": 0.9928
           }
         },
         {
-          "archivo": "VZ_08_FEL.ogg",
+          "archivo": "VZ_06_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.3765,
-            "Feliz": 0.5585,
-            "Tristeza": 0.065
+            "Enojo": 0.2478,
+            "Tranquilidad": 0.7522
           }
         },
         {
-          "archivo": "VZ_06_FEL.ogg",
+          "archivo": "VZ_05_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.2295,
-            "Feliz": 0.6785,
-            "Tristeza": 0.092
-          }
-        },
-        {
-          "archivo": "ED_03_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.5681,
-            "Feliz": 0.2026,
-            "Tristeza": 0.2292
-          }
-        },
-        {
-          "archivo": "MT_02_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.3208,
-            "Feliz": 0.3243,
-            "Tristeza": 0.3548
+            "Enojo": 0.0589,
+            "Tranquilidad": 0.9411
           }
         },
         {
           "archivo": "VZ_01_FEL.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.3581,
-            "Feliz": 0.3744,
-            "Tristeza": 0.2675
-          }
-        },
-        {
-          "archivo": "VZ_03_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.3154,
-            "Feliz": 0.4988,
-            "Tristeza": 0.1858
-          }
-        },
-        {
-          "archivo": "VZ_04_FEL.mp4",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.0444,
-            "Feliz": 0.0103,
-            "Tristeza": 0.9453
-          }
-        },
-        {
-          "archivo": "VZ_05_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.1907,
-            "Feliz": 0.2804,
-            "Tristeza": 0.5289
+            "Enojo": 0.2339,
+            "Tranquilidad": 0.7661
           }
         }
       ]
@@ -680,20 +348,18 @@
       "label": "Reg. Logística",
       "classes_order": [
         "Enojo",
-        "Feliz",
-        "Tristeza"
+        "Tranquilidad"
       ],
       "predictions": [
         {
           "archivo": "ED_03_ENO_S.ogg",
           "recolector": "ED",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.25,
-            "Feliz": 0.7431,
-            "Tristeza": 0.0069
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
@@ -703,9 +369,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.8444,
-            "Feliz": 0.1551,
-            "Tristeza": 0.0005
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
@@ -715,21 +380,19 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.9502,
-            "Feliz": 0.0497,
-            "Tristeza": 0.0001
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
           "archivo": "MT_05_ENO.ogg",
           "recolector": "MT",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0129,
-            "Feliz": 0.9845,
-            "Tristeza": 0.0026
+            "Enojo": 0.9988,
+            "Tranquilidad": 0.0012
           }
         },
         {
@@ -739,9 +402,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.9929,
-            "Feliz": 0.0071,
-            "Tristeza": 0.0
+            "Enojo": 0.9987,
+            "Tranquilidad": 0.0013
           }
         },
         {
@@ -751,9 +413,30 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.9691,
-            "Feliz": 0.0308,
-            "Tristeza": 0.0001
+            "Enojo": 0.9996,
+            "Tranquilidad": 0.0004
+          }
+        },
+        {
+          "archivo": "SG_01_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Enojo",
+          "prediccion": "Enojo",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.9941,
+            "Tranquilidad": 0.0059
+          }
+        },
+        {
+          "archivo": "SG_06_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Enojo",
+          "prediccion": "Enojo",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.9941,
+            "Tranquilidad": 0.0059
           }
         },
         {
@@ -763,57 +446,19 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.9952,
-            "Feliz": 0.0043,
-            "Tristeza": 0.0005
-          }
-        },
-        {
-          "archivo": "VA_03_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.9999,
-            "Feliz": 0.0,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "MT_06_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.9728,
-            "Feliz": 0.0062,
-            "Tristeza": 0.0209
-          }
-        },
-        {
-          "archivo": "VA_11_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.7405,
-            "Feliz": 0.0089,
-            "Tristeza": 0.2506
+            "Enojo": 0.9879,
+            "Tranquilidad": 0.0121
           }
         },
         {
           "archivo": "MT_07_ENO.ogg",
           "recolector": "MT",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0831,
-            "Feliz": 0.9164,
-            "Tristeza": 0.0005
+            "Enojo": 0.9977,
+            "Tranquilidad": 0.0023
           }
         },
         {
@@ -823,93 +468,41 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.7782,
-            "Feliz": 0.1165,
-            "Tristeza": 0.1053
+            "Enojo": 0.995,
+            "Tranquilidad": 0.005
           }
         },
         {
-          "archivo": "VA_10_ENO.ogg",
-          "recolector": "VA",
+          "archivo": "SG_07_ENO.mp4",
+          "recolector": "SG",
           "clase_real": "Enojo",
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.5438,
-            "Feliz": 0.0726,
-            "Tristeza": 0.3835
+            "Enojo": 0.5839,
+            "Tranquilidad": 0.4161
           }
         },
         {
-          "archivo": "VA_08_ENO.ogg",
+          "archivo": "VA_13_ENO.mpeg",
           "recolector": "VA",
           "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.8792,
-            "Feliz": 0.0057,
-            "Tristeza": 0.1152
-          }
-        },
-        {
-          "archivo": "MT_09_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.5106,
-            "Feliz": 0.0006,
-            "Tristeza": 0.4888
-          }
-        },
-        {
-          "archivo": "VA_02_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.6412,
-            "Feliz": 0.3202,
-            "Tristeza": 0.0386
-          }
-        },
-        {
-          "archivo": "VA_05_ENO.mp4",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Tristeza",
+          "prediccion": "Tranquilidad",
           "correcto": false,
           "probabilidades": {
-            "Enojo": 0.0008,
-            "Feliz": 0.0201,
-            "Tristeza": 0.9791
+            "Enojo": 0.3273,
+            "Tranquilidad": 0.6727
           }
         },
         {
           "archivo": "VZ_08_ENO.ogg",
           "recolector": "VZ",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0226,
-            "Feliz": 0.9773,
-            "Tristeza": 0.0001
-          }
-        },
-        {
-          "archivo": "MT_01_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.121,
-            "Feliz": 0.8696,
-            "Tristeza": 0.0094
+            "Enojo": 0.6893,
+            "Tranquilidad": 0.3107
           }
         },
         {
@@ -919,429 +512,173 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.8991,
-            "Feliz": 0.0815,
-            "Tristeza": 0.0194
+            "Enojo": 0.8282,
+            "Tranquilidad": 0.1718
           }
         },
         {
-          "archivo": "VZ_01_TRI.mp4",
+          "archivo": "VZ_10_TRA.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0,
-            "Feliz": 0.0003,
-            "Tristeza": 0.9997
+            "Enojo": 0.0002,
+            "Tranquilidad": 0.9998
           }
         },
         {
-          "archivo": "VZ_04_TRI.ogg",
+          "archivo": "VZ_10_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0088,
-            "Feliz": 0.0,
-            "Tristeza": 0.9911
+            "Enojo": 0.0007,
+            "Tranquilidad": 0.9993
           }
         },
         {
-          "archivo": "MT_11.mp3_TRI.mpeg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "archivo": "VZ_07_ENO.ogg",
+          "recolector": "VZ",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0097,
+            "Tranquilidad": 0.9903
+          }
+        },
+        {
+          "archivo": "VZ_03_ENO.ogg",
+          "recolector": "VZ",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0329,
+            "Tranquilidad": 0.9671
+          }
+        },
+        {
+          "archivo": "ED_02_TRA_S.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0774,
+            "Tranquilidad": 0.9226
+          }
+        },
+        {
+          "archivo": "SG_04_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0001,
+            "Tranquilidad": 0.9999
+          }
+        },
+        {
+          "archivo": "ED_01_TRA.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.0081,
-            "Feliz": 0.0001,
-            "Tristeza": 0.9918
+            "Tranquilidad": 0.9919
           }
         },
         {
-          "archivo": "VZ_07_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "archivo": "ED_05_TRA.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0642,
-            "Feliz": 0.0073,
-            "Tristeza": 0.9285
+            "Enojo": 0.07,
+            "Tranquilidad": 0.93
           }
         },
         {
-          "archivo": "MT_06_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.288,
-            "Feliz": 0.0024,
-            "Tristeza": 0.7095
-          }
-        },
-        {
-          "archivo": "VA_11_TRI.ogg",
+          "archivo": "VA_07_ENO.ogg",
           "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.1512,
-            "Feliz": 0.0817,
-            "Tristeza": 0.7671
+            "Enojo": 0.0195,
+            "Tranquilidad": 0.9805
           }
         },
         {
-          "archivo": "VZ_09_TRI.ogg",
+          "archivo": "VZ_03_TRA.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0255,
+            "Tranquilidad": 0.9745
+          }
+        },
+        {
+          "archivo": "ED_02_TRI_S.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.0,
-            "Feliz": 0.0486,
-            "Tristeza": 0.9514
+            "Tranquilidad": 1.0
           }
         },
         {
-          "archivo": "MT_05_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "archivo": "VZ_09_TRA.ogg",
+          "recolector": "VZ",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.0156,
-            "Feliz": 0.0005,
-            "Tristeza": 0.984
-          }
-        },
-        {
-          "archivo": "MT_04_TRI.mp4",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Feliz",
-          "correcto": false,
           "probabilidades": {
             "Enojo": 0.0,
-            "Feliz": 0.9578,
-            "Tristeza": 0.0422
+            "Tranquilidad": 1.0
           }
         },
         {
-          "archivo": "VZ_08_TRI.ogg",
+          "archivo": "VZ_06_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0021,
-            "Feliz": 0.0023,
-            "Tristeza": 0.9956
+            "Enojo": 0.1154,
+            "Tranquilidad": 0.8846
           }
         },
         {
-          "archivo": "MT_03_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.0278,
-            "Feliz": 0.0008,
-            "Tristeza": 0.9713
-          }
-        },
-        {
-          "archivo": "MT_07_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.33,
-            "Feliz": 0.0082,
-            "Tristeza": 0.6618
-          }
-        },
-        {
-          "archivo": "MT_09_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.025,
-            "Feliz": 0.427,
-            "Tristeza": 0.548
-          }
-        },
-        {
-          "archivo": "VA_07_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.1483,
-            "Feliz": 0.0061,
-            "Tristeza": 0.8456
-          }
-        },
-        {
-          "archivo": "VZ_02_TRI.ogg",
+          "archivo": "VZ_05_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.1954,
-            "Feliz": 0.7913,
-            "Tristeza": 0.0134
-          }
-        },
-        {
-          "archivo": "VZ_05_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0025,
-            "Feliz": 0.3044,
-            "Tristeza": 0.6931
-          }
-        },
-        {
-          "archivo": "VA_04_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.0054,
-            "Feliz": 0.2298,
-            "Tristeza": 0.7648
-          }
-        },
-        {
-          "archivo": "VA_08_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.7011,
-            "Feliz": 0.0005,
-            "Tristeza": 0.2984
-          }
-        },
-        {
-          "archivo": "ED_01_TRI.ogg",
-          "recolector": "ED",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.0036,
-            "Feliz": 0.0237,
-            "Tristeza": 0.9728
-          }
-        },
-        {
-          "archivo": "VA_10_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.4567,
-            "Feliz": 0.0011,
-            "Tristeza": 0.5422
-          }
-        },
-        {
-          "archivo": "ED_02_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.9641,
-            "Feliz": 0.0117,
-            "Tristeza": 0.0241
-          }
-        },
-        {
-          "archivo": "VZ_07_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.0983,
-            "Feliz": 0.8968,
-            "Tristeza": 0.0049
-          }
-        },
-        {
-          "archivo": "MT_01_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.1729,
-            "Feliz": 0.3244,
-            "Tristeza": 0.5027
-          }
-        },
-        {
-          "archivo": "MT_03_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.8875,
-            "Feliz": 0.1124,
-            "Tristeza": 0.0001
-          }
-        },
-        {
-          "archivo": "ED_01_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.8979,
-            "Feliz": 0.102,
-            "Tristeza": 0.0001
-          }
-        },
-        {
-          "archivo": "VZ_02_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.9677,
-            "Feliz": 0.0283,
-            "Tristeza": 0.004
-          }
-        },
-        {
-          "archivo": "ED_04_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.0592,
-            "Feliz": 0.9407,
-            "Tristeza": 0.0001
-          }
-        },
-        {
-          "archivo": "VZ_08_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.1436,
-            "Feliz": 0.8561,
-            "Tristeza": 0.0004
-          }
-        },
-        {
-          "archivo": "VZ_06_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.0081,
-            "Feliz": 0.9915,
-            "Tristeza": 0.0004
-          }
-        },
-        {
-          "archivo": "ED_03_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.8516,
-            "Feliz": 0.0396,
-            "Tristeza": 0.1087
-          }
-        },
-        {
-          "archivo": "MT_02_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.1765,
-            "Feliz": 0.4895,
-            "Tristeza": 0.334
+            "Enojo": 0.0027,
+            "Tranquilidad": 0.9973
           }
         },
         {
           "archivo": "VZ_01_FEL.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.1423,
-            "Feliz": 0.7083,
-            "Tristeza": 0.1494
-          }
-        },
-        {
-          "archivo": "VZ_03_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.0744,
-            "Feliz": 0.9209,
-            "Tristeza": 0.0047
-          }
-        },
-        {
-          "archivo": "VZ_04_FEL.mp4",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.0,
-            "Feliz": 0.0,
-            "Tristeza": 1.0
-          }
-        },
-        {
-          "archivo": "VZ_05_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.0223,
-            "Feliz": 0.1604,
-            "Tristeza": 0.8173
+            "Enojo": 0.1159,
+            "Tranquilidad": 0.8841
           }
         }
       ]
@@ -1350,20 +687,18 @@
       "label": "SVM RBF",
       "classes_order": [
         "Enojo",
-        "Feliz",
-        "Tristeza"
+        "Tranquilidad"
       ],
       "predictions": [
         {
           "archivo": "ED_03_ENO_S.ogg",
           "recolector": "ED",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.4501,
-            "Feliz": 0.408,
-            "Tristeza": 0.142
+            "Enojo": 0.9696,
+            "Tranquilidad": 0.0304
           }
         },
         {
@@ -1373,9 +708,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.5173,
-            "Feliz": 0.4161,
-            "Tristeza": 0.0666
+            "Enojo": 0.9074,
+            "Tranquilidad": 0.0926
           }
         },
         {
@@ -1385,21 +719,19 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.5496,
-            "Feliz": 0.3307,
-            "Tristeza": 0.1197
+            "Enojo": 0.9019,
+            "Tranquilidad": 0.0981
           }
         },
         {
           "archivo": "MT_05_ENO.ogg",
           "recolector": "MT",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.3099,
-            "Feliz": 0.5757,
-            "Tristeza": 0.1144
+            "Enojo": 0.951,
+            "Tranquilidad": 0.049
           }
         },
         {
@@ -1409,9 +741,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.469,
-            "Feliz": 0.3381,
-            "Tristeza": 0.1929
+            "Enojo": 0.9701,
+            "Tranquilidad": 0.0299
           }
         },
         {
@@ -1421,9 +752,30 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.575,
-            "Feliz": 0.3973,
-            "Tristeza": 0.0277
+            "Enojo": 0.9843,
+            "Tranquilidad": 0.0157
+          }
+        },
+        {
+          "archivo": "SG_01_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Enojo",
+          "prediccion": "Enojo",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.997,
+            "Tranquilidad": 0.003
+          }
+        },
+        {
+          "archivo": "SG_06_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Enojo",
+          "prediccion": "Enojo",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.997,
+            "Tranquilidad": 0.003
           }
         },
         {
@@ -1433,57 +785,19 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.5763,
-            "Feliz": 0.3711,
-            "Tristeza": 0.0525
-          }
-        },
-        {
-          "archivo": "VA_03_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.6254,
-            "Feliz": 0.2853,
-            "Tristeza": 0.0893
-          }
-        },
-        {
-          "archivo": "MT_06_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.5516,
-            "Feliz": 0.2586,
-            "Tristeza": 0.1899
-          }
-        },
-        {
-          "archivo": "VA_11_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.4357,
-            "Feliz": 0.2113,
-            "Tristeza": 0.353
+            "Enojo": 0.9515,
+            "Tranquilidad": 0.0485
           }
         },
         {
           "archivo": "MT_07_ENO.ogg",
           "recolector": "MT",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.3923,
-            "Feliz": 0.5702,
-            "Tristeza": 0.0375
+            "Enojo": 0.9888,
+            "Tranquilidad": 0.0112
           }
         },
         {
@@ -1493,93 +807,41 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.443,
-            "Feliz": 0.3482,
-            "Tristeza": 0.2088
+            "Enojo": 0.972,
+            "Tranquilidad": 0.028
           }
         },
         {
-          "archivo": "VA_10_ENO.ogg",
-          "recolector": "VA",
+          "archivo": "SG_07_ENO.mp4",
+          "recolector": "SG",
           "clase_real": "Enojo",
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.4174,
-            "Feliz": 0.2626,
-            "Tristeza": 0.32
+            "Enojo": 0.7401,
+            "Tranquilidad": 0.2599
           }
         },
         {
-          "archivo": "VA_08_ENO.ogg",
+          "archivo": "VA_13_ENO.mpeg",
           "recolector": "VA",
           "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.5066,
-            "Feliz": 0.288,
-            "Tristeza": 0.2054
-          }
-        },
-        {
-          "archivo": "MT_09_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.3615,
-            "Feliz": 0.1751,
-            "Tristeza": 0.4634
-          }
-        },
-        {
-          "archivo": "VA_02_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.4345,
-            "Feliz": 0.355,
-            "Tristeza": 0.2105
-          }
-        },
-        {
-          "archivo": "VA_05_ENO.mp4",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Tristeza",
+          "prediccion": "Tranquilidad",
           "correcto": false,
           "probabilidades": {
-            "Enojo": 0.0792,
-            "Feliz": 0.2637,
-            "Tristeza": 0.6571
+            "Enojo": 0.3944,
+            "Tranquilidad": 0.6056
           }
         },
         {
           "archivo": "VZ_08_ENO.ogg",
           "recolector": "VZ",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.4758,
-            "Feliz": 0.4733,
-            "Tristeza": 0.0509
-          }
-        },
-        {
-          "archivo": "MT_01_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.3526,
-            "Feliz": 0.5468,
-            "Tristeza": 0.1006
+            "Enojo": 0.6612,
+            "Tranquilidad": 0.3388
           }
         },
         {
@@ -1589,429 +851,173 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.4942,
-            "Feliz": 0.3626,
-            "Tristeza": 0.1432
+            "Enojo": 0.7713,
+            "Tranquilidad": 0.2287
           }
         },
         {
-          "archivo": "VZ_01_TRI.mp4",
+          "archivo": "VZ_10_TRA.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0447,
-            "Feliz": 0.0926,
-            "Tristeza": 0.8627
+            "Enojo": 0.0397,
+            "Tranquilidad": 0.9603
           }
         },
         {
-          "archivo": "VZ_04_TRI.ogg",
+          "archivo": "VZ_10_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0622,
-            "Feliz": 0.0447,
-            "Tristeza": 0.8931
+            "Enojo": 0.0067,
+            "Tranquilidad": 0.9933
           }
         },
         {
-          "archivo": "MT_11.mp3_TRI.mpeg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.0656,
-            "Feliz": 0.1084,
-            "Tristeza": 0.8261
-          }
-        },
-        {
-          "archivo": "VZ_07_TRI.ogg",
+          "archivo": "VZ_07_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.1979,
-            "Feliz": 0.258,
-            "Tristeza": 0.5441
+            "Enojo": 0.1823,
+            "Tranquilidad": 0.8177
           }
         },
         {
-          "archivo": "MT_06_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.2741,
-            "Feliz": 0.1867,
-            "Tristeza": 0.5392
-          }
-        },
-        {
-          "archivo": "VA_11_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.3715,
-            "Feliz": 0.1928,
-            "Tristeza": 0.4357
-          }
-        },
-        {
-          "archivo": "VZ_09_TRI.ogg",
+          "archivo": "VZ_03_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0292,
-            "Feliz": 0.0863,
-            "Tristeza": 0.8846
+            "Enojo": 0.1016,
+            "Tranquilidad": 0.8984
           }
         },
         {
-          "archivo": "MT_05_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.103,
-            "Feliz": 0.1093,
-            "Tristeza": 0.7876
-          }
-        },
-        {
-          "archivo": "MT_04_TRI.mp4",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.0687,
-            "Feliz": 0.1519,
-            "Tristeza": 0.7795
-          }
-        },
-        {
-          "archivo": "VZ_08_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.0643,
-            "Feliz": 0.1163,
-            "Tristeza": 0.8195
-          }
-        },
-        {
-          "archivo": "MT_03_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.2028,
-            "Feliz": 0.2015,
-            "Tristeza": 0.5958
-          }
-        },
-        {
-          "archivo": "MT_07_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.3726,
-            "Feliz": 0.2215,
-            "Tristeza": 0.4059
-          }
-        },
-        {
-          "archivo": "MT_09_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.2298,
-            "Feliz": 0.2449,
-            "Tristeza": 0.5253
-          }
-        },
-        {
-          "archivo": "VA_07_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.1431,
-            "Feliz": 0.1954,
-            "Tristeza": 0.6615
-          }
-        },
-        {
-          "archivo": "VZ_02_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.4964,
-            "Feliz": 0.3866,
-            "Tristeza": 0.117
-          }
-        },
-        {
-          "archivo": "VZ_05_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.0559,
-            "Feliz": 0.1145,
-            "Tristeza": 0.8297
-          }
-        },
-        {
-          "archivo": "VA_04_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.128,
-            "Feliz": 0.1525,
-            "Tristeza": 0.7196
-          }
-        },
-        {
-          "archivo": "VA_08_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.2735,
-            "Feliz": 0.203,
-            "Tristeza": 0.5235
-          }
-        },
-        {
-          "archivo": "ED_01_TRI.ogg",
+          "archivo": "ED_02_TRA_S.ogg",
           "recolector": "ED",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0539,
-            "Feliz": 0.0731,
-            "Tristeza": 0.873
+            "Enojo": 0.0811,
+            "Tranquilidad": 0.9189
           }
         },
         {
-          "archivo": "VA_10_TRI.ogg",
+          "archivo": "SG_04_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0551,
+            "Tranquilidad": 0.9449
+          }
+        },
+        {
+          "archivo": "ED_01_TRA.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0449,
+            "Tranquilidad": 0.9551
+          }
+        },
+        {
+          "archivo": "ED_05_TRA.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.2361,
+            "Tranquilidad": 0.7639
+          }
+        },
+        {
+          "archivo": "VA_07_ENO.ogg",
           "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.4246,
-            "Feliz": 0.2451,
-            "Tristeza": 0.3303
-          }
-        },
-        {
-          "archivo": "ED_02_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.7215,
-            "Feliz": 0.1697,
-            "Tristeza": 0.1089
-          }
-        },
-        {
-          "archivo": "VZ_07_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.3026,
-            "Feliz": 0.399,
-            "Tristeza": 0.2984
+            "Enojo": 0.1394,
+            "Tranquilidad": 0.8606
           }
         },
         {
-          "archivo": "MT_01_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.1976,
-            "Feliz": 0.1618,
-            "Tristeza": 0.6405
-          }
-        },
-        {
-          "archivo": "MT_03_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.7081,
-            "Feliz": 0.2697,
-            "Tristeza": 0.0223
-          }
-        },
-        {
-          "archivo": "ED_01_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.5881,
-            "Feliz": 0.3967,
-            "Tristeza": 0.0153
-          }
-        },
-        {
-          "archivo": "VZ_02_FEL.ogg",
+          "archivo": "VZ_03_TRA.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6279,
-            "Feliz": 0.1808,
-            "Tristeza": 0.1914
-          }
-        },
-        {
-          "archivo": "ED_04_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.399,
-            "Feliz": 0.5888,
-            "Tristeza": 0.0122
+            "Enojo": 0.1342,
+            "Tranquilidad": 0.8658
           }
         },
         {
-          "archivo": "VZ_08_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.3795,
-            "Feliz": 0.5981,
-            "Tristeza": 0.0224
-          }
-        },
-        {
-          "archivo": "VZ_06_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.2899,
-            "Feliz": 0.6531,
-            "Tristeza": 0.057
-          }
-        },
-        {
-          "archivo": "ED_03_FEL.ogg",
+          "archivo": "ED_02_TRI_S.ogg",
           "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.4146,
-            "Feliz": 0.2726,
-            "Tristeza": 0.3128
+            "Enojo": 0.0188,
+            "Tranquilidad": 0.9812
           }
         },
         {
-          "archivo": "MT_02_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
+          "archivo": "VZ_09_TRA.ogg",
+          "recolector": "VZ",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.5002,
-            "Feliz": 0.2827,
-            "Tristeza": 0.2171
+            "Enojo": 0.0122,
+            "Tranquilidad": 0.9878
+          }
+        },
+        {
+          "archivo": "VZ_06_ENO.ogg",
+          "recolector": "VZ",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.1741,
+            "Tranquilidad": 0.8259
+          }
+        },
+        {
+          "archivo": "VZ_05_ENO.ogg",
+          "recolector": "VZ",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0872,
+            "Tranquilidad": 0.9128
           }
         },
         {
           "archivo": "VZ_01_FEL.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.4569,
-            "Feliz": 0.3148,
-            "Tristeza": 0.2283
-          }
-        },
-        {
-          "archivo": "VZ_03_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.2679,
-            "Feliz": 0.2869,
-            "Tristeza": 0.4452
-          }
-        },
-        {
-          "archivo": "VZ_04_FEL.mp4",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.0543,
-            "Feliz": 0.0411,
-            "Tristeza": 0.9046
-          }
-        },
-        {
-          "archivo": "VZ_05_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.3727,
-            "Feliz": 0.2972,
-            "Tristeza": 0.3301
+            "Enojo": 0.2411,
+            "Tranquilidad": 0.7589
           }
         }
       ]
@@ -2020,8 +1026,7 @@
       "label": "Random Forest",
       "classes_order": [
         "Enojo",
-        "Feliz",
-        "Tristeza"
+        "Tranquilidad"
       ],
       "predictions": [
         {
@@ -2031,9 +1036,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.425,
-            "Feliz": 0.395,
-            "Tristeza": 0.18
+            "Enojo": 0.835,
+            "Tranquilidad": 0.165
           }
         },
         {
@@ -2043,9 +1047,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.45,
-            "Feliz": 0.405,
-            "Tristeza": 0.145
+            "Enojo": 0.94,
+            "Tranquilidad": 0.06
           }
         },
         {
@@ -2055,9 +1058,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.56,
-            "Feliz": 0.32,
-            "Tristeza": 0.12
+            "Enojo": 0.94,
+            "Tranquilidad": 0.06
           }
         },
         {
@@ -2067,9 +1069,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.445,
-            "Feliz": 0.395,
-            "Tristeza": 0.16
+            "Enojo": 0.715,
+            "Tranquilidad": 0.285
           }
         },
         {
@@ -2079,9 +1080,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.47,
-            "Feliz": 0.285,
-            "Tristeza": 0.245
+            "Enojo": 0.865,
+            "Tranquilidad": 0.135
           }
         },
         {
@@ -2091,9 +1091,30 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.615,
-            "Feliz": 0.32,
-            "Tristeza": 0.065
+            "Enojo": 0.905,
+            "Tranquilidad": 0.095
+          }
+        },
+        {
+          "archivo": "SG_01_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Enojo",
+          "prediccion": "Enojo",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.835,
+            "Tranquilidad": 0.165
+          }
+        },
+        {
+          "archivo": "SG_06_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Enojo",
+          "prediccion": "Enojo",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.835,
+            "Tranquilidad": 0.165
           }
         },
         {
@@ -2103,153 +1124,63 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.485,
-            "Feliz": 0.385,
-            "Tristeza": 0.13
-          }
-        },
-        {
-          "archivo": "VA_03_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.605,
-            "Feliz": 0.205,
-            "Tristeza": 0.19
-          }
-        },
-        {
-          "archivo": "MT_06_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.41,
-            "Feliz": 0.215,
-            "Tristeza": 0.375
-          }
-        },
-        {
-          "archivo": "VA_11_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.385,
-            "Feliz": 0.2,
-            "Tristeza": 0.415
+            "Enojo": 0.805,
+            "Tranquilidad": 0.195
           }
         },
         {
           "archivo": "MT_07_ENO.ogg",
           "recolector": "MT",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.43,
-            "Feliz": 0.51,
-            "Tristeza": 0.06
+            "Enojo": 0.79,
+            "Tranquilidad": 0.21
           }
         },
         {
           "archivo": "ED_02_ENO_S.ogg",
           "recolector": "ED",
           "clase_real": "Enojo",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.31,
-            "Feliz": 0.3,
-            "Tristeza": 0.39
-          }
-        },
-        {
-          "archivo": "VA_10_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.38,
-            "Feliz": 0.265,
-            "Tristeza": 0.355
+            "Enojo": 0.795,
+            "Tranquilidad": 0.205
           }
         },
         {
-          "archivo": "VA_08_ENO.ogg",
-          "recolector": "VA",
+          "archivo": "SG_07_ENO.mp4",
+          "recolector": "SG",
           "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.425,
-            "Feliz": 0.255,
-            "Tristeza": 0.32
-          }
-        },
-        {
-          "archivo": "MT_09_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Tristeza",
+          "prediccion": "Tranquilidad",
           "correcto": false,
           "probabilidades": {
-            "Enojo": 0.39,
-            "Feliz": 0.18,
-            "Tristeza": 0.43
+            "Enojo": 0.46,
+            "Tranquilidad": 0.54
           }
         },
         {
-          "archivo": "VA_02_ENO.ogg",
+          "archivo": "VA_13_ENO.mpeg",
           "recolector": "VA",
           "clase_real": "Enojo",
-          "prediccion": "Tristeza",
+          "prediccion": "Tranquilidad",
           "correcto": false,
           "probabilidades": {
-            "Enojo": 0.275,
-            "Feliz": 0.33,
-            "Tristeza": 0.395
-          }
-        },
-        {
-          "archivo": "VA_05_ENO.mp4",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.145,
-            "Feliz": 0.265,
-            "Tristeza": 0.59
+            "Enojo": 0.49,
+            "Tranquilidad": 0.51
           }
         },
         {
           "archivo": "VZ_08_ENO.ogg",
           "recolector": "VZ",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.41,
-            "Feliz": 0.485,
-            "Tristeza": 0.105
-          }
-        },
-        {
-          "archivo": "MT_01_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.385,
-            "Feliz": 0.435,
-            "Tristeza": 0.18
+            "Enojo": 0.565,
+            "Tranquilidad": 0.435
           }
         },
         {
@@ -2259,429 +1190,173 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.375,
-            "Feliz": 0.29,
-            "Tristeza": 0.335
+            "Enojo": 0.56,
+            "Tranquilidad": 0.44
           }
         },
         {
-          "archivo": "VZ_01_TRI.mp4",
+          "archivo": "VZ_10_TRA.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.15,
-            "Feliz": 0.23,
-            "Tristeza": 0.62
+            "Enojo": 0.105,
+            "Tranquilidad": 0.895
           }
         },
         {
-          "archivo": "VZ_04_TRI.ogg",
+          "archivo": "VZ_10_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.295,
-            "Feliz": 0.13,
-            "Tristeza": 0.575
+            "Enojo": 0.085,
+            "Tranquilidad": 0.915
           }
         },
         {
-          "archivo": "MT_11.mp3_TRI.mpeg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.15,
-            "Feliz": 0.185,
-            "Tristeza": 0.665
-          }
-        },
-        {
-          "archivo": "VZ_07_TRI.ogg",
+          "archivo": "VZ_07_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.23,
-            "Feliz": 0.335,
-            "Tristeza": 0.435
+            "Enojo": 0.345,
+            "Tranquilidad": 0.655
           }
         },
         {
-          "archivo": "MT_06_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.47,
-            "Feliz": 0.18,
-            "Tristeza": 0.35
-          }
-        },
-        {
-          "archivo": "VA_11_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.35,
-            "Feliz": 0.245,
-            "Tristeza": 0.405
-          }
-        },
-        {
-          "archivo": "VZ_09_TRI.ogg",
+          "archivo": "VZ_03_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.135,
-            "Feliz": 0.21,
-            "Tristeza": 0.655
+            "Enojo": 0.24,
+            "Tranquilidad": 0.76
           }
         },
         {
-          "archivo": "MT_05_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
+          "archivo": "ED_02_TRA_S.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.385,
-            "Feliz": 0.245,
-            "Tristeza": 0.37
+            "Enojo": 0.175,
+            "Tranquilidad": 0.825
           }
         },
         {
-          "archivo": "MT_04_TRI.mp4",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "archivo": "SG_04_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.18,
+            "Tranquilidad": 0.82
+          }
+        },
+        {
+          "archivo": "ED_01_TRA.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.17,
-            "Feliz": 0.285,
-            "Tristeza": 0.545
+            "Tranquilidad": 0.83
           }
         },
         {
-          "archivo": "VZ_08_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "archivo": "ED_05_TRA.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.29,
-            "Feliz": 0.185,
-            "Tristeza": 0.525
-          }
-        },
-        {
-          "archivo": "MT_03_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.29,
-            "Feliz": 0.235,
-            "Tristeza": 0.475
-          }
-        },
-        {
-          "archivo": "MT_07_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.335,
-            "Feliz": 0.25,
-            "Tristeza": 0.415
-          }
-        },
-        {
-          "archivo": "MT_09_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.26,
-            "Feliz": 0.27,
-            "Tristeza": 0.47
-          }
-        },
-        {
-          "archivo": "VA_07_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.235,
-            "Feliz": 0.245,
-            "Tristeza": 0.52
-          }
-        },
-        {
-          "archivo": "VZ_02_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.5,
-            "Feliz": 0.305,
-            "Tristeza": 0.195
-          }
-        },
-        {
-          "archivo": "VZ_05_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.155,
-            "Feliz": 0.21,
-            "Tristeza": 0.635
-          }
-        },
-        {
-          "archivo": "VA_04_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.155,
-            "Feliz": 0.265,
-            "Tristeza": 0.58
-          }
-        },
-        {
-          "archivo": "VA_08_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
           "probabilidades": {
             "Enojo": 0.405,
-            "Feliz": 0.205,
-            "Tristeza": 0.39
+            "Tranquilidad": 0.595
           }
         },
         {
-          "archivo": "ED_01_TRI.ogg",
-          "recolector": "ED",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "archivo": "VA_07_ENO.ogg",
+          "recolector": "VA",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.16,
-            "Feliz": 0.24,
-            "Tristeza": 0.6
+            "Enojo": 0.32,
+            "Tranquilidad": 0.68
           }
         },
         {
-          "archivo": "VA_10_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "archivo": "VZ_03_TRA.ogg",
+          "recolector": "VZ",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.345,
+            "Tranquilidad": 0.655
+          }
+        },
+        {
+          "archivo": "ED_02_TRI_S.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.095,
+            "Tranquilidad": 0.905
+          }
+        },
+        {
+          "archivo": "VZ_09_TRA.ogg",
+          "recolector": "VZ",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.065,
+            "Tranquilidad": 0.935
+          }
+        },
+        {
+          "archivo": "VZ_06_ENO.ogg",
+          "recolector": "VZ",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.365,
-            "Feliz": 0.255,
-            "Tristeza": 0.38
+            "Tranquilidad": 0.635
           }
         },
         {
-          "archivo": "ED_02_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.635,
-            "Feliz": 0.24,
-            "Tristeza": 0.125
-          }
-        },
-        {
-          "archivo": "VZ_07_FEL.ogg",
+          "archivo": "VZ_05_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.385,
-            "Feliz": 0.4,
-            "Tristeza": 0.215
-          }
-        },
-        {
-          "archivo": "MT_01_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.385,
-            "Feliz": 0.19,
-            "Tristeza": 0.425
-          }
-        },
-        {
-          "archivo": "MT_03_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.63,
-            "Feliz": 0.295,
-            "Tristeza": 0.075
-          }
-        },
-        {
-          "archivo": "ED_01_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.58,
-            "Feliz": 0.37,
-            "Tristeza": 0.05
-          }
-        },
-        {
-          "archivo": "VZ_02_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.515,
-            "Feliz": 0.25,
-            "Tristeza": 0.235
-          }
-        },
-        {
-          "archivo": "ED_04_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.455,
-            "Feliz": 0.44,
-            "Tristeza": 0.105
-          }
-        },
-        {
-          "archivo": "VZ_08_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.37,
-            "Feliz": 0.515,
-            "Tristeza": 0.115
-          }
-        },
-        {
-          "archivo": "VZ_06_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.26,
-            "Feliz": 0.6,
-            "Tristeza": 0.14
-          }
-        },
-        {
-          "archivo": "ED_03_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.34,
-            "Feliz": 0.235,
-            "Tristeza": 0.425
-          }
-        },
-        {
-          "archivo": "MT_02_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.425,
-            "Feliz": 0.245,
-            "Tristeza": 0.33
+            "Enojo": 0.265,
+            "Tranquilidad": 0.735
           }
         },
         {
           "archivo": "VZ_01_FEL.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.45,
-            "Feliz": 0.245,
-            "Tristeza": 0.305
-          }
-        },
-        {
-          "archivo": "VZ_03_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.24,
-            "Feliz": 0.255,
-            "Tristeza": 0.505
-          }
-        },
-        {
-          "archivo": "VZ_04_FEL.mp4",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.145,
-            "Feliz": 0.115,
-            "Tristeza": 0.74
-          }
-        },
-        {
-          "archivo": "VZ_05_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.305,
-            "Feliz": 0.305,
-            "Tristeza": 0.39
+            "Enojo": 0.32,
+            "Tranquilidad": 0.68
           }
         }
       ]
@@ -2690,8 +1365,7 @@
       "label": "KNN (k=5)",
       "classes_order": [
         "Enojo",
-        "Feliz",
-        "Tristeza"
+        "Tranquilidad"
       ],
       "predictions": [
         {
@@ -2701,9 +1375,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.4,
-            "Tristeza": 0.0
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
@@ -2713,9 +1386,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.4,
-            "Tristeza": 0.0
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
@@ -2725,21 +1397,19 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.8,
-            "Feliz": 0.2,
-            "Tristeza": 0.0
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
           "archivo": "MT_05_ENO.ogg",
           "recolector": "MT",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.6,
-            "Tristeza": 0.0
+            "Enojo": 0.8,
+            "Tranquilidad": 0.2
           }
         },
         {
@@ -2749,9 +1419,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.2,
-            "Tristeza": 0.2
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
@@ -2761,9 +1430,30 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.4,
-            "Tristeza": 0.0
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
+          }
+        },
+        {
+          "archivo": "SG_01_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Enojo",
+          "prediccion": "Tranquilidad",
+          "correcto": false,
+          "probabilidades": {
+            "Enojo": 0.4,
+            "Tranquilidad": 0.6
+          }
+        },
+        {
+          "archivo": "SG_06_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Enojo",
+          "prediccion": "Tranquilidad",
+          "correcto": false,
+          "probabilidades": {
+            "Enojo": 0.4,
+            "Tranquilidad": 0.6
           }
         },
         {
@@ -2773,45 +1463,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.4,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "VA_03_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
             "Enojo": 0.8,
-            "Feliz": 0.0,
-            "Tristeza": 0.2
-          }
-        },
-        {
-          "archivo": "MT_06_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.2,
-            "Tristeza": 0.2
-          }
-        },
-        {
-          "archivo": "VA_11_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.2,
-            "Tristeza": 0.2
+            "Tranquilidad": 0.2
           }
         },
         {
@@ -2821,105 +1474,52 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.4,
-            "Tristeza": 0.0
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
           "archivo": "ED_02_ENO_S.ogg",
           "recolector": "ED",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
+          "prediccion": "Enojo",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.8,
+            "Tranquilidad": 0.2
+          }
+        },
+        {
+          "archivo": "SG_07_ENO.mp4",
+          "recolector": "SG",
+          "clase_real": "Enojo",
+          "prediccion": "Tranquilidad",
           "correcto": false,
           "probabilidades": {
             "Enojo": 0.4,
-            "Feliz": 0.6,
-            "Tristeza": 0.0
+            "Tranquilidad": 0.6
           }
         },
         {
-          "archivo": "VA_10_ENO.ogg",
+          "archivo": "VA_13_ENO.mpeg",
           "recolector": "VA",
           "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.2,
-            "Tristeza": 0.2
-          }
-        },
-        {
-          "archivo": "VA_08_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.2,
-            "Tristeza": 0.2
-          }
-        },
-        {
-          "archivo": "MT_09_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.0,
-            "Tristeza": 0.4
-          }
-        },
-        {
-          "archivo": "VA_02_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Feliz",
+          "prediccion": "Tranquilidad",
           "correcto": false,
           "probabilidades": {
             "Enojo": 0.4,
-            "Feliz": 0.6,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "VA_05_ENO.mp4",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.4,
-            "Tristeza": 0.2
+            "Tranquilidad": 0.6
           }
         },
         {
           "archivo": "VZ_08_ENO.ogg",
           "recolector": "VZ",
           "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.4,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "MT_01_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Feliz",
+          "prediccion": "Tranquilidad",
           "correcto": false,
           "probabilidades": {
             "Enojo": 0.4,
-            "Feliz": 0.6,
-            "Tristeza": 0.0
+            "Tranquilidad": 0.6
           }
         },
         {
@@ -2930,428 +1530,172 @@
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.6,
-            "Feliz": 0.4,
-            "Tristeza": 0.0
+            "Tranquilidad": 0.4
           }
         },
         {
-          "archivo": "VZ_01_TRI.mp4",
+          "archivo": "VZ_10_TRA.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.0,
-            "Feliz": 0.2,
-            "Tristeza": 0.8
+            "Tranquilidad": 1.0
           }
         },
         {
-          "archivo": "VZ_04_TRI.ogg",
+          "archivo": "VZ_10_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.0,
-            "Tristeza": 0.6
-          }
-        },
-        {
-          "archivo": "MT_11.mp3_TRI.mpeg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.2,
-            "Feliz": 0.2,
-            "Tristeza": 0.6
-          }
-        },
-        {
-          "archivo": "VZ_07_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.4,
-            "Tristeza": 0.2
-          }
-        },
-        {
-          "archivo": "MT_06_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.2,
-            "Tristeza": 0.2
-          }
-        },
-        {
-          "archivo": "VA_11_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.4,
-            "Tristeza": 0.2
-          }
-        },
-        {
-          "archivo": "VZ_09_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.0,
-            "Feliz": 0.2,
-            "Tristeza": 0.8
+            "Tranquilidad": 1.0
           }
         },
         {
-          "archivo": "MT_05_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
+          "archivo": "VZ_07_ENO.ogg",
+          "recolector": "VZ",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.2,
-            "Tristeza": 0.2
+            "Enojo": 0.2,
+            "Tranquilidad": 0.8
           }
         },
         {
-          "archivo": "MT_04_TRI.mp4",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "archivo": "VZ_03_ENO.ogg",
+          "recolector": "VZ",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.2,
+            "Tranquilidad": 0.8
+          }
+        },
+        {
+          "archivo": "ED_02_TRA_S.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.2,
+            "Tranquilidad": 0.8
+          }
+        },
+        {
+          "archivo": "SG_04_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.0,
-            "Feliz": 0.4,
-            "Tristeza": 0.6
+            "Tranquilidad": 1.0
           }
         },
         {
-          "archivo": "VZ_08_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.2,
-            "Feliz": 0.4,
-            "Tristeza": 0.4
-          }
-        },
-        {
-          "archivo": "MT_03_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.4,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "MT_07_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.6,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "MT_09_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.4,
-            "Tristeza": 0.2
-          }
-        },
-        {
-          "archivo": "VA_07_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.2,
-            "Tristeza": 0.4
-          }
-        },
-        {
-          "archivo": "VZ_02_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.6,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "VZ_05_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.2,
-            "Feliz": 0.4,
-            "Tristeza": 0.4
-          }
-        },
-        {
-          "archivo": "VA_04_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.2,
-            "Tristeza": 0.4
-          }
-        },
-        {
-          "archivo": "VA_08_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.4,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "ED_01_TRI.ogg",
+          "archivo": "ED_01_TRA.ogg",
           "recolector": "ED",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.2,
-            "Feliz": 0.2,
-            "Tristeza": 0.6
+            "Tranquilidad": 0.8
           }
         },
         {
-          "archivo": "VA_10_TRI.ogg",
+          "archivo": "ED_05_TRA.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0,
+            "Tranquilidad": 1.0
+          }
+        },
+        {
+          "archivo": "VA_07_ENO.ogg",
           "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.8,
-            "Feliz": 0.0,
-            "Tristeza": 0.2
+            "Enojo": 0.2,
+            "Tranquilidad": 0.8
           }
         },
         {
-          "archivo": "ED_02_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.8,
-            "Feliz": 0.2,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "VZ_07_FEL.ogg",
+          "archivo": "VZ_03_TRA.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.6,
-            "Tristeza": 0.0
+            "Enojo": 0.2,
+            "Tranquilidad": 0.8
           }
         },
         {
-          "archivo": "MT_01_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.0,
-            "Tristeza": 0.6
-          }
-        },
-        {
-          "archivo": "MT_03_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.8,
-            "Feliz": 0.2,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "ED_01_FEL.ogg",
+          "archivo": "ED_02_TRI_S.ogg",
           "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.8,
-            "Feliz": 0.2,
-            "Tristeza": 0.0
+            "Enojo": 0.0,
+            "Tranquilidad": 1.0
           }
         },
         {
-          "archivo": "VZ_02_FEL.ogg",
+          "archivo": "VZ_09_TRA.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.6,
-            "Tristeza": 0.0
+            "Enojo": 0.0,
+            "Tranquilidad": 1.0
           }
         },
         {
-          "archivo": "ED_04_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.6,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "VZ_08_FEL.ogg",
+          "archivo": "VZ_06_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.4,
-            "Feliz": 0.6,
-            "Tristeza": 0.0
+            "Tranquilidad": 0.6
           }
         },
         {
-          "archivo": "VZ_06_FEL.ogg",
+          "archivo": "VZ_05_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.6,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "ED_03_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.4,
-            "Feliz": 0.4,
-            "Tristeza": 0.2
-          }
-        },
-        {
-          "archivo": "MT_02_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.4,
-            "Tristeza": 0.0
+            "Enojo": 0.0,
+            "Tranquilidad": 1.0
           }
         },
         {
           "archivo": "VZ_01_FEL.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.2,
-            "Tristeza": 0.2
-          }
-        },
-        {
-          "archivo": "VZ_03_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.2,
-            "Tristeza": 0.2
-          }
-        },
-        {
-          "archivo": "VZ_04_FEL.mp4",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.2,
-            "Feliz": 0.0,
-            "Tristeza": 0.8
-          }
-        },
-        {
-          "archivo": "VZ_05_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6,
-            "Feliz": 0.4,
-            "Tristeza": 0.0
+            "Enojo": 0.4,
+            "Tranquilidad": 0.6
           }
         }
       ]
@@ -3360,8 +1704,7 @@
       "label": "KNN (k=3)",
       "classes_order": [
         "Enojo",
-        "Feliz",
-        "Tristeza"
+        "Tranquilidad"
       ],
       "predictions": [
         {
@@ -3371,9 +1714,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
@@ -3383,9 +1725,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
@@ -3395,21 +1736,19 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
           "archivo": "MT_05_ENO.ogg",
           "recolector": "MT",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0,
-            "Feliz": 1.0,
-            "Tristeza": 0.0
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
@@ -3419,9 +1758,8 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
@@ -3431,69 +1769,52 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
+          }
+        },
+        {
+          "archivo": "SG_01_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Enojo",
+          "prediccion": "Tranquilidad",
+          "correcto": false,
+          "probabilidades": {
+            "Enojo": 0.3333,
+            "Tranquilidad": 0.6667
+          }
+        },
+        {
+          "archivo": "SG_06_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Enojo",
+          "prediccion": "Tranquilidad",
+          "correcto": false,
+          "probabilidades": {
+            "Enojo": 0.3333,
+            "Tranquilidad": 0.6667
           }
         },
         {
           "archivo": "MT_02_ENO.ogg",
           "recolector": "MT",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.6667,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "VA_03_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
             "Enojo": 1.0,
-            "Feliz": 0.0,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "MT_06_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.3333,
-            "Tristeza": 0.3333
-          }
-        },
-        {
-          "archivo": "VA_11_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.0,
-            "Tristeza": 0.3333
+            "Tranquilidad": 0.0
           }
         },
         {
           "archivo": "MT_07_ENO.ogg",
           "recolector": "MT",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
-          "correcto": false,
+          "prediccion": "Enojo",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.6667,
-            "Tristeza": 0.0
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
@@ -3503,525 +1824,217 @@
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
+            "Enojo": 1.0,
+            "Tranquilidad": 0.0
           }
         },
         {
-          "archivo": "VA_10_ENO.ogg",
-          "recolector": "VA",
+          "archivo": "SG_07_ENO.mp4",
+          "recolector": "SG",
           "clase_real": "Enojo",
           "prediccion": "Enojo",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.6667,
-            "Feliz": 0.0,
-            "Tristeza": 0.3333
+            "Tranquilidad": 0.3333
           }
         },
         {
-          "archivo": "VA_08_ENO.ogg",
+          "archivo": "VA_13_ENO.mpeg",
           "recolector": "VA",
           "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.3333,
-            "Tristeza": 0.3333
-          }
-        },
-        {
-          "archivo": "MT_09_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.0,
-            "Tristeza": 0.3333
-          }
-        },
-        {
-          "archivo": "VA_02_ENO.ogg",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "VA_05_ENO.mp4",
-          "recolector": "VA",
-          "clase_real": "Enojo",
-          "prediccion": "Feliz",
+          "prediccion": "Tranquilidad",
           "correcto": false,
           "probabilidades": {
             "Enojo": 0.0,
-            "Feliz": 0.6667,
-            "Tristeza": 0.3333
+            "Tranquilidad": 1.0
           }
         },
         {
           "archivo": "VZ_08_ENO.ogg",
           "recolector": "VZ",
           "clase_real": "Enojo",
-          "prediccion": "Enojo",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "MT_01_ENO.ogg",
-          "recolector": "MT",
-          "clase_real": "Enojo",
-          "prediccion": "Feliz",
+          "prediccion": "Tranquilidad",
           "correcto": false,
           "probabilidades": {
             "Enojo": 0.3333,
-            "Feliz": 0.6667,
-            "Tristeza": 0.0
+            "Tranquilidad": 0.6667
           }
         },
         {
           "archivo": "ED_01_ENO_S.ogg",
           "recolector": "ED",
           "clase_real": "Enojo",
-          "prediccion": "Feliz",
+          "prediccion": "Tranquilidad",
           "correcto": false,
           "probabilidades": {
             "Enojo": 0.3333,
-            "Feliz": 0.6667,
-            "Tristeza": 0.0
+            "Tranquilidad": 0.6667
           }
         },
         {
-          "archivo": "VZ_01_TRI.mp4",
+          "archivo": "VZ_10_TRA.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.0,
-            "Feliz": 0.3333,
-            "Tristeza": 0.6667
+            "Tranquilidad": 1.0
           }
         },
         {
-          "archivo": "VZ_04_TRI.ogg",
+          "archivo": "VZ_10_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.0,
-            "Tristeza": 0.6667
-          }
-        },
-        {
-          "archivo": "MT_11.mp3_TRI.mpeg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.0,
-            "Feliz": 0.0,
-            "Tristeza": 1.0
+            "Tranquilidad": 1.0
           }
         },
         {
-          "archivo": "VZ_07_TRI.ogg",
+          "archivo": "VZ_07_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.6667,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "MT_06_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.0,
-            "Tristeza": 0.3333
-          }
-        },
-        {
-          "archivo": "VA_11_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.0,
-            "Tristeza": 0.3333
-          }
-        },
-        {
-          "archivo": "VZ_09_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.0,
-            "Feliz": 0.3333,
-            "Tristeza": 0.6667
-          }
-        },
-        {
-          "archivo": "MT_05_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.0,
-            "Tristeza": 0.3333
-          }
-        },
-        {
-          "archivo": "MT_04_TRI.mp4",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.0,
-            "Feliz": 0.3333,
-            "Tristeza": 0.6667
-          }
-        },
-        {
-          "archivo": "VZ_08_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.3333,
-            "Feliz": 0.0,
-            "Tristeza": 0.6667
+            "Tranquilidad": 0.6667
           }
         },
         {
-          "archivo": "MT_03_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "MT_07_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.6667,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "MT_09_TRI.ogg",
-          "recolector": "MT",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.3333,
-            "Tristeza": 0.3333
-          }
-        },
-        {
-          "archivo": "VA_07_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "VZ_02_TRI.ogg",
+          "archivo": "VZ_03_ENO.ogg",
           "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Feliz",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.6667,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "VZ_05_TRI.ogg",
-          "recolector": "VZ",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.0,
-            "Feliz": 0.3333,
-            "Tristeza": 0.6667
-          }
-        },
-        {
-          "archivo": "VA_04_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
             "Enojo": 0.3333,
-            "Feliz": 0.3333,
-            "Tristeza": 0.3333
+            "Tranquilidad": 0.6667
           }
         },
         {
-          "archivo": "VA_08_TRI.ogg",
-          "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 1.0,
-            "Feliz": 0.0,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "ED_01_TRI.ogg",
+          "archivo": "ED_02_TRA_S.ogg",
           "recolector": "ED",
-          "clase_real": "Tristeza",
-          "prediccion": "Tristeza",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.0,
-            "Feliz": 0.3333,
-            "Tristeza": 0.6667
+            "Tranquilidad": 1.0
           }
         },
         {
-          "archivo": "VA_10_TRI.ogg",
+          "archivo": "SG_04_ENO.ogg",
+          "recolector": "SG",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0,
+            "Tranquilidad": 1.0
+          }
+        },
+        {
+          "archivo": "ED_01_TRA.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.3333,
+            "Tranquilidad": 0.6667
+          }
+        },
+        {
+          "archivo": "ED_05_TRA.ogg",
+          "recolector": "ED",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0,
+            "Tranquilidad": 1.0
+          }
+        },
+        {
+          "archivo": "VA_07_ENO.ogg",
           "recolector": "VA",
-          "clase_real": "Tristeza",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 1.0,
-            "Feliz": 0.0,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "ED_02_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 1.0,
-            "Feliz": 0.0,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "VZ_07_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
             "Enojo": 0.3333,
-            "Feliz": 0.6667,
-            "Tristeza": 0.0
+            "Tranquilidad": 0.6667
           }
         },
         {
-          "archivo": "MT_01_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.0,
-            "Tristeza": 0.6667
-          }
-        },
-        {
-          "archivo": "MT_03_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "ED_01_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "VZ_02_FEL.ogg",
+          "archivo": "VZ_03_TRA.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "ED_04_FEL.ogg",
-          "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "VZ_08_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.6667,
-            "Tristeza": 0.0
+            "Enojo": 0.0,
+            "Tranquilidad": 1.0
           }
         },
         {
-          "archivo": "VZ_06_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
-          "correcto": true,
-          "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.6667,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "ED_03_FEL.ogg",
+          "archivo": "ED_02_TRI_S.ogg",
           "recolector": "ED",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.6667,
-            "Tristeza": 0.0
+            "Enojo": 0.0,
+            "Tranquilidad": 1.0
           }
         },
         {
-          "archivo": "MT_02_FEL.ogg",
-          "recolector": "MT",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
+          "archivo": "VZ_09_TRA.ogg",
+          "recolector": "VZ",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
           "probabilidades": {
-            "Enojo": 0.6667,
-            "Feliz": 0.3333,
-            "Tristeza": 0.0
+            "Enojo": 0.0,
+            "Tranquilidad": 1.0
+          }
+        },
+        {
+          "archivo": "VZ_06_ENO.ogg",
+          "recolector": "VZ",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0,
+            "Tranquilidad": 1.0
+          }
+        },
+        {
+          "archivo": "VZ_05_ENO.ogg",
+          "recolector": "VZ",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
+          "correcto": true,
+          "probabilidades": {
+            "Enojo": 0.0,
+            "Tranquilidad": 1.0
           }
         },
         {
           "archivo": "VZ_01_FEL.ogg",
           "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 1.0,
-            "Feliz": 0.0,
-            "Tristeza": 0.0
-          }
-        },
-        {
-          "archivo": "VZ_03_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Enojo",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.3333,
-            "Tristeza": 0.3333
-          }
-        },
-        {
-          "archivo": "VZ_04_FEL.mp4",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Tristeza",
-          "correcto": false,
-          "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.0,
-            "Tristeza": 0.6667
-          }
-        },
-        {
-          "archivo": "VZ_05_FEL.ogg",
-          "recolector": "VZ",
-          "clase_real": "Feliz",
-          "prediccion": "Feliz",
+          "clase_real": "Tranquilidad",
+          "prediccion": "Tranquilidad",
           "correcto": true,
           "probabilidades": {
-            "Enojo": 0.3333,
-            "Feliz": 0.6667,
-            "Tristeza": 0.0
+            "Enojo": 0.0,
+            "Tranquilidad": 1.0
           }
         }
       ]
@@ -4032,14 +2045,10 @@
       "archivo": "ED_03_ENO_S.ogg",
       "recolector": "ED",
       "clase_real": "Enojo",
-      "n_modelos_correctos": 3,
+      "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "svm_rbf"
-      ],
-      "confundido_con": "Feliz"
+      "modelos_fallidos": [],
+      "confundido_con": null
     },
     {
       "archivo": "ED_04_ENO_S.ogg",
@@ -4063,16 +2072,10 @@
       "archivo": "MT_05_ENO.ogg",
       "recolector": "MT",
       "clase_real": "Enojo",
-      "n_modelos_correctos": 1,
+      "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "svm_rbf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Feliz"
+      "modelos_fallidos": [],
+      "confundido_con": null
     },
     {
       "archivo": "MT_03_ENO.ogg",
@@ -4093,146 +2096,72 @@
       "confundido_con": null
     },
     {
+      "archivo": "SG_01_ENO.ogg",
+      "recolector": "SG",
+      "clase_real": "Enojo",
+      "n_modelos_correctos": 4,
+      "n_modelos_totales": 6,
+      "modelos_fallidos": [
+        "knn_k5",
+        "knn_k3"
+      ],
+      "confundido_con": "Tranquilidad"
+    },
+    {
+      "archivo": "SG_06_ENO.ogg",
+      "recolector": "SG",
+      "clase_real": "Enojo",
+      "n_modelos_correctos": 4,
+      "n_modelos_totales": 6,
+      "modelos_fallidos": [
+        "knn_k5",
+        "knn_k3"
+      ],
+      "confundido_con": "Tranquilidad"
+    },
+    {
       "archivo": "MT_02_ENO.ogg",
       "recolector": "MT",
       "clase_real": "Enojo",
-      "n_modelos_correctos": 5,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "knn_k3"
-      ],
-      "confundido_con": "Feliz"
-    },
-    {
-      "archivo": "VA_03_ENO.ogg",
-      "recolector": "VA",
-      "clase_real": "Enojo",
       "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
       "modelos_fallidos": [],
       "confundido_con": null
-    },
-    {
-      "archivo": "MT_06_ENO.ogg",
-      "recolector": "MT",
-      "clase_real": "Enojo",
-      "n_modelos_correctos": 6,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [],
-      "confundido_con": null
-    },
-    {
-      "archivo": "VA_11_ENO.ogg",
-      "recolector": "VA",
-      "clase_real": "Enojo",
-      "n_modelos_correctos": 5,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "rf"
-      ],
-      "confundido_con": "Tristeza"
     },
     {
       "archivo": "MT_07_ENO.ogg",
       "recolector": "MT",
       "clase_real": "Enojo",
-      "n_modelos_correctos": 1,
+      "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "svm_rbf",
-        "rf",
-        "knn_k3"
-      ],
-      "confundido_con": "Feliz"
+      "modelos_fallidos": [],
+      "confundido_con": null
     },
     {
       "archivo": "ED_02_ENO_S.ogg",
       "recolector": "ED",
       "clase_real": "Enojo",
-      "n_modelos_correctos": 4,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "rf",
-        "knn_k5"
-      ],
-      "confundido_con": "Tristeza"
-    },
-    {
-      "archivo": "VA_10_ENO.ogg",
-      "recolector": "VA",
-      "clase_real": "Enojo",
       "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
       "modelos_fallidos": [],
       "confundido_con": null
     },
     {
-      "archivo": "VA_08_ENO.ogg",
-      "recolector": "VA",
+      "archivo": "SG_07_ENO.mp4",
+      "recolector": "SG",
       "clase_real": "Enojo",
-      "n_modelos_correctos": 6,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [],
-      "confundido_con": null
-    },
-    {
-      "archivo": "MT_09_ENO.ogg",
-      "recolector": "MT",
-      "clase_real": "Enojo",
-      "n_modelos_correctos": 4,
+      "n_modelos_correctos": 3,
       "n_modelos_totales": 6,
       "modelos_fallidos": [
         "svm_lineal",
-        "rf"
-      ],
-      "confundido_con": "Tristeza"
-    },
-    {
-      "archivo": "VA_02_ENO.ogg",
-      "recolector": "VA",
-      "clase_real": "Enojo",
-      "n_modelos_correctos": 4,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
         "rf",
         "knn_k5"
       ],
-      "confundido_con": "Tristeza"
+      "confundido_con": "Tranquilidad"
     },
     {
-      "archivo": "VA_05_ENO.mp4",
+      "archivo": "VA_13_ENO.mpeg",
       "recolector": "VA",
-      "clase_real": "Enojo",
-      "n_modelos_correctos": 1,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "svm_rbf",
-        "rf",
-        "knn_k3"
-      ],
-      "confundido_con": "Tristeza"
-    },
-    {
-      "archivo": "VZ_08_ENO.ogg",
-      "recolector": "VZ",
-      "clase_real": "Enojo",
-      "n_modelos_correctos": 2,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "svm_rbf",
-        "rf"
-      ],
-      "confundido_con": "Feliz"
-    },
-    {
-      "archivo": "MT_01_ENO.ogg",
-      "recolector": "MT",
       "clase_real": "Enojo",
       "n_modelos_correctos": 0,
       "n_modelos_totales": 6,
@@ -4244,7 +2173,19 @@
         "knn_k5",
         "knn_k3"
       ],
-      "confundido_con": "Feliz"
+      "confundido_con": "Tranquilidad"
+    },
+    {
+      "archivo": "VZ_08_ENO.ogg",
+      "recolector": "VZ",
+      "clase_real": "Enojo",
+      "n_modelos_correctos": 4,
+      "n_modelos_totales": 6,
+      "modelos_fallidos": [
+        "knn_k5",
+        "knn_k3"
+      ],
+      "confundido_con": "Tranquilidad"
     },
     {
       "archivo": "ED_01_ENO_S.ogg",
@@ -4255,451 +2196,142 @@
       "modelos_fallidos": [
         "knn_k3"
       ],
-      "confundido_con": "Feliz"
+      "confundido_con": "Tranquilidad"
     },
     {
-      "archivo": "VZ_01_TRI.mp4",
+      "archivo": "VZ_10_TRA.ogg",
       "recolector": "VZ",
-      "clase_real": "Tristeza",
+      "clase_real": "Tranquilidad",
       "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
       "modelos_fallidos": [],
       "confundido_con": null
     },
     {
-      "archivo": "VZ_04_TRI.ogg",
+      "archivo": "VZ_10_ENO.ogg",
       "recolector": "VZ",
-      "clase_real": "Tristeza",
+      "clase_real": "Tranquilidad",
       "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
       "modelos_fallidos": [],
       "confundido_con": null
     },
     {
-      "archivo": "MT_11.mp3_TRI.mpeg",
-      "recolector": "MT",
-      "clase_real": "Tristeza",
+      "archivo": "VZ_07_ENO.ogg",
+      "recolector": "VZ",
+      "clase_real": "Tranquilidad",
       "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
       "modelos_fallidos": [],
       "confundido_con": null
     },
     {
-      "archivo": "VZ_07_TRI.ogg",
+      "archivo": "VZ_03_ENO.ogg",
       "recolector": "VZ",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 4,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "MT_06_TRI.ogg",
-      "recolector": "MT",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 3,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "rf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "VA_11_TRI.ogg",
-      "recolector": "VA",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 2,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "svm_rbf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "VZ_09_TRI.ogg",
-      "recolector": "VZ",
-      "clase_real": "Tristeza",
+      "clase_real": "Tranquilidad",
       "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
       "modelos_fallidos": [],
       "confundido_con": null
     },
     {
-      "archivo": "MT_05_TRI.ogg",
-      "recolector": "MT",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 3,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "rf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "MT_04_TRI.mp4",
-      "recolector": "MT",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 4,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg"
-      ],
-      "confundido_con": "Feliz"
-    },
-    {
-      "archivo": "VZ_08_TRI.ogg",
-      "recolector": "VZ",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 5,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "knn_k5"
-      ],
-      "confundido_con": "Feliz"
-    },
-    {
-      "archivo": "MT_03_TRI.ogg",
-      "recolector": "MT",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 4,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "MT_07_TRI.ogg",
-      "recolector": "MT",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 2,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "svm_rbf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "MT_09_TRI.ogg",
-      "recolector": "MT",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 4,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "VA_07_TRI.ogg",
-      "recolector": "VA",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 4,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "VZ_02_TRI.ogg",
-      "recolector": "VZ",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 0,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "svm_rbf",
-        "rf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Feliz"
-    },
-    {
-      "archivo": "VZ_05_TRI.ogg",
-      "recolector": "VZ",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 5,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "knn_k5"
-      ],
-      "confundido_con": "Feliz"
-    },
-    {
-      "archivo": "VA_04_TRI.ogg",
-      "recolector": "VA",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 4,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "VA_08_TRI.ogg",
-      "recolector": "VA",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 1,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "rf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "ED_01_TRI.ogg",
+      "archivo": "ED_02_TRA_S.ogg",
       "recolector": "ED",
-      "clase_real": "Tristeza",
+      "clase_real": "Tranquilidad",
       "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
       "modelos_fallidos": [],
       "confundido_con": null
     },
     {
-      "archivo": "VA_10_TRI.ogg",
+      "archivo": "SG_04_ENO.ogg",
+      "recolector": "SG",
+      "clase_real": "Tranquilidad",
+      "n_modelos_correctos": 6,
+      "n_modelos_totales": 6,
+      "modelos_fallidos": [],
+      "confundido_con": null
+    },
+    {
+      "archivo": "ED_01_TRA.ogg",
+      "recolector": "ED",
+      "clase_real": "Tranquilidad",
+      "n_modelos_correctos": 6,
+      "n_modelos_totales": 6,
+      "modelos_fallidos": [],
+      "confundido_con": null
+    },
+    {
+      "archivo": "ED_05_TRA.ogg",
+      "recolector": "ED",
+      "clase_real": "Tranquilidad",
+      "n_modelos_correctos": 6,
+      "n_modelos_totales": 6,
+      "modelos_fallidos": [],
+      "confundido_con": null
+    },
+    {
+      "archivo": "VA_07_ENO.ogg",
       "recolector": "VA",
-      "clase_real": "Tristeza",
-      "n_modelos_correctos": 2,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "svm_rbf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "ED_02_FEL.ogg",
-      "recolector": "ED",
-      "clase_real": "Feliz",
-      "n_modelos_correctos": 0,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "svm_rbf",
-        "rf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "VZ_07_FEL.ogg",
-      "recolector": "VZ",
-      "clase_real": "Feliz",
+      "clase_real": "Tranquilidad",
       "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
       "modelos_fallidos": [],
       "confundido_con": null
     },
     {
-      "archivo": "MT_01_FEL.ogg",
-      "recolector": "MT",
-      "clase_real": "Feliz",
-      "n_modelos_correctos": 0,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "svm_rbf",
-        "rf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Tristeza"
-    },
-    {
-      "archivo": "MT_03_FEL.ogg",
-      "recolector": "MT",
-      "clase_real": "Feliz",
-      "n_modelos_correctos": 0,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "svm_rbf",
-        "rf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "ED_01_FEL.ogg",
-      "recolector": "ED",
-      "clase_real": "Feliz",
-      "n_modelos_correctos": 0,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "svm_rbf",
-        "rf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "VZ_02_FEL.ogg",
+      "archivo": "VZ_03_TRA.ogg",
       "recolector": "VZ",
-      "clase_real": "Feliz",
-      "n_modelos_correctos": 1,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "svm_rbf",
-        "rf",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "ED_04_FEL.ogg",
-      "recolector": "ED",
-      "clase_real": "Feliz",
-      "n_modelos_correctos": 4,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "rf",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "VZ_08_FEL.ogg",
-      "recolector": "VZ",
-      "clase_real": "Feliz",
+      "clase_real": "Tranquilidad",
       "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
       "modelos_fallidos": [],
       "confundido_con": null
     },
     {
-      "archivo": "VZ_06_FEL.ogg",
-      "recolector": "VZ",
-      "clase_real": "Feliz",
+      "archivo": "ED_02_TRI_S.ogg",
+      "recolector": "ED",
+      "clase_real": "Tranquilidad",
       "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
       "modelos_fallidos": [],
       "confundido_con": null
     },
     {
-      "archivo": "ED_03_FEL.ogg",
-      "recolector": "ED",
-      "clase_real": "Feliz",
-      "n_modelos_correctos": 1,
+      "archivo": "VZ_09_TRA.ogg",
+      "recolector": "VZ",
+      "clase_real": "Tranquilidad",
+      "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "svm_rbf",
-        "rf",
-        "knn_k5"
-      ],
-      "confundido_con": "Enojo"
+      "modelos_fallidos": [],
+      "confundido_con": null
     },
     {
-      "archivo": "MT_02_FEL.ogg",
-      "recolector": "MT",
-      "clase_real": "Feliz",
-      "n_modelos_correctos": 2,
+      "archivo": "VZ_06_ENO.ogg",
+      "recolector": "VZ",
+      "clase_real": "Tranquilidad",
+      "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_rbf",
-        "rf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
+      "modelos_fallidos": [],
+      "confundido_con": null
+    },
+    {
+      "archivo": "VZ_05_ENO.ogg",
+      "recolector": "VZ",
+      "clase_real": "Tranquilidad",
+      "n_modelos_correctos": 6,
+      "n_modelos_totales": 6,
+      "modelos_fallidos": [],
+      "confundido_con": null
     },
     {
       "archivo": "VZ_01_FEL.ogg",
       "recolector": "VZ",
-      "clase_real": "Feliz",
-      "n_modelos_correctos": 2,
+      "clase_real": "Tranquilidad",
+      "n_modelos_correctos": 6,
       "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_rbf",
-        "rf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "VZ_03_FEL.ogg",
-      "recolector": "VZ",
-      "clase_real": "Feliz",
-      "n_modelos_correctos": 2,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_rbf",
-        "rf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Enojo"
-    },
-    {
-      "archivo": "VZ_04_FEL.mp4",
-      "recolector": "VZ",
-      "clase_real": "Feliz",
-      "n_modelos_correctos": 0,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "svm_rbf",
-        "rf",
-        "knn_k5",
-        "knn_k3"
-      ],
-      "confundido_con": "Tristeza"
-    },
-    {
-      "archivo": "VZ_05_FEL.ogg",
-      "recolector": "VZ",
-      "clase_real": "Feliz",
-      "n_modelos_correctos": 1,
-      "n_modelos_totales": 6,
-      "modelos_fallidos": [
-        "svm_lineal",
-        "logreg",
-        "svm_rbf",
-        "rf",
-        "knn_k5"
-      ],
-      "confundido_con": "Tristeza"
+      "modelos_fallidos": [],
+      "confundido_con": null
     }
   ]
 }

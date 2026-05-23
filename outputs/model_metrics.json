@@ -1,48 +1,47 @@
 {
   "active_classes": [
     "Enojo",
-    "Tristeza",
-    "Feliz"
+    "Tranquilidad"
   ],
-  "samples_per_class": 20,
-  "dataset_size": 55,
-  "chance_accuracy": 0.3333,
+  "samples_per_class": 15,
+  "dataset_size": 30,
+  "chance_accuracy": 0.5,
   "models": {
     "svm_lineal": {
       "label": "SVM lineal",
       "description": "Excelente separabilidad lineal en el espacio de embeddings.",
-      "accuracy": 0.6182,
-      "balanced_accuracy": 0.6056
+      "accuracy": 0.9333,
+      "balanced_accuracy": 0.9333
     },
     "logreg": {
       "label": "Reg. Logística",
       "description": "Clasificador probabilístico de entropía máxima.",
-      "accuracy": 0.6909,
-      "balanced_accuracy": 0.6722
+      "accuracy": 0.9667,
+      "balanced_accuracy": 0.9667
     },
     "svm_rbf": {
       "label": "SVM RBF",
       "description": "Captura fronteras no lineales entre emociones.",
-      "accuracy": 0.6182,
-      "balanced_accuracy": 0.5889
+      "accuracy": 0.9667,
+      "balanced_accuracy": 0.9667
     },
     "rf": {
       "label": "Random Forest",
       "description": "Ensemble robusto basado en árboles de decisión.",
-      "accuracy": 0.5636,
-      "balanced_accuracy": 0.5333
+      "accuracy": 0.9333,
+      "balanced_accuracy": 0.9333
     },
     "knn_k5": {
       "label": "KNN (k=5)",
       "description": "Votación por 5 vecinos más cercanos.",
-      "accuracy": 0.4909,
-      "balanced_accuracy": 0.4778
+      "accuracy": 0.8333,
+      "balanced_accuracy": 0.8333
     },
     "knn_k3": {
       "label": "KNN (k=3)",
       "description": "Votación por 3 vecinos más cercanos.",
-      "accuracy": 0.4909,
-      "balanced_accuracy": 0.4778
+      "accuracy": 0.8333,
+      "balanced_accuracy": 0.8333
     }
   },
   "best_model": "logreg"
