@@ -5,7 +5,6 @@ import json
 import numpy as np
 import pandas as pd
 import librosa
-import torch
 import joblib
 from flask import Flask, request, jsonify, render_template, send_from_directory
 
@@ -26,14 +25,12 @@ DECISIONS_DATA_PATH = os.path.join("outputs", "decisions_data.json")
 # Audios usados en training (se cargan desde el cache al arrancar)
 TRAINING_FILES = set()
 
-# Device configuration
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-print(f"Webapp running on device: {DEVICE}")
 
 # Global model references
 loaded_models = {}
 processor = None
-wav2vec2_model = None
+encoder_model = None
+encoder_device = None
 
 # Model mapping for friendly names
 MODEL_MAPPING = {
@@ -53,11 +50,13 @@ SCORE_COLUMNS = {
     "Enojo": "score_enojo",
     "Tristeza": "score_tristeza",
     "Feliz": "score_feliz",
+    "Tranquilidad": "score_tranquilidad",
 }
 CLASS_STYLES = {
     "Enojo": {"slug": "enojo", "label": "Enojo", "accent": "#ef4444", "accent_dark": "#b91c1c"},
     "Tristeza": {"slug": "tristeza", "label": "Tristeza", "accent": "#06b6d4", "accent_dark": "#0891b2"},
     "Feliz": {"slug": "feliz", "label": "Feliz", "accent": "#f59e0b", "accent_dark": "#d97706"},
+    "Tranquilidad": {"slug": "tranquilidad", "label": "Tranquilidad", "accent": "#22c55e", "accent_dark": "#15803d"},
 }
 
 
@@ -94,7 +93,7 @@ def load_decisions_data():
         return json.load(f)
 
 def init_models():
-    global loaded_models, processor, wav2vec2_model, TRAINING_FILES
+    global loaded_models, processor, encoder_model, encoder_device, TRAINING_FILES
 
     # 1. Load pre-trained models from joblib files
     model_dir = os.path.join("outputs", "modelos")
@@ -114,14 +113,13 @@ def init_models():
             TRAINING_FILES = set(str(f) for f in c["files"])
             print(f"  Training set: {len(TRAINING_FILES)} archivos únicos cargados del cache.")
 
-    # 2. Load wav2vec2 for inference
-    from transformers import Wav2Vec2Processor, Wav2Vec2Model
-    print("Loading facebook/wav2vec2-base...")
+    # 2. Load emotional encoder (audeering) for inference
+    from emotion_encoder import load_encoder, MODEL_ID as ENCODER_ID
+    print(f"Loading {ENCODER_ID}...")
     t0 = time.time()
-    processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base")
-    wav2vec2_model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base").to(DEVICE)
-    wav2vec2_model.eval()
-    print(f"wav2vec2 loaded in {time.time() - t0:.1f}s")
+    # Forzamos cpu/cuda en flask (mps a veces da problemas con torch.no_grad en debug)
+    processor, encoder_model, encoder_device = load_encoder(prefer_mps=False)
+    print(f"  Encoder loaded in {time.time() - t0:.1f}s on {encoder_device}")
 
 @app.route("/")
 def index():
@@ -215,20 +213,18 @@ def get_dataset():
 
 
 def extract_features_and_predict(y, sr, model_key="svm_lineal"):
-    """Procesa el audio COMPLETO con wav2vec2 (mean-pool sobre todos los frames)
-    y predice con el clasificador seleccionado. Misma lógica que el training."""
-    global loaded_models, processor, wav2vec2_model
+    """Procesa el audio con el encoder emocional (audeering) y predice con
+    el clasificador seleccionado. Misma logica que el training."""
+    global loaded_models, processor, encoder_model, encoder_device
 
     if model_key not in loaded_models:
         model_key = "svm_lineal" if "svm_lineal" in loaded_models else list(loaded_models.keys())[0]
     clf = loaded_models[model_key]
     classes = list(clf.classes_)
 
-    # 1. Embedding wav2vec2 sobre el audio completo (mean-pool)
-    inputs = processor(y, sampling_rate=sr, return_tensors="pt", padding=True)
-    with torch.no_grad():
-        out = wav2vec2_model(inputs.input_values.to(DEVICE))
-    emb = out.last_hidden_state.mean(dim=1).squeeze().cpu().numpy().astype(np.float32)
+    # 1. Embedding emocional (1024 dims, mean-pool de hidden_states de audeering)
+    from emotion_encoder import extract_embedding
+    emb = extract_embedding(y, sr, processor, encoder_model, encoder_device)
 
     # 2. Predicción
     prediction = clf.predict([emb])[0]

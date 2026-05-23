@@ -17,11 +17,11 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
-from transformers import Wav2Vec2Model, Wav2Vec2Processor
 
 # Importa configuración centralizada desde la raíz del proyecto
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import N_PER_CLASS, ACTIVE_CLASSES
+from config import N_PER_CLASS, ACTIVE_CLASSES, MIN_SCORE
+from emotion_encoder import load_encoder, extract_embedding, MODEL_ID as ENCODER_ID
 
 
 DATA_DIR = os.path.join("data", "AUDIOS MACHINE LEARNING")
@@ -36,14 +36,13 @@ SCORE_COLUMNS = {
     "Enojo": "score_enojo",
     "Tristeza": "score_tristeza",
     "Feliz": "score_feliz",
+    "Tranquilidad": "score_tranquilidad",
 }
 TARGET_SR = 16000
 MIN_AUDIO_DURATION = 4.0   # se descartan audios más cortos que esto
 MAX_DURATION = 10.0        # ventana de N s a procesar desde el inicio del audio
 # Nota: probamos warm-up de 1-2s (offset al inicio) y dilución del audio completo;
 # ambos empeoran el bal_acc. 0-10s es el sweet spot para este dataset.
-DEVICE = "mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu"
-
 MODEL_SPECS = {
     "svm_lineal": {
         "label": "SVM lineal",
@@ -97,6 +96,8 @@ MODEL_SPECS = {
 
 
 def seleccionar_audios():
+    """Selecciona audios para training: top-N_PER_CLASS por score, descartando
+    los que no alcancen MIN_SCORE (filtro de calidad minimo, no de prototipo)."""
     if not os.path.exists(REPORTE):
         raise FileNotFoundError(f"No se encontró el reporte en {REPORTE}")
 
@@ -108,40 +109,36 @@ def seleccionar_audios():
         filas.sort(key=lambda row: row[score_col], reverse=True)
         audios = []
         for row in filas:
+            if row[score_col] < MIN_SCORE:
+                continue  # filtro de calidad: descartamos por debajo del floor
             ruta = os.path.join(DATA_DIR, clase, row["archivo"])
             if os.path.exists(ruta):
                 audios.append(row["archivo"])
             if len(audios) >= N_PER_CLASS:
                 break
         seleccion[clase] = audios
-        print(f"{clase:<9} ({len(audios)}): {audios}")
+        print(f"{clase:<14} ({len(audios)}): {audios}")
     return seleccion
 
 
-def cargar_wav2vec2():
-    print("Cargando facebook/wav2vec2-base...")
+def cargar_encoder():
+    print(f"Cargando {ENCODER_ID}...")
     t0 = time.time()
-    processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base")
-    model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base").to(DEVICE)
-    model.eval()
-    print(f"  Modelo listo en {time.time() - t0:.1f}s sobre {DEVICE}")
-    return processor, model
+    processor, model, device = load_encoder(prefer_mps=True)
+    print(f"  Modelo listo en {time.time() - t0:.1f}s sobre {device}")
+    return processor, model, device
 
 
-def extraer_embedding(ruta, processor, model):
-    """Carga los primeros MAX_DURATION s del audio y devuelve un embedding de 768d.
+def extraer_embedding(ruta, processor, model, device):
+    """Carga los primeros MAX_DURATION s del audio y devuelve un embedding emocional (1024d).
 
-    Sweet spot empírico para este dataset: 10s desde el inicio. Probamos warm-up
-    de 1-2s y dilución del audio completo; ambos empeoran el bal_acc.
+    Usa el encoder audeering (wav2vec2-large fine-tuneado para emocion) — sus
+    hidden_states ya estan optimizados para arousal/valence/dominance, no fonemas.
     """
     y, _ = librosa.load(ruta, sr=TARGET_SR, mono=True, duration=MAX_DURATION)
     if len(y) < TARGET_SR * MIN_AUDIO_DURATION:
         return None
-
-    inputs = processor(y, sampling_rate=TARGET_SR, return_tensors="pt", padding=True)
-    with torch.no_grad():
-        out = model(inputs.input_values.to(DEVICE))
-    return out.last_hidden_state.mean(dim=1).squeeze().cpu().numpy().astype(np.float32)
+    return extract_embedding(y, TARGET_SR, processor, model, device)
 
 
 def construir_cache(force_rebuild=False):
@@ -171,13 +168,13 @@ def construir_cache(force_rebuild=False):
             print("Caché legacy detectado. Recalculando...")
 
     seleccion = seleccionar_audios()
-    processor, model = cargar_wav2vec2()
+    processor, model, device = cargar_encoder()
     plan = [(archivo, clase) for clase in ACTIVE_CLASSES for archivo in seleccion[clase]]
 
     X_list, y_list, rec_list, files_list = [], [], [], []
     for idx, (archivo, clase) in enumerate(plan, 1):
         ruta = os.path.join(DATA_DIR, clase, archivo)
-        emb = extraer_embedding(ruta, processor, model)
+        emb = extraer_embedding(ruta, processor, model, device)
         if emb is None:
             print(f"  [{idx:02d}/{len(plan)}] {clase}/{archivo} → SKIP (audio demasiado corto)")
             continue
