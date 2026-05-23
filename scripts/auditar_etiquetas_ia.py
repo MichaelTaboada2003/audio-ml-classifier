@@ -70,9 +70,16 @@ def score_clase(avd, clase):
 
 def main():
     # --- Config ---
+    import argparse
     _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    DATA = os.path.join(_ROOT, "data", "AUDIOS MACHINE LEARNING")
-    OUT_CSV = os.path.join(_ROOT, "outputs", "audios_sospechosos_ia.csv")
+    parser = argparse.ArgumentParser(description="Audita etiquetas con el modelo emocional audeering.")
+    parser.add_argument("--data", default=os.path.join(_ROOT, "data", "AUDIOS MACHINE LEARNING"),
+                        help="Carpeta raiz con subcarpetas de clase a auditar.")
+    parser.add_argument("--out", default=os.path.join(_ROOT, "outputs", "audios_sospechosos_ia.csv"),
+                        help="CSV de salida.")
+    args = parser.parse_args()
+    DATA = args.data
+    OUT_CSV = args.out
     SR = 16000
     MAX_DUR = 10.0
     EXTS = {".ogg", ".mp3", ".mp4", ".mpeg", ".wav", ".flac", ".m4a"}
