@@ -46,7 +46,7 @@ Pipeline actual: **2 clases (Enojo vs Tranquilidad), N_PER_CLASS=15**, encoder e
 
 ## Historial de iteraciones y errores
 
-El proyecto pasó por siete fases. Cada una arregló (o intentó arreglar) un problema concreto detectado en la anterior. Esta sección documenta qué fallaba, qué cambió y qué resultado dio.
+El proyecto pasó por ocho fases. Cada una arregló (o intentó arreglar) un problema concreto detectado en la anterior. Esta sección documenta qué fallaba, qué cambió y qué resultado dio.
 
 ### Línea de tiempo resumida
 
@@ -59,6 +59,7 @@ El proyecto pasó por siete fases. Cada una arregló (o intentó arreglar) un pr
 | 5 | 2026-05-22 | N_PER_CLASS=20 con `class_weight='balanced'` | LOOCV 67%, **59% recall Enojo holdout** (+50 pp) |
 | 6 | 2026-05-23 | Intento con 4 clases (+ Tranquilidad) | Colapsa a **42% LOOCV** (chance=25%) — Tranquilidad confunde todo |
 | 7 | 2026-05-23 | Re-etiquetado por IA + encoder emocional audeering | **97% LOOCV, 88% holdout** — gap LOOCV/holdout cerrado |
+| 8 | 2026-05-23 | Localización de segmentos → dataset curado en `data/procesado` | 146 segmentos de 10 s (tramo más emotivo por audio); 6 mal-etiquetados eliminados |
 
 ### Iteración 1 — Filtrado acústico (commits `608636a`–`c514281`)
 
@@ -214,6 +215,43 @@ Esta iteración resolvió **tres problemas estructurales simultáneamente** que 
 
 **Acción:** desactivar el filtro hard (`MIN_SCORE = 0.0` en `config.py`). El score acústico sigue calculándose y se usa como criterio de ranking dentro de clase (top-N), pero **no descarta audios**. La detección de etiquetas erróneas pasa a ser responsabilidad del modelo SER vía `scripts/auditar_etiquetas_ia.py`.
 
+### Iteración 8 — Localización de segmentos y dataset curado (esta sesión, 2026-05-23)
+
+**Contexto:** Enojo y Feliz quedaron con pocos audios (≈17 y ≈13). El usuario notó que en varios de ellos **los primeros 10 s no suenan a la clase** (marcan Tranquilidad), pero **otros tramos del mismo audio sí**. Como el pipeline solo mira los primeros 10 s, esa señal se perdía.
+
+**Herramientas de inspección añadidas:**
+- `scripts/mostrar_todos.py` — vista en terminal de los 4 scores audeering + A/V/D de **todos** los audios, agrupados por carpeta, con `suena_a` = la clase de mayor score. Hermano de `scripts/mostrar_sospechosos.py` (que solo lista los discrepantes).
+- `scripts/auditar_etiquetas_ia.py` parametrizado con `--data` y `--out` para poder auditar cualquier carpeta, no solo el dataset original.
+
+**Localización (`scripts/segmentar_rescate.py`):** ventana deslizante de 10 s sobre el audio **completo**; para cada audio se queda con la ventana de mayor score para su clase y la recorta a un `.wav`. Estados por audio:
+
+| Estado | Significado |
+|---|---|
+| OK | los primeros 10 s ya suenan a la clase |
+| RESCATADO | los primeros 10 s no, pero otro tramo sí (ej. Tristeza que recién aparece en 35-45 s) |
+| SIN_RESCATE | ningún tramo de 10 s suena a la clase → candidato a mal-etiquetado |
+
+**¿Esto es cherry-picking?** No, y la distinción importa para la defensa:
+- Seleccionar **qué audios** entran (botar los difíciles) **sí** sesga — es exactamente lo que causó el desastre de la iteración 4.
+- Seleccionar **qué 10 s dentro de cada audio**, conservando *todos* los audios, **no** sesga: la emoción es actuada (la etiqueta vale para toda la grabación) y en qué tramo le salió mejor al hablante es ruido de grabación (arranque, carraspeo), no señal de la clase. Es localización de emoción / refinamiento de etiqueta débil, igual que recortar el silencio inicial de un clip.
+- **Guardrail obligatorio:** el holdout **nunca** se segmenta. Se entrena con los recortes localizados pero se valida sobre audio crudo. Si solo sube el LOOCV-sobre-recortes y no el holdout-crudo, fue inflación, no mejora.
+
+**Auditoría de los 152 recortes:** 149/152 (98%) confirman su clase. *Caveat honesto:* ese 98% es en parte circular — los segmentos se eligieron con audeering y se auditan con audeering, así que confirma que la selección funcionó, no que las etiquetas sean correctas. La validación real sigue siendo el holdout crudo con el clasificador downstream.
+
+**Revisión manual:** los recortes que ni localizando confirmaban (`VA_13_ENO`, `SG_02_FEL`, `VZ_07_TRI`) se escucharon a oído. Tras escucharlos el usuario eliminó 6 audios genuinamente mal-etiquetados (4 Enojo + 2 Feliz) y conservó el resto, incluido `VZ_07_TRI` (empate Tristeza/Tranquilidad, no mal-etiquetado sino ambigüedad de bajo arousal).
+
+**Resultado — dataset curado en `data/procesado/` (gitignored, regenerable):**
+
+| Clase | Segmentos |
+|---|---|
+| Enojo | 13 |
+| Feliz | 11 |
+| Tranquilidad | 89 |
+| Tristeza | 33 |
+| **Total** | **146** |
+
+Cada segmento es el tramo de 10 s más emotivo de su audio, listo para entrenar sin tocar `MAX_DURATION`. **Re-entrenamiento con este dataset: pendiente** (próximo paso, manteniendo un holdout crudo aparte).
+
 ### Lecciones acumuladas
 
 1. **Cherry-picking del score sesga el training.** Filtrar solo "prototípicos" entrena al modelo a aprender la pista trivial (energía) y rompe la generalización.
@@ -221,6 +259,7 @@ Esta iteración resolvió **tres problemas estructurales simultáneamente** que 
 3. **`wav2vec2-base` es ASR, no SER.** Para clasificación emocional, usar un encoder fine-tuneado para emoción cambia el techo de rendimiento en holdout dramáticamente.
 4. **Etiquetas humanas ≠ ground truth.** En datasets pequeños con actores no entrenados, ~50% de los audios pueden no proyectar la emoción pedida. Una segunda opinión de un modelo SER pre-entrenado es trabajo de auditoría obligatorio.
 5. **Aburrido y Tristeza colapsan acústicamente.** No conviene tratarlas como clases separadas con un dataset pequeño — habría que distinguirlas con contexto léxico, no solo prosodia.
+6. **Localizar la emoción ≠ cherry-picking.** En emoción actuada, recortar cada audio a su tramo más expresivo —conservando *todos* los audios— es refinamiento de etiqueta, no selección sesgada, siempre que el holdout no se segmente. Es distinto de filtrar *qué audios* entran, que sí sesga (lección 1).
 
 ---
 
@@ -501,16 +540,21 @@ clasificador-audios/
 │   └── 03_clasificador_v2_balanceado.ipynb    # Iteración 5: N=20 + class_weight
 ├── scripts/
 │   ├── filtrar_audios.py                      # Scoring acústico (ranking, no filtro hard)
-│   ├── auditar_etiquetas_ia.py                # ★ Auditoría de etiquetas con modelo SER
-│   ├── reasignar_audios.py                    # ★ Re-etiquetado físico con manifest reversible
+│   ├── auditar_etiquetas_ia.py                # ★ Auditoría de etiquetas con modelo SER (--data/--out)
+│   ├── reasignar_audios.py                    # Re-etiquetado físico con manifest reversible
+│   ├── mostrar_sospechosos.py                 # Lista los audios cuya etiqueta discrepa de la IA
+│   ├── mostrar_todos.py                       # ★ Vista de scores audeering de TODOS los audios
+│   ├── segmentar_rescate.py                   # ★ Localización: mejor segmento de 10 s por audio
 │   ├── exportar_modelos.py                    # Training LOOCV + serialización
 │   ├── build_experiment_history.py            # Historial para el dashboard
 │   ├── generar_datos_decisiones.py            # Data del módulo Decisiones
 │   └── regenerar_figuras.py                   # Regenera PNGs del dashboard
 ├── outputs/
 │   ├── reporte_filtrado_v2.csv                # Scores acústicos por audio
-│   ├── audios_sospechosos_ia.csv              # ★ Auditoría IA: A/V/D + delta + suena_a
-│   ├── reasignacion_log.json                  # ★ Manifest reversible de la última reasignación
+│   ├── audios_sospechosos_ia.csv              # Auditoría IA: A/V/D + delta + suena_a
+│   ├── mejores_segmentos.csv                  # ★ Reporte de localización por audio (estado, mejor tramo)
+│   ├── mejores_segmentos_auditoria.csv        # ★ Auditoría IA de los segmentos localizados
+│   ├── reasignacion_log.json                  # Manifest reversible de la última reasignación
 │   ├── model_metrics.json                     # BalAcc y descripción por modelo
 │   ├── experiment_history.json
 │   ├── decisions_data.json                    # Data para el módulo Decisiones
@@ -520,10 +564,12 @@ clasificador-audios/
 │   ├── modelos/                               # 6 clasificadores serializados (.joblib)
 │   └── figuras/                               # Gráficos de resultados
 ├── data/                                      # Dataset (gitignored)
+│   ├── AUDIOS MACHINE LEARNING/               # Originales por clase
+│   └── procesado/                             # ★ Dataset curado: mejor segmento de 10 s por audio (146)
 └── README.md
 ```
 
-`★` = añadido o renovado en la iteración 7.
+`★` = añadido o renovado en las iteraciones 7-8.
 
 ---
 
@@ -536,6 +582,14 @@ source ../.venv/bin/activate
 # 2. (Una sola vez) Auditar etiquetas del dataset con modelo SER
 python scripts/auditar_etiquetas_ia.py
 # → outputs/audios_sospechosos_ia.csv
+
+# 2b. (Opcional) Inspeccionar los scores audeering de todos los audios
+python scripts/mostrar_todos.py          # todos, agrupados por carpeta
+python scripts/mostrar_sospechosos.py    # solo los discrepantes
+
+# 2c. (Opcional) Localizar el mejor segmento de 10 s de cada audio
+python scripts/segmentar_rescate.py
+# → outputs/mejores_segmentos/<Clase>/*.wav (dataset localizado, luego movible a data/procesado)
 
 # 3. (Opcional, reversible) Re-etiquetar audios sospechosos
 python scripts/reasignar_audios.py --apply --umbral 0.25
