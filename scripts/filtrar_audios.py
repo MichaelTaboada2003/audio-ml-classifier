@@ -10,9 +10,10 @@ clase usando estos scores como filtro de calidad: solo entran al training audios
 que SUENAN como su etiqueta.
 
 Scores calculados (cada uno en [0, 1]):
-  - score_enojo:    firma de enojo (energia alta, pitch variable, dinamica rapida)
-  - score_tristeza: firma de tristeza (energia baja, pitch grave, monotonia)
-  - score_feliz:    firma de felicidad (brillo espectral alto, entonacion melodica amplia)
+  - score_enojo:        firma de enojo (energia alta, pitch variable, dinamica rapida)
+  - score_tristeza:     firma de tristeza (energia baja, pitch grave, monotonia)
+  - score_feliz:        firma de felicidad (brillo espectral alto, entonacion melodica amplia)
+  - score_tranquilidad: firma de habla calma/neutral (energia media estable, sin extremos)
 
 Uso (desde la raiz del proyecto):
     python scripts/filtrar_audios.py
@@ -152,6 +153,33 @@ def score_tristeza(m):
             0.13 * s_silencios + 0.15 * s_lentitud + 0.15 * s_brillo_bajo)
 
 
+def score_tranquilidad(m):
+    """
+    Firma de calma / habla neutral: energia media estable, pitch en rango medio
+    sin extremos, variaciones suaves, brillo medio, ritmo moderado.
+    Diferencia clave con tristeza: tranquilidad NO requiere pitch grave ni
+    silencios largos — es voz hablada "normal" sin proyeccion emocional.
+    """
+    # Energia centrada en -30 dB (ni gritada ni murmurada)
+    s_energia_media = 1.0 - min(abs(m['energy_level_db'] - (-30.0)) / 12.0, 1.0)
+    # Pitch en rango medio (no extremo grave ni agudo)
+    s_pitch_medio = 1.0 - min(abs(m['pitch_mean_st'] - 6.0) / 8.0, 1.0)
+    # Variabilidad de pitch baja-media (estable sin ser monotono como tristeza)
+    s_pitch_estable = _norm(m['pitch_std_st'], 1.0, 3.5)
+    s_pitch_estable = min(s_pitch_estable, 1.0 - max(m['pitch_std_st'] - 4.5, 0) / 3.5)
+    s_pitch_estable = max(s_pitch_estable, 0.0)
+    # Pocos silencios largos (habla continua)
+    s_continuidad = 1.0 - _norm(m['frac_silencio'], 0.10, 0.35)
+    # Dinamica moderada (ni plana ni explosiva)
+    s_dinamica_mod = 1.0 - min(abs(m['dynamic_range_db'] - 28.0) / 18.0, 1.0)
+    # Ritmo moderado
+    s_ritmo_mod = 1.0 - min(abs(m['onset_rate'] - 2.0) / 1.5, 1.0)
+
+    return (0.20 * s_energia_media + 0.15 * s_pitch_medio +
+            0.20 * s_pitch_estable + 0.15 * s_continuidad +
+            0.15 * s_dinamica_mod + 0.15 * s_ritmo_mod)
+
+
 def score_feliz(m):
     """
     Firma de felicidad: brillo espectral alto (sonrisa al hablar) y
@@ -196,12 +224,13 @@ def analizar_dataset(data_dir):
         if m is None:
             continue
         m.update({
-            'archivo':        nombre,
-            'clase_original': clase,
-            'recolector':     nombre[:2],
-            'score_enojo':    score_enojo(m),
-            'score_tristeza': score_tristeza(m),
-            'score_feliz':    score_feliz(m),
+            'archivo':            nombre,
+            'clase_original':     clase,
+            'recolector':         nombre[:2],
+            'score_enojo':        score_enojo(m),
+            'score_tristeza':     score_tristeza(m),
+            'score_feliz':        score_feliz(m),
+            'score_tranquilidad': score_tranquilidad(m),
         })
         filas.append(m)
     return pd.DataFrame(filas)
@@ -218,7 +247,7 @@ def imprimir_reporte(df):
     print(df['clase_original'].value_counts().to_string())
 
     print('\nMedia de score por clase original:')
-    cols_score = ['score_enojo', 'score_tristeza', 'score_feliz']
+    cols_score = ['score_enojo', 'score_tristeza', 'score_feliz', 'score_tranquilidad']
     print(df.groupby('clase_original')[cols_score].mean().round(3).to_string())
 
     # Top-5 por cada score
@@ -236,9 +265,10 @@ def imprimir_reporte(df):
 
     umbrales = [0.30, 0.346, 0.40, 0.45, 0.50, 0.55, 0.60]
     score_map = {
-        'Enojo':    'score_enojo',
-        'Tristeza': 'score_tristeza',
-        'Feliz':    'score_feliz',
+        'Enojo':        'score_enojo',
+        'Tristeza':     'score_tristeza',
+        'Feliz':        'score_feliz',
+        'Tranquilidad': 'score_tranquilidad',
     }
 
     print('{:<15} {:>8}  '.format('Clase', 'Total') +
@@ -336,14 +366,15 @@ def imprimir_reporte(df):
 
 
 def graficar_reporte(df, output_path):
-    cols_score = ['score_enojo', 'score_tristeza', 'score_feliz']
+    cols_score = ['score_enojo', 'score_tristeza', 'score_feliz', 'score_tranquilidad']
     colores = {
-        'Enojo':    '#DD8452',
-        'Tristeza': '#C44E52',
-        'Feliz':    '#E377C2',
+        'Enojo':        '#DD8452',
+        'Tristeza':     '#C44E52',
+        'Feliz':        '#E377C2',
+        'Tranquilidad': '#55A868',
     }
 
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    fig, axes = plt.subplots(2, 2, figsize=(14, 9))
     for ax, score in zip(axes.ravel(), cols_score):
         for clase in CLASES:
             sub = df[df['clase_original'] == clase][score].values

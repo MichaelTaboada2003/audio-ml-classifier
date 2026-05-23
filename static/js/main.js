@@ -907,6 +907,9 @@ function getRingVisual(name) {
     if (slug === 'feliz') {
         return { stroke: 'url(#gradient-feliz)', glow: 'drop-shadow(0 0 10px rgba(245, 158, 11, 0.45))' };
     }
+    if (slug === 'tranquilidad') {
+        return { stroke: 'url(#gradient-tranquilidad)', glow: 'drop-shadow(0 0 10px rgba(34, 197, 94, 0.45))' };
+    }
     return { stroke: 'url(#gradient-default)', glow: 'none' };
 }
 

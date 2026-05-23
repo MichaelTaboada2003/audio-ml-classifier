@@ -42,7 +42,7 @@ MODEL_DIR = os.path.join("outputs", "modelos")
 TARGET_SR = 16000
 MAX_DURATION = 10.0
 
-CLASS_COLOR = {"Enojo": "#DD8452", "Tristeza": "#C44E52", "Feliz": "#E377C2"}
+CLASS_COLOR = {"Enojo": "#DD8452", "Tristeza": "#C44E52", "Feliz": "#E377C2", "Tranquilidad": "#55A868"}
 MODEL_ORDER = ["svm_lineal", "logreg", "svm_rbf", "rf", "knn_k5", "knn_k3"]
 
 
@@ -159,7 +159,8 @@ def figura_holdout():
 
     holdout_X = {}
     for clase in ACTIVE_CLASSES:
-        score_col = {"Enojo": "score_enojo", "Tristeza": "score_tristeza", "Feliz": "score_feliz"}[clase]
+        score_col = {"Enojo": "score_enojo", "Tristeza": "score_tristeza",
+                     "Feliz": "score_feliz", "Tranquilidad": "score_tranquilidad"}[clase]
         hold = rep[(rep["clase_original"] == clase) & (~rep["archivo"].isin(training))].sort_values(score_col, ascending=False)
         embs = []
         for _, row in hold.iterrows():
