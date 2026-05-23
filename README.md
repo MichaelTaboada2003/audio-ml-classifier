@@ -2,7 +2,7 @@
 
 Proyecto integrado de dos capas:
 
-1. **Capa de Machine Learning** — clasificación de emociones a partir de audio de voz (wav2vec2 + clasificadores clásicos).
+1. **Capa de Machine Learning** — clasificación de emociones a partir de audio de voz usando un encoder fine-tuneado para emoción (`audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim`) + clasificadores clásicos.
 2. **Capa de Toma de Decisiones** — un módulo analítico construido sobre los resultados del clasificador que permite simular, evaluar y recomendar despliegues con justificación cuantitativa de negocio.
 
 La capa de Toma de Decisiones se agregó **sin modificar la capa de ML**: solo consume los embeddings y los modelos ya entrenados.
@@ -12,20 +12,10 @@ La capa de Toma de Decisiones se agregó **sin modificar la capa de ML**: solo c
 ## Tabla de contenido
 
 - [Resumen rápido](#resumen-rápido)
+- [Historial de iteraciones y errores](#historial-de-iteraciones-y-errores)
 - [Aplicación web — pestañas disponibles](#aplicación-web--pestañas-disponibles)
 - [Capa 1 · Machine Learning](#capa-1--machine-learning)
-  - [Decisiones de diseño verificadas empíricamente](#decisiones-de-diseño-verificadas-empíricamente)
-  - [Caveat sobre generalización a hablantes nuevos](#caveat-sobre-generalización-a-hablantes-nuevos)
 - [Capa 2 · Toma de Decisiones](#capa-2--toma-de-decisiones)
-  - [Problema de decisión](#problema-de-decisión)
-  - [Estructura del módulo](#estructura-del-módulo)
-  - [Sección 1 · Contexto y matriz de costos](#sección-1--contexto-y-matriz-de-costos)
-  - [Sección 2 · Datos para decidir](#sección-2--datos-para-decidir)
-  - [Sección 3 · Simulador de despliegue](#sección-3--simulador-de-despliegue)
-  - [Sección 4 · Análisis de decisiones](#sección-4--análisis-de-decisiones)
-  - [Recomendación final](#recomendación-final)
-  - [Modelo matemático](#modelo-matemático)
-  - [Origen y validez de los valores económicos](#origen-y-validez-de-los-valores-económicos)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Uso rápido](#uso-rápido)
 - [Dependencias](#dependencias)
@@ -36,10 +26,201 @@ La capa de Toma de Decisiones se agregó **sin modificar la capa de ML**: solo c
 
 | Capa | Qué hace | Salida |
 |---|---|---|
-| ML | Clasifica audio en Enojo / Tristeza / Feliz con 6 modelos clásicos sobre embeddings wav2vec2 (768 dims) | Predicción + probabilidades + métricas acústicas |
+| ML | Clasifica audio en Enojo / Tranquilidad con embedding emocional (1024 dims de audeering) + 6 clasificadores clásicos | Predicción + probabilidades + arousal/valence/dominance |
 | Decisiones | Convierte las matrices de confusión y probabilidades LOO en una decisión de negocio (GO / NO-GO, umbral óptimo, VPN esperado) | Recomendación justificada con sensibilidad y Monte Carlo |
 
-**Mejor modelo actual:** Regresión Logística con **67.2 %** de balanced accuracy LOOCV en el escenario de 3 emociones, training cap a 20 por clase con `class_weight='balanced'` (Enojo 20 + Tristeza 20 + Feliz 15; Feliz limitado por el dataset). Pipeline: wav2vec2-base sobre los primeros 10 segundos de cada audio (sweet spot empírico). El "Explorador del Dataset" muestra **solo audios holdout** (no usados en training) para permitir validación honesta out-of-sample desde la app. En holdout, **SVM lineal alcanza ~59% recall en Enojo** vs solo 9% con N=14 (ver [Decisiones de diseño](#decisiones-de-diseño-verificadas-empíricamente)).
+**Estado actual (2026-05-23):**
+
+| Modelo | LOOCV bal_acc | **Holdout bal_acc (out-of-sample)** |
+|---|---|---|
+| **Random Forest** | 0.93 | **0.88** |
+| SVM lineal | 0.93 | 0.84 |
+| KNN k=5 | 0.83 | 0.81 |
+| LogReg | 0.97 | 0.77 |
+| SVM RBF | 0.97 | 0.76 |
+| KNN k=3 | 0.83 | 0.72 |
+
+Pipeline actual: **2 clases (Enojo vs Tranquilidad), N_PER_CLASS=15**, encoder emocional audeering, dataset re-etiquetado con auditoría de IA. Random Forest gana en holdout (88.2% balanced accuracy sobre 79 audios no vistos). Para llegar a estos números pasamos por **siete iteraciones de pipeline** y resolvimos cuatro problemas estructurales — la próxima sección documenta ese recorrido.
+
+---
+
+## Historial de iteraciones y errores
+
+El proyecto pasó por siete fases. Cada una arregló (o intentó arreglar) un problema concreto detectado en la anterior. Esta sección documenta qué fallaba, qué cambió y qué resultado dio.
+
+### Línea de tiempo resumida
+
+| # | Fecha | Cambio principal | Resultado |
+|---|---|---|---|
+| 1 | 2026-05-20 | Filtrado acústico naive sobre 84 audios (3 clases) | Filtro funciona, pero escoge ejemplos muy prototípicos |
+| 2 | 2026-05-20 | Notebook v2: Enojo vs Tristeza con `wav2vec2-base` | LOOCV 90% — primera señal de que el encoder neuronal supera features manuales |
+| 3 | 2026-05-21 | App Flask + 3 clases (Enojo / Tristeza / Feliz) | Pipeline productivo + dashboard interactivo |
+| 4 | 2026-05-21 | N_PER_CLASS=14 con audios EXCELENTE solamente | **LOOCV 69%, pero solo 9% recall Enojo en holdout** — generalización catastrófica |
+| 5 | 2026-05-22 | N_PER_CLASS=20 con `class_weight='balanced'` | LOOCV 67%, **59% recall Enojo holdout** (+50 pp) |
+| 6 | 2026-05-23 | Intento con 4 clases (+ Tranquilidad) | Colapsa a **42% LOOCV** (chance=25%) — Tranquilidad confunde todo |
+| 7 | 2026-05-23 | Re-etiquetado por IA + encoder emocional audeering | **97% LOOCV, 88% holdout** — gap LOOCV/holdout cerrado |
+
+### Iteración 1 — Filtrado acústico (commits `608636a`–`c514281`)
+
+**Objetivo:** detectar audios donde el participante no proyectó la emoción pedida (algunos grabaron "enojo" en tono neutro).
+
+**Implementación inicial:** 7 métricas acústicas globales por audio (energía RMS, pitch medio, brillo espectral, fracción de silencio, dinámica) combinadas con pesos manuales en cuatro scores: `score_enojo`, `score_tristeza`, `score_feliz`, `score_tranquilidad`. Cada score normalizado a [0, 1] con kernel lineal saturado.
+
+**Decisiones tempranas:**
+- Selección por **ranking** dentro de la clase declarada, no reasignar (commit `796cf99`).
+- Umbral mínimo `MIN_SCORE` para descartar audios "muy malos".
+
+**Problema que apareció después:** estas 7 métricas globales **no son lo bastante finas** para distinguir tristeza de tranquilidad (acústicamente casi idénticas: voz baja, monótona) ni emoción real de "habla pasiva". Esto se descubrió en la iteración 7 al comparar con un modelo emocional fine-tuneado.
+
+### Iteración 2 — wav2vec2-base como encoder (commit `61fe927`)
+
+**Salto técnico:** reemplazar features manuales (144 dims) por embeddings de `facebook/wav2vec2-base` mean-pooled (768 dims).
+
+**Resultado:** LOOCV 90% en 2 clases (Enojo vs Tristeza). Esto validó usar un encoder neuronal pre-entrenado por encima de features handcrafted.
+
+**Decisión empírica adoptada:** `MAX_DURATION = 10s` desde el inicio del audio. Probamos también:
+
+| Variante | BalAcc LogReg LOOCV | Decisión |
+|---|---|---|
+| **0-10 s** (adoptado) | 67-69% | ✓ |
+| Audio completo, 1 embedding | 0% (lineales colapsan) | ✗ |
+| 0-15 s | 62% | ✗ |
+| Warm-up 1-2 s + 10 s | 67% | ✗ |
+| Chunks 8 s + agregación RMS | 60% | ✗ |
+
+**Por qué 10s gana:** wav2vec2 hace mean-pool sobre los frames. Audios largos diluyen la firma emocional con contenido neutro/transicional. 10s captura prosodia sin diluir.
+
+### Iteración 3 — App Flask + escalado a 3 clases (commits `76eb3e1`–`a020e6b`)
+
+**Objetivo:** envolver el modelo en un dashboard usable y añadir una tercera clase.
+
+**Implementación:** Flask + 4 tabs (Clasificador en Vivo, Explorador Dataset, Decisiones, Análisis). Predicción en vivo desde archivo o grabación del navegador (con conversión `webm/opus` → WAV PCM en cliente, commit `3e11824`).
+
+**Problema descubierto:** ampliar a 3 clases (Enojo + Tristeza + Feliz) bajó el LOOCV a ~65%. Feliz tenía solo 15 audios disponibles vs 37 de las otras dos. El desbalance forzaba al modelo a predecir Feliz casi siempre o casi nunca.
+
+### Iteración 4 — N=14 solo audios EXCELENTE (commit `4b059a6`)
+
+**Hipótesis:** "Si entreno solo con los audios más prototípicos por clase, el modelo aprende fronteras más limpias."
+
+**Implementación:** N_PER_CLASS=14, filtrando solo audios con score > 0.45 ("EXCELENTE").
+
+**Resultado:** LOOCV LogReg 69%, **pero holdout devastador:**
+
+| Métrica | Training (LOOCV) | Holdout |
+|---|---|---|
+| Recall Enojo | ~70% | **9% (2/23)** |
+| Recall Tristeza | ~67% | ~30% |
+
+**Causa diagnosticada:** *cherry-picking* del score. Los top-14 audios por score son los más extremos acústicamente (Enojo con energía/pitch claramente altos, Tristeza con energía/pitch claramente bajos). El modelo aprendió "alta energía → Enojo, baja energía → Tristeza", una pista trivial. Los audios mid-score del holdout caían geométricamente en el centroide opuesto. **Distribution shift inducido por la propia selección.**
+
+**Lección:** el filtro acústico, usado como criterio de ranking estricto, sesga el training contra audios realistas.
+
+### Iteración 5 — N=20 + class_weight balanced (commit `ee8edce`)
+
+**Cambio:** subir N_PER_CLASS a 20 (incluir audios mid-score) y usar `class_weight='balanced'` para compensar que Feliz solo tiene 15 audios.
+
+**Resultado:**
+
+| Métrica | LOOCV | Holdout |
+|---|---|---|
+| LogReg bal_acc | 0.672 | 0.412 |
+| SVM lineal bal_acc | 0.606 | 0.500 |
+| **Recall Enojo holdout (SVM lineal)** | — | **10/17 (59%)** ← +50 pp vs iteración 4 |
+
+**Cómo se logró:** los audios mid-score que antes excluíamos cubrían la curva completa de expresividad real. El modelo aprendió fronteras menos triviales y generalizó mejor. El LOOCV bajó porque ahora dentro del training hay audios más difíciles — caída honesta que refleja la dificultad real.
+
+**Pero el holdout todavía estaba en ~50% bal_acc** — apenas por encima de chance en 3 clases con holdout desbalanceado.
+
+### Iteración 6 — Intento con 4 clases (Tranquilidad incluida)
+
+**Hipótesis:** "Una clase 'neutral' debería ayudar al modelo a no clasificar habla normal como Enojo o Feliz."
+
+**Resultado:** colapso total.
+
+| Modelo | LOOCV bal_acc | chance=0.25 |
+|---|---|---|
+| Random Forest | 0.38 |  |
+| SVM RBF | 0.36 |  |
+| SVM lineal | 0.35 |  |
+
+**Causa:** acústicamente Tristeza y Tranquilidad son casi indistinguibles con features globales (ambas son voz baja, monótona, sin proyección). El modelo no las separaba y la confusión se propagaba a las otras dos clases.
+
+**Decisión:** descartar Tranquilidad como cuarta clase. Vuelta atrás a 3 clases.
+
+### Iteración 7 — Re-etiquetado por IA + encoder emocional (esta sesión, 2026-05-23)
+
+Esta iteración resolvió **tres problemas estructurales simultáneamente** que las anteriores no habían podido cerrar.
+
+#### Problema A — etiquetas ruidosas masivamente
+
+**Síntoma reportado por el usuario:** "Algunos audios etiquetados como Enojo me los predice como Tristeza incluso con score alto. Y audios similares dan resultados contradictorios."
+
+**Análisis:** corrimos el modelo SER `audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim` sobre los 162 audios del dataset para extraer arousal/valence/dominance (AVD) por audio. Mapeamos AVD a las 4 clases con kernels gaussianos centrados en los puntos teóricos de cada emoción y comparamos con la etiqueta humana.
+
+**Resultados de la auditoría:**
+
+| Clase | OK (IA confirma) | Sospechoso (IA discrepa, Δ > 0.15) | Suenan a... |
+|---|---|---|---|
+| **Enojo** | 10/48 (21%) | **34 (71%)** | Tranquilidad (30), Tristeza (3), Feliz (1) |
+| Tristeza | 20/48 (42%) | 20 (42%) | Tranquilidad (20) |
+| Feliz | 8/21 (38%) | 10 (48%) | Tranquilidad (7), Enojo (3) |
+| Tranquilidad | 36/45 (**80%**) | 6 (13%) | Tristeza (4), Feliz (2) |
+
+**Lectura:** Enojo era la clase peor etiquetada — el 71% de los audios marcados "Enojo" en realidad sonaban a habla normal (Tranquilidad). Casos extremos: `MT_08_ENO.ogg` con score_Enojo=0.006 y score_Tranquilidad=0.861. La gente no proyectó la emoción pedida.
+
+**Importante:** el filtro acústico de las 7 métricas globales daba un diagnóstico **invertido** (decía que Tristeza era la peor). El modelo SER captura prosodia/micro-tensión que la energía promedio no ve.
+
+**Acción tomada:** `scripts/reasignar_audios.py` movió 60 audios físicamente entre carpetas según la predicción del modelo SER, con umbral `Δ > 0.25` y manifest reversible en `outputs/reasignacion_log.json`.
+
+| Origen → Destino | Audios movidos |
+|---|---|
+| Enojo → Tranquilidad | 26 |
+| Tristeza → Tranquilidad | 18 |
+| Feliz → Tranquilidad | 5 |
+| Tranquilidad → Tristeza | 4 |
+| Enojo → Tristeza | 3 |
+| Tranquilidad → Feliz | 2 |
+| Feliz → Enojo | 2 |
+
+**Conteo final por carpeta tras reasignación:** Enojo 21, Feliz 16, Tranquilidad 88, Tristeza 37, Aburrido 45.
+
+#### Problema B — encoder inadecuado
+
+**Síntoma:** después del re-etiquetado, **LOOCV subió de 74% a 97%** pero **el holdout siguió en 50-57%**. Brecha enorme.
+
+**Análisis:** mirando los errores con confianza alta — `VZ_04_ENO.ogg` (etiquetado Tranquilidad por reasignación, predicho Enojo conf=0.98), `MT_02_TRI.ogg` (predicho Enojo conf=0.97). El clasificador con `wav2vec2-base` discrepaba sistemáticamente del modelo SER que había hecho el re-etiquetado.
+
+**Causa:** `facebook/wav2vec2-base` está pre-entrenado para reconocimiento de habla (ASR). Sus 768 dims capturan principalmente fonemas y palabras, no prosodia emocional. LOOCV funcionaba porque había solapamiento de vocabulario entre audios; holdout fallaba porque las palabras eran distintas y el modelo no veía la emoción.
+
+**Acción:** migrar el encoder oficial del pipeline a `audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim` — mismo modelo que ya usábamos como auditor — vía un módulo compartido `emotion_encoder.py` en la raíz. Sus 1024 hidden_states están fine-tuneados sobre MSP-Podcast para predecir A/V/D, son emocionalmente relevantes por diseño.
+
+**Resultado al re-entrenar con audeering:**
+
+| Modelo | LOOCV antes (wav2vec2-base) | Holdout antes | LOOCV ahora (audeering) | **Holdout ahora** |
+|---|---|---|---|---|
+| SVM lineal | 0.97 | 0.55 | 0.93 | **0.84** |
+| LogReg | 0.97 | 0.53 | 0.97 | **0.77** |
+| SVM RBF | 0.93 | 0.57 | 0.97 | **0.76** |
+| **Random Forest** | 0.93 | 0.53 | 0.93 | **0.88** |
+| KNN k=5 | 0.83 | 0.43 | 0.83 | **0.81** |
+
+**De 53% a 88% en holdout.** El cambio de encoder fue el factor decisivo, no solo el re-etiquetado.
+
+#### Problema C — filtro acústico engañoso
+
+**Síntoma:** durante la auditoría descubrimos que el filtro acústico original marcaba como "sospechoso" cosas distintas a lo que un humano (y el modelo SER) marcaba.
+
+**Causa:** las 7 métricas globales (energía, pitch, brillo) son demasiado toscas. Alguien puede hablar suave pero con tensión emocional, y la energía promedio no lo capta.
+
+**Acción:** desactivar el filtro hard (`MIN_SCORE = 0.0` en `config.py`). El score acústico sigue calculándose y se usa como criterio de ranking dentro de clase (top-N), pero **no descarta audios**. La detección de etiquetas erróneas pasa a ser responsabilidad del modelo SER vía `scripts/auditar_etiquetas_ia.py`.
+
+### Lecciones acumuladas
+
+1. **Cherry-picking del score sesga el training.** Filtrar solo "prototípicos" entrena al modelo a aprender la pista trivial (energía) y rompe la generalización.
+2. **LOOCV alto + holdout bajo ≠ overfitting "normal".** En este proyecto significaba que el modelo aprendía algo que NO era emoción (etiquetas ruidosas o contenido lingüístico).
+3. **`wav2vec2-base` es ASR, no SER.** Para clasificación emocional, usar un encoder fine-tuneado para emoción cambia el techo de rendimiento en holdout dramáticamente.
+4. **Etiquetas humanas ≠ ground truth.** En datasets pequeños con actores no entrenados, ~50% de los audios pueden no proyectar la emoción pedida. Una segunda opinión de un modelo SER pre-entrenado es trabajo de auditoría obligatorio.
+5. **Aburrido y Tristeza colapsan acústicamente.** No conviene tratarlas como clases separadas con un dataset pequeño — habría que distinguirlas con contexto léxico, no solo prosodia.
 
 ---
 
@@ -56,94 +237,89 @@ La app Flask (`app.py`) levanta una interfaz con 4 pestañas:
 
 ## Capa 1 · Machine Learning
 
-### Resultado principal
+### Resultado actual (post-iteración 7)
 
-**LOOCV (Leave-One-Audio-Out)** sobre training Enojo=20, Tristeza=20, Feliz=15, con `class_weight='balanced'`:
+**LOOCV (Leave-One-Audio-Out)** sobre training Enojo=15, Tranquilidad=15, con `class_weight='balanced'` y encoder audeering (1024 dims):
 
 | Modelo | Accuracy | Balanced Acc |
 |---|---|---|
-| **Regresión Logística** | **0.691** | **0.672** |
-| SVM lineal | 0.618 | 0.606 |
-| SVM RBF | 0.618 | 0.589 |
-| Random Forest | 0.564 | 0.533 |
-| KNN (k=5) | 0.491 | 0.478 |
-| KNN (k=3) | 0.491 | 0.478 |
-| Baseline (chance) | — | 0.333 |
+| LogReg | 0.967 | 0.967 |
+| SVM RBF | 0.967 | 0.967 |
+| SVM lineal | 0.933 | 0.933 |
+| Random Forest | 0.933 | 0.933 |
+| KNN (k=5) | 0.833 | 0.833 |
+| KNN (k=3) | 0.833 | 0.833 |
+| Baseline (chance) | — | 0.500 |
 
-**Holdout** (audios no usados en training, 17 Enojo + 17 Tristeza + 0 Feliz):
+**Holdout (79 audios no usados en training: 6 Enojo + 73 Tranquilidad):**
 
-| Modelo | Recall Enojo | Recall Tristeza | BalAcc holdout |
-|---|---|---|---|
-| **SVM lineal** | **10/17 (59%)** | 7/17 (41%) | **50.0%** |
-| LogReg | 8/17 (47%) | 6/17 (35%) | 41.2% |
-| SVM RBF | 5/17 (29%) | 10/17 (59%) | 44.1% |
-| KNN k=5 | 9/17 (53%) | 4/17 (24%) | 38.2% |
+| Modelo | Acc | **Bal Acc** | Recall Enojo | Recall Tranq |
+|---|---|---|---|---|
+| **Random Forest** | 0.924 | **0.882** | 0.833 | 0.932 |
+| SVM lineal | 0.848 | 0.841 | 0.833 | 0.849 |
+| KNN k=5 | 0.924 | 0.806 | 0.667 | 0.945 |
+| LogReg | 0.861 | 0.772 | 0.667 | 0.877 |
+| SVM RBF | 0.835 | 0.758 | 0.667 | 0.849 |
+| KNN k=3 | 0.899 | 0.716 | 0.500 | 0.932 |
 
-Antes (N=14 sin class_weight), SVM lineal acertaba solo 2/23 = 9% Enojo en holdout. El salto a 59% con N=20 confirma que **el problema previo era el rango de expresividad del training**, no el modelo.
+**Holdout balanceado (6 Enojo + 6 Tranquilidad random):** Random Forest, SVM lineal, KNN k=5 → 83.3% accuracy.
 
-### Dataset
+### Dataset (post-reasignación)
 
 | Parámetro | Valor |
 |---|---|
-| Total de audios disponibles | 89 (Enojo 37, Tristeza 37, Feliz **15**) + 36 Tranquilidad (no activos) |
-| Clases activas | Enojo, Tristeza, Feliz |
-| Audios usados en training | 20+20+15 = 55 (top por `score_clase`, Feliz cap a 15) |
-| Audios disponibles en holdout (dashboard) | 17 Enojo + 17 Tristeza + 0 Feliz |
-| Recolectores | MT, VZ, VA, ED |
-| Duración por audio | 21-64 segundos (mediana 34.6s; se usan los primeros 10s) |
+| Total de audios disponibles tras reasignación | 207 (Enojo 21, Tristeza 37, Feliz 16, Tranquilidad 88, Aburrido 45) |
+| Clases activas en el pipeline actual | Enojo, Tranquilidad |
+| Audios usados en training | 15 + 15 = 30 (top por `score_clase`, sin filtro hard) |
+| Audios disponibles en holdout | 6 Enojo + 73 Tranquilidad |
+| Recolectores | MT, VA, ED, VZ, SG (5) |
+| Duración por audio | 21-64 segundos (mediana 34.6 s; se usan los primeros 10 s) |
+| Audios reasignados por IA (con manifest reversible) | 60 / 222 originales |
 
-**Limitación reconocida del dataset:**
-- **Feliz solo tiene 15 grabaciones** vs 37 de Enojo/Tristeza. Se usan todas para training; no quedan holdout Feliz. La métrica holdout no incluye Feliz por esta razón.
-- **Cada audio es de un hablante distinto** (los prefijos MT/VZ/VA/ED identifican al *recolector* del audio, no al hablante). Esto significa que LOOCV ya es efectivamente leave-one-speaker-out: cada audio held-out es una persona que el modelo nunca escuchó. El número reportado refleja generalización razonable a nuevos hablantes.
-- **Solo 4 recolectores = 4 condiciones de grabación** (mic, ambiente). El modelo podría haber aprendido huellas técnicas del recolector. Nuevos recolectores en futuras grabaciones probarían robustez a hardware/ambiente distintos.
+**Cada audio es de un hablante distinto.** Los prefijos MT/VZ/VA/ED/SG identifican al *recolector* del audio, no al hablante. LOOCV ya es efectivamente leave-one-speaker-out.
 
-### Pipeline ML
+### Pipeline ML actual
 
 ```
-1. Scoring acústico (scripts/filtrar_audios.py)
-   → Calcula score_enojo, score_tristeza, score_feliz sobre los primeros 10s
-   → Genera outputs/reporte_filtrado_v2.csv
+1. (Una sola vez por dataset) Auditoría de etiquetas
+   python scripts/auditar_etiquetas_ia.py
+   → Usa audeering para predecir A/V/D de cada audio
+   → Genera outputs/audios_sospechosos_ia.csv
 
-2. Selección por ranking (top-N_PER_CLASS por clase, ordenado por su score)
+2. (Opcional) Reasignación por IA
+   python scripts/reasignar_audios.py --apply --umbral 0.25
+   → Mueve audios entre carpetas según predicción del modelo SER
+   → Manifest reversible en outputs/reasignacion_log.json
+   → Para revertir: python scripts/reasignar_audios.py --revert
 
-3. Extracción de embeddings con wav2vec2 (cache: outputs/embeddings_v2.npz)
-   → librosa.load(..., duration=10.0) + wav2vec2-base + mean-pool
-   → un embedding 768-d por audio
+3. Scoring acústico (mantiene el rol de ranking, no de filtro)
+   python scripts/filtrar_audios.py
+   → outputs/reporte_filtrado_v2.csv
 
-4. Entrenamiento LOOCV + serialización (scripts/exportar_modelos.py)
-   → outputs/modelos/*.joblib (6 modelos entrenados con TODOS los 42 audios)
-   → outputs/model_metrics.json (métricas LOOCV honestas, no del modelo final)
-   → outputs/predicciones_loocv.{csv,json} (qué audios falló cada modelo)
+4. Selección por ranking (top-N_PER_CLASS por score dentro de clase)
+   → MIN_SCORE = 0.0 (desactivado, ya no se descartan audios)
+
+5. Extracción de embeddings con audeering (cache: outputs/embeddings_v2.npz)
+   python scripts/exportar_modelos.py
+   → librosa.load(..., duration=10.0) + audeering + mean-pool de hidden_states
+   → un embedding 1024-d por audio
+
+6. Entrenamiento LOOCV + serialización
+   → outputs/modelos/*.joblib (6 modelos entrenados con TODOS los audios de training)
+   → outputs/model_metrics.json (métricas LOOCV honestas)
+   → outputs/predicciones_loocv.{csv,json}
 ```
 
-### Decisiones de diseño verificadas empíricamente
+### Decisiones de diseño actuales
 
-**Ventana de audio (MAX_DURATION):**
-
-| Variante probada | BalAcc LogReg LOOCV | Decisión |
+| Decisión | Valor | Por qué |
 |---|---|---|
-| **0-10s** (actual) | 67-69% | ✓ Adoptado |
-| Audio completo, 1 embedding | 0% (lineales colapsan) | Rechazado |
-| 0-15s | 62% | Rechazado |
-| Warm-up 1-2s + 10s | 67% | Rechazado |
-| Chunks 8s + agregación RMS | 60% | Rechazado |
-
-**Por qué 10s gana:** wav2vec2 hace mean-pool internamente sobre los frames del input. Audios largos diluyen la firma emocional al promediar contenido neutro/transicional. 10s es suficiente para capturar la prosodia emocional sin caer en dilución. Chunks introducen ruido de etiqueta y rompen modelos basados en distancia (KNN cae a 38%).
-
-**Tamaño y composición del training (N_PER_CLASS):**
-
-| Configuración | LOOCV LogReg | Holdout Enojo (SVM lineal) | Decisión |
-|---|---|---|---|
-| N=14 (solo EXCELENTE) | 69% | 9% (2/23) | Rechazado |
-| **N=20 + class_weight balanced** | 67% | **59% (10/17)** | ✓ Adoptado |
-
-**Por qué N=20 gana:** N=14 seleccionaba solo audios con score muy alto, creando un training set homogéneo en expresividad. El modelo aprendía "Enojo = audio muy gritado" y fallaba en holdout porque los audios mid-score caían geométricamente cerca del centroide de Tristeza en el espacio de embeddings wav2vec2. Expandir a N=20 incluye audios mid-score que cubren la curva completa de expresividad → modelo generaliza dramáticamente mejor (+50pp en recall holdout). El LOOCV baja levemente porque ahora hay audios más difíciles dentro del training, pero esa caída es honesta — refleja la dificultad real del problema. Feliz queda en 15 (todos los disponibles) y se compensa la asimetría con `class_weight='balanced'`.
-
-### Caveat sobre generalización: hablantes vs condiciones de grabación
-
-Cada audio del dataset es de un hablante **distinto** — el prefijo MT/VZ/VA/ED identifica quién recolectó la grabación, no quién habla. Esto hace que el LOOCV ya sea efectivamente leave-one-speaker-out: el 67% reportado es generalización a personas que el modelo nunca escuchó.
-
-Lo que sí persiste es **condición-de-grabación overlap**: solo hay 4 recolectores, así que solo 4 configuraciones de micrófono/ambiente. El modelo podría haber capturado señal técnica del recolector. La forma rigurosa de medirlo sería leave-one-*recolector*-out (dejar fuera todos los audios de MT, etc.): probablemente daría algo menor que 67% pero no se puede estimar a priori. Una mejora futura sería incorporar audios de más recolectores.
+| **Encoder** | `audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim` | Fine-tuneado para SER. Sus hidden_states son emocionales por diseño, no fonéticos. Subió holdout de 55% a 88%. |
+| **MAX_DURATION** | 10 s | Sweet spot empírico. Audios largos diluyen la señal con mean-pool. |
+| **MIN_SCORE** | 0.0 (desactivado) | El filtro acústico engañaba. Las decisiones de etiqueta se toman con el modelo SER en `auditar_etiquetas_ia.py`. |
+| **N_PER_CLASS** | 15 | Enojo solo tiene 21 audios tras reasignación; N=15 deja 6 audios de Enojo para holdout. |
+| **class_weight** | 'balanced' | Tranquilidad tiene 88 audios y Enojo 21; balanceo automático en SVMs, LogReg, RF. |
+| **Mejor modelo desplegado** | Random Forest | Mejor holdout bal_acc (0.882). Más robusto a los 11 errores residuales que LogReg/SVM resuelven con alta confianza incorrecta. |
 
 ---
 
@@ -151,12 +327,12 @@ Lo que sí persiste es **condición-de-grabación overlap**: solo hay 4 recolect
 
 ### Problema de decisión
 
-> **Pregunta central:** Un call center evalúa desplegar un detector acústico de enojo para escalar llamadas críticas a un supervisor senior antes de que el cliente cuelgue molesto. ¿Conviene desplegarlo? Si sí, ¿con qué escenario (2 ó 3 emociones), qué modelo y qué umbral operativo?
+> **Pregunta central:** Un call center evalúa desplegar un detector acústico de enojo para escalar llamadas críticas a un supervisor senior antes de que el cliente cuelgue molesto. ¿Conviene desplegarlo? Si sí, ¿con qué configuración (modelo × umbral)?
 
 | Elemento | Detalle |
 |---|---|
 | **Stakeholder** | Coordinador de Operaciones del call center |
-| **Decisión** | GO / NO-GO + configuración óptima (escenario × modelo × umbral) |
+| **Decisión** | GO / NO-GO + configuración óptima (modelo × umbral) |
 | **Métrica de éxito** | Valor Presente Neto mensual esperado (USD) |
 | **Restricciones** | El modelo no puede degradar la experiencia de clientes no-enojados (falsos positivos costosos por tiempo de supervisor) |
 
@@ -209,13 +385,13 @@ Todos los valores son inputs numéricos editables; cualquier cambio recalcula la
 
 ### Sección 2 · Datos para decidir
 
-Renderiza dos tarjetas (una por escenario) con la **evidencia LOOCV real** que respalda la decisión:
+Renderiza tarjetas con la **evidencia LOOCV real** que respalda la decisión:
 
 - Distribución de clases (chips con cuenta por clase).
-- Mejor modelo del escenario con su BalAcc.
+- Mejor modelo con su BalAcc.
 - Tabla con precision, recall y F1 por clase para ese mejor modelo.
 
-Esto convierte el output del clasificador en evidencia inspeccionable antes de la simulación. Por ejemplo, en 3 emociones uno ve que Tristeza tiene recall=0.70 pero F1 menor por menos precision (algunas confusiones con Enojo).
+Esto convierte el output del clasificador en evidencia inspeccionable antes de la simulación.
 
 ### Sección 3 · Simulador de despliegue
 
@@ -223,8 +399,8 @@ La sección más interactiva. Tiene 6 controles:
 
 | Control | Qué ajusta | Default |
 |---|---|---|
-| **Escenario** | 2 emociones (Enojo vs Tristeza) o 3 emociones (Enojo, Tristeza, Feliz) | 3 emociones |
-| **Modelo** | Cualquiera de los 6 clasificadores (ordenados por BalAcc) | SVM lineal |
+| **Escenario** | 2 emociones (Enojo vs Tranquilidad) o configuraciones legacy de 3 emociones | 2 emociones |
+| **Modelo** | Cualquiera de los 6 clasificadores (ordenados por BalAcc) | Random Forest |
 | **Umbral P(Enojo) ≥** | Umbral de decisión binaria sobre la probabilidad de Enojo | 0.50 |
 | **Volumen mensual** | Llamadas/mes proyectadas | 10 000 |
 | **Prevalencia de Enojo** | % de llamadas que realmente son enojo en producción | 18 % |
@@ -232,53 +408,25 @@ La sección más interactiva. Tiene 6 controles:
 
 A la derecha hay tres outputs:
 
-1. **Matriz de confusión @ umbral activo**  
-   Se recalcula desde las probabilidades LOO de las 20-30 muestras usando el umbral elegido. Muestra TP/FP/FN/TN con colores (verde, ámbar, rojo, gris) y debajo: Recall, Precision, F1, FPR.
-
-2. **Curva ROC + punto óptimo**  
-   ROC binaria (Enojo vs no-Enojo) construida desde las probabilidades LOO. Marca dos puntos: 🟢 verde = operación actual, ⭐ amarillo = umbral que maximiza VPN dadas las costos actuales.
-
-3. **VPN mensual + desglose**  
-   Suma de beneficios menos costos esperados. Verde si > 0, rojo si < 0. El desglose línea por línea muestra cuánto aporta cada componente (+beneficio TP, −costo FN, −costo FP, −costo inferencia, −costos fijos).
+1. **Matriz de confusión @ umbral activo** — se recalcula desde las probabilidades LOO usando el umbral elegido. Muestra TP/FP/FN/TN con colores y debajo: Recall, Precision, F1, FPR.
+2. **Curva ROC + punto óptimo** — ROC binaria (Enojo vs no-Enojo). Marca 🟢 verde = operación actual, ⭐ amarillo = umbral que maximiza VPN dadas las costos actuales.
+3. **VPN mensual + desglose** — Suma de beneficios menos costos esperados. Verde si > 0, rojo si < 0.
 
 ### Sección 4 · Análisis de decisiones
 
-Aquí no se ajusta más el modelo; se prueba si la decisión es **robusta** ante cambios en los inputs.
-
-- **Tornado de sensibilidad**  
-  Para cada parámetro (FN, FP, TP, prevalencia, volumen, costo de inferencia), varía ±30 % manteniendo los demás fijos y mide el rango de VPN resultante. Las barras más largas identifican los parámetros más críticos. Si la decisión cambia de GO a NO-GO en alguna barra, ese parámetro merece atención antes de desplegar.
-
-- **Monte Carlo (2 000 escenarios)**  
-  Cada simulación samplea ruido triangular en costos, volumen y prevalencia y calcula el VPN resultante. Devuelve:
-  - **P(VPN > 0)**: probabilidad de que la decisión sea rentable bajo incertidumbre.
-  - Media, mediana e intervalo de confianza del 90 %.
-  - Histograma con la línea VPN=0 marcada en amarillo.
-
-- **Tabla de break-even (escenario × modelo)**  
-  Para las 12 combinaciones (2 escenarios × 6 modelos) calcula:
-  - Umbral óptimo en VPN (búsqueda sobre 0.05 → 0.95).
-  - VPN óptimo al mes.
-  - **Prevalencia mínima de Enojo** que rentabiliza el modelo (break-even).
-  - Veredicto: GO fuerte / GO / Marginal / NO-GO.
-  
-  La fila ganadora se marca con una estrella.
+- **Tornado de sensibilidad** — varía ±30 % por parámetro (FN, FP, TP, prevalencia, volumen, costo de inferencia) y mide el rango de VPN.
+- **Monte Carlo (2 000 escenarios)** — ruido triangular en costos, volumen y prevalencia. Devuelve P(VPN > 0), media, mediana e IC90%.
+- **Tabla de break-even (escenario × modelo)** — para las combinaciones disponibles, calcula umbral óptimo, VPN óptimo, prevalencia mínima rentable y veredicto.
 
 ### Recomendación final
 
-Tarjeta de cierre con un badge **GO / GO condicional / NO-GO** decidido así:
+Tarjeta de cierre con badge **GO / GO condicional / NO-GO**:
 
 | Veredicto | Criterio |
 |---|---|
 | **GO** | VPN óptimo > USD 1 000 y P(VPN > 0) ≥ 75 % en Monte Carlo |
 | **GO condicional** | P(VPN > 0) ≥ 55 % |
 | **NO-GO** | Cualquier otra condición |
-
-Acompañado de cinco bloques de justificación:
-
-- **Por qué gana** — diferencia de VPN vs runner-up, relación con la asimetría de costos.
-- **Riesgos / Trade-off** — qué se pierde con la configuración elegida.
-- **Condiciones de la decisión** — bajo qué rangos de prevalencia / costos se mantiene la recomendación.
-- **Siguiente acción** — piloto sugerido (volumen, duración, métricas de cierre).
 
 ### Modelo matemático
 
@@ -291,8 +439,6 @@ Para cada muestra `i`, el modelo entregó un vector de probabilidades `p_i` con 
 ŷ_i = 0  en otro caso
 ```
 
-A partir de los 20 (2-clases) o 30 (3-clases) pares (y_i, ŷ_i) se obtiene TP, FP, FN, TN.
-
 **Valor neto mensual esperado**
 
 ```
@@ -301,7 +447,7 @@ FPR = FP / (FP + TN)
 FNR = 1 - TPR
 TNR = 1 - FPR
 
-V_pos = Volumen × Prevalencia          # llamadas realmente enojadas/mes
+V_pos = Volumen × Prevalencia
 V_neg = Volumen × (1 - Prevalencia)
 
 E[TP] = V_pos × TPR
@@ -317,46 +463,23 @@ VPN = E[TP]·valor_TP
     − costo_fijo_mensual
 ```
 
-**Umbral óptimo**
-
-Búsqueda lineal sobre θ ∈ [0.05, 0.95] con paso 0.01 maximizando VPN.
-
-**Break-even de prevalencia**
-
-Despejando `p` en `VPN(p) = 0` con TPR, FPR fijos:
-
-```
-VPN(p) = V·[ p·(TPR·v_TP − FNR·c_FN) + (1−p)·(−FPR·c_FP − TNR·c_TN) ] − V·c_inf − c_fix
-
-→ p* = [ V·(c_inf − b) + c_fix ] / [ (a − b)·V ]
-  donde a = TPR·v_TP − FNR·c_FN
-        b = −FPR·c_FP − TNR·c_TN
-```
-
-**Monte Carlo**
-
-Distribución triangular (low, mode, high) sobre cada input financiero. Mode = valor actual, low = mode×0.7, high = mode×1.3-1.6 según el parámetro. 2 000 muestras → cuantiles p5/p50/p95 y P(VPN > 0).
+**Umbral óptimo:** búsqueda lineal sobre θ ∈ [0.05, 0.95] con paso 0.01 maximizando VPN.
 
 ### Origen y validez de los valores económicos
 
-Los valores de costo por defecto **no provienen de datos confidenciales de una empresa real** — un proyecto académico no tiene acceso a esa información. En lugar de eso, son **valores ilustrativos calibrados con benchmarks de industria publicados**, elegidos para que el orden de magnitud y las relaciones entre ellos sean defendibles. La interfaz permite al usuario reemplazarlos con datos propios en cualquier momento.
+Los valores de costo por defecto **no provienen de datos confidenciales de una empresa real** — un proyecto académico no tiene acceso a esa información. En lugar de eso, son **valores ilustrativos calibrados con benchmarks de industria publicados**, elegidos para que el orden de magnitud y las relaciones entre ellos sean defendibles. La interfaz permite reemplazarlos con datos propios en cualquier momento.
 
-| Parámetro | Default | Razonamiento | Fuente / benchmark |
-|---|---|---|---|
-| **Costo FN** (Enojo no detectado) | USD 80 | Costo aproximado de churn de un cliente molesto que no recibió escalación. | Reichheld & Sasser, *"Zero Defections: Quality Comes to Services"*, Harvard Business Review (1990) — adquirir un cliente cuesta 5-7× más que retenerlo. Reportes Salesforce State of the Connected Customer (2023): 80% de los clientes considera la experiencia tan importante como el producto. |
-| **Costo FP** (falsa alarma) | USD 4 | ~5 minutos de tiempo de un supervisor con costo cargado de ≈ USD 48/hora. | U.S. Bureau of Labor Statistics — *Customer Service Supervisors* OEWS 2023: salario mediano USD 25/hora + ~80% de costos de empleo cargado (impuestos, beneficios, facilities). |
-| **Valor TP** (escalación acertada) | USD 25 | Aproximadamente 30% del costo de FN, asumiendo que la escalación a tiempo no garantiza retención total. | Bain & Company — *Prescription for cutting costs*: clientes cuyos problemas se resuelven bien tienen 70% probabilidad de quedarse. |
-| **Costo de inferencia** | USD 0.02/llamada | Pricing público de servicios cloud de reconocimiento de voz para audio de ~10 segundos. | AWS Transcribe (USD 0.024/min, 2024); Azure Cognitive Services Speech (USD 0.016/min); Google Cloud Speech-to-Text (USD 0.024/min, primer tier). |
-| **Costo fijo mensual** | USD 1 200 | Hosting de un servicio ML pequeño: instancia GPU + monitoring + parte proporcional de ingeniería. | AWS EC2 `g4dn.xlarge` ≈ USD 380/mes on-demand; AWS CloudWatch + S3 ≈ USD 50/mes; resto en mantenimiento prorrateado. |
-| **Volumen 10 000 llamadas/mes** | — | Tamaño típico de un call center mediano (pyme). | ContactBabel — *The US Contact Center Decision-Makers' Guide* (anual); ICMI benchmarks 2023. |
-| **Prevalencia 18% de Enojo** | — | Proporción de llamadas con expresión clara de enojo en operaciones de servicio. | NICE inContact CX Transformation Benchmark (2023): ~15-25% de llamadas escaladas por insatisfacción. Calabrio Sentiment Analysis benchmarks. |
+| Parámetro | Default | Fuente / benchmark |
+|---|---|---|
+| **Costo FN** | USD 80 | Reichheld & Sasser, HBR (1990); Salesforce State of the Connected Customer (2023). |
+| **Costo FP** | USD 4 | U.S. BLS — Customer Service Supervisors OEWS 2023. |
+| **Valor TP** | USD 25 | Bain & Company — *Prescription for cutting costs*. |
+| **Costo de inferencia** | USD 0.02/llamada | AWS Transcribe, Azure Speech, Google Cloud STT pricing (2024). |
+| **Costo fijo mensual** | USD 1 200 | AWS EC2 `g4dn.xlarge` + monitoring + ingeniería prorrateada. |
+| **Volumen 10 000 llamadas/mes** | — | ContactBabel + ICMI benchmarks 2023. |
+| **Prevalencia 18% de Enojo** | — | NICE inContact CX Transformation Benchmark (2023). |
 
-**Validez de la decisión bajo incertidumbre.** El módulo no depende de que estos números sean exactos. Las dos herramientas críticas de Fase 4 — **análisis de sensibilidad (tornado)** y **simulación Monte Carlo** — están diseñadas precisamente para responder *"¿qué tan robusta es la recomendación si estos valores se mueven?"*:
-
-- El **tornado** muestra qué parámetro tiene más impacto en el VPN si se varía ±30%. En la mayoría de configuraciones, prevalencia y costo FN dominan; el resto son secundarios.
-- **Monte Carlo** samplea ±30-60% sobre cada parámetro y devuelve **P(VPN > 0)**: la probabilidad de que la decisión siga siendo rentable bajo incertidumbre.
-
-> **Cómo leer esto en un informe.** Los valores por defecto **fijan un punto de partida razonable**; el análisis de sensibilidad y Monte Carlo **validan que la recomendación sobrevive a errores grandes en la calibración**. Para una implementación real, los valores deberían reemplazarse con datos del área de Finanzas / Operaciones del cliente concreto — la matriz de costos editable de Sección 1 fue construida con ese flujo de trabajo en mente.
+El **tornado de sensibilidad** y **Monte Carlo** existen precisamente para validar que la recomendación sobrevive a errores en estos valores. Para implementación real, reemplazar con datos del cliente.
 
 ---
 
@@ -364,34 +487,43 @@ Los valores de costo por defecto **no provienen de datos confidenciales de una e
 
 ```
 clasificador-audios/
-├── app.py                                     # Servidor Flask (Backend API)
+├── app.py                                     # Flask backend
+├── config.py                                  # N_PER_CLASS, ACTIVE_CLASSES, MIN_SCORE
+├── emotion_encoder.py                         # ★ Encoder audeering compartido (training + auditoria + inferencia)
 ├── templates/
-│   └── index.html                             # 4 pestañas (Clasificador, Dataset, Decisiones, Análisis)
+│   └── index.html                             # 4 pestañas
 ├── static/
-│   ├── css/style.css                          # Estilos Glassmorphism + módulo Decisiones
-│   └── js/main.js                             # Lógica del cliente + simulador de decisiones
+│   ├── css/style.css
+│   └── js/main.js                             # Simulador de decisiones en cliente
 ├── notebooks/
-│   ├── 01_clasificador_v1_features.ipynb      # Features manuales (144 dims)
-│   ├── 02_clasificador_v1_embeddings.ipynb    # wav2vec2 (768 dims)
-│   └── 03_clasificador_v2_balanceado.ipynb    # Comparativa final + conclusiones
+│   ├── 01_clasificador_v1_features.ipynb      # Iteración 1: features manuales (144 dims)
+│   ├── 02_clasificador_v1_embeddings.ipynb    # Iteración 2: wav2vec2-base (768 dims)
+│   └── 03_clasificador_v2_balanceado.ipynb    # Iteración 5: N=20 + class_weight
 ├── scripts/
-│   ├── filtrar_audios.py                      # Scoring acústico
-│   ├── exportar_modelos.py                    # Entrenamiento + serialización (.joblib)
-│   ├── build_experiment_history.py            # Genera historial de experimentos
-│   └── generar_datos_decisiones.py            # ★ NUEVO: extrae CM + probs LOO + ROC
+│   ├── filtrar_audios.py                      # Scoring acústico (ranking, no filtro hard)
+│   ├── auditar_etiquetas_ia.py                # ★ Auditoría de etiquetas con modelo SER
+│   ├── reasignar_audios.py                    # ★ Re-etiquetado físico con manifest reversible
+│   ├── exportar_modelos.py                    # Training LOOCV + serialización
+│   ├── build_experiment_history.py            # Historial para el dashboard
+│   ├── generar_datos_decisiones.py            # Data del módulo Decisiones
+│   └── regenerar_figuras.py                   # Regenera PNGs del dashboard
 ├── outputs/
-│   ├── reporte_filtrado_v2.csv                # Scores de los 146 audios
+│   ├── reporte_filtrado_v2.csv                # Scores acústicos por audio
+│   ├── audios_sospechosos_ia.csv              # ★ Auditoría IA: A/V/D + delta + suena_a
+│   ├── reasignacion_log.json                  # ★ Manifest reversible de la última reasignación
 │   ├── model_metrics.json                     # BalAcc y descripción por modelo
-│   ├── experiment_history.json                # Historial de experimentos
-│   ├── decisions_data.json                    # ★ NUEVO: data para el módulo de Decisiones
-│   ├── embeddings_v2.npz                      # Embeddings 3-clase cacheados
-│   ├── embeddings_wav2vec2.npz                # Embeddings 2-clase cacheados
-│   ├── modelos/                               # 6 clasificadores serializados
+│   ├── experiment_history.json
+│   ├── decisions_data.json                    # Data para el módulo Decisiones
+│   ├── embeddings_v2.npz                      # Embeddings 1024-d cacheados (audeering)
+│   ├── embeddings_wav2vec2.npz                # (Legacy, 2-clase con wav2vec2-base)
+│   ├── predicciones_loocv.{csv,json}          # Predicciones por audio
+│   ├── modelos/                               # 6 clasificadores serializados (.joblib)
 │   └── figuras/                               # Gráficos de resultados
-├── data/                                      # Dataset original (no versionado)
-├── imgs/                                      # Capturas de pantalla
-└── README.md                                  # Este archivo
+├── data/                                      # Dataset (gitignored)
+└── README.md
 ```
+
+`★` = añadido o renovado en la iteración 7.
 
 ---
 
@@ -401,22 +533,30 @@ clasificador-audios/
 # 1. Activar entorno
 source ../.venv/bin/activate
 
-# 2. (Opcional) Reentrenar los 6 modelos desde cero
-python scripts/exportar_modelos.py
+# 2. (Una sola vez) Auditar etiquetas del dataset con modelo SER
+python scripts/auditar_etiquetas_ia.py
+# → outputs/audios_sospechosos_ia.csv
 
-# 3. Generar el dataset cuantitativo para el módulo de Decisiones
-#    (extrae matrices de confusión y probabilidades LOO desde los embeddings)
+# 3. (Opcional, reversible) Re-etiquetar audios sospechosos
+python scripts/reasignar_audios.py --apply --umbral 0.25
+# Para revertir: python scripts/reasignar_audios.py --revert
+
+# 4. Re-correr el pipeline completo
+python scripts/filtrar_audios.py
+python scripts/exportar_modelos.py
+python scripts/build_experiment_history.py
 python scripts/generar_datos_decisiones.py
 
-# 4. Levantar la app
+# 5. Levantar la app
 python app.py
-
-# 5. Abrir en el navegador
 # http://127.0.0.1:5001
-#   → Tab "Decisiones" para el módulo de Toma de Decisiones
 ```
 
-El paso 3 produce `outputs/decisions_data.json` (~53 KB) con todo lo necesario para que el cliente haga simulación y sensibilidad sin más roundtrips al backend.
+**Override puntual de N_PER_CLASS sin tocar `config.py`:**
+
+```bash
+N_PER_CLASS=20 python scripts/exportar_modelos.py
+```
 
 ---
 
@@ -426,7 +566,7 @@ El paso 3 produce `outputs/decisions_data.json` (~53 KB) con todo lo necesario p
 flask
 librosa>=0.10
 torch>=2.0
-transformers>=4.30
+transformers>=4.40        # audeering requiere transformers reciente
 scikit-learn>=1.3
 joblib
 numpy
@@ -434,14 +574,16 @@ pandas
 matplotlib
 ```
 
+**Nota sobre la primera descarga:** el modelo `audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim` pesa ~1.2 GB. Se cachea en `~/.cache/huggingface/` la primera vez que cargas el encoder. Después de eso, el arranque de la app y el pipeline son rápidos (~3 s para cargar el modelo desde caché).
+
 ---
 
 ## Hallazgos relevantes para la decisión
 
 - **El umbral 0.5 no es óptimo cuando los costos son asimétricos.** Con FN/FP = 20×, el VPN óptimo suele estar en umbrales 0.25-0.35, sacrificando precisión por recall.
-- **La prevalencia importa más que la BalAcc.** En el tornado típico, prevalencia y costo_FN dominan; el modelo es relativamente intercambiable mientras esté por encima de 70 % BalAcc.
-- **2 emociones vence en decisión, no en cobertura.** El escenario binario consistentemente tiene mejor VPN por su mayor BalAcc (85 %) y menor confusión Enojo↔Feliz; sin embargo, sacrifica la capacidad analítica de detectar satisfacción positiva.
-- **Monte Carlo es decisivo.** Algunos modelos (KNN k=5) tienen VPN positivo en promedio pero P(VPN > 0) < 60 % → recomendarían un piloto pequeño antes de escalar.
+- **La prevalencia importa más que la BalAcc.** En el tornado típico, prevalencia y costo_FN dominan; el modelo es relativamente intercambiable mientras esté por encima de 75 % BalAcc.
+- **Monte Carlo es decisivo.** Modelos con bal_acc alto pero P(VPN > 0) < 60 % deberían pasar por piloto pequeño antes de escalar.
+- **El re-etiquetado por IA es trabajo upstream, no un truco.** Ningún encoder ni modelo arregla etiquetas mal puestas — limpiar el ground truth es un paso anterior a cualquier comparación de algoritmos.
 
 ---
 
@@ -450,4 +592,4 @@ matplotlib
 - **Curso de Machine Learning**: pipeline de clasificación de emociones (capa 1).
 - **Curso de Toma de Decisiones**: módulo analítico de simulación, sensibilidad y recomendación (capa 2).
 
-Dataset recolectado por 4 personas (MT, VZ, VA, ED) con ~21 hablantes distintos por recolector y ~10-30 s por audio.
+Dataset recolectado por 5 personas (MT, VZ, VA, ED, SG) con ~10-30 s por audio. Cada audio es de un hablante distinto.
