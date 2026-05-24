@@ -2494,3 +2494,518 @@ body {
     }
     .toast { min-width: 0; }
 }
+
+/* ============================================================================
+   REFINEMENT LAYER — Motion, hovers, jerarquía visual.
+   Sin overrides tipográficos: respeta la tipografía original (Inter + Outfit).
+   ============================================================================ */
+
+:root {
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.35);
+    --shadow-card-hover: 0 1px 2px rgba(0, 0, 0, 0.4), 0 22px 52px rgba(147, 51, 234, 0.18), 0 0 0 1px rgba(147, 51, 234, 0.25);
+    --glow-primary-soft: 0 0 14px rgba(147, 51, 234, 0.18);
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Tabular nums sutiles en datos numéricos */
+.prediction-value,
+.metric-val,
+.cm-cell-value,
+.vpn-value,
+.evidence-balacc,
+.final-rec-vpn-value,
+.analytics-pill-value,
+.sim-value,
+.cost-input input,
+.cm-stat strong,
+.mc-stat strong {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+}
+
+/* ============ CARDS — Lift hover + reveal stagger ============ */
+.card {
+    box-shadow: var(--shadow-card);
+    transition: transform 0.35s var(--ease-out),
+                box-shadow 0.35s var(--ease-out),
+                border-color 0.25s var(--ease-out);
+    animation: card-enter 0.55s var(--ease-out) both;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: rgba(147, 51, 234, 0.18);
+}
+
+.results-card:hover,
+.decision-recommendation-card:hover {
+    transform: none;
+}
+
+@keyframes card-enter {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tab-pane.active .card:nth-child(1) { animation-delay: 0.04s; }
+.tab-pane.active .card:nth-child(2) { animation-delay: 0.10s; }
+.tab-pane.active .card:nth-child(3) { animation-delay: 0.18s; }
+.tab-pane.active .card:nth-child(4) { animation-delay: 0.26s; }
+.tab-pane.active .card:nth-child(5) { animation-delay: 0.34s; }
+
+/* ============ BUTTONS — Lift sutil ============ */
+.btn {
+    transition: transform 0.15s var(--ease-out),
+                background 0.2s var(--ease-out),
+                box-shadow 0.2s var(--ease-out),
+                color 0.2s var(--ease-out);
+}
+
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+/* ============ UPLOAD ZONE ============ */
+.upload-zone {
+    transition: all 0.25s var(--ease-out);
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+    border-color: rgba(147, 51, 234, 0.55);
+    background: rgba(147, 51, 234, 0.05);
+    box-shadow: inset 0 0 30px rgba(147, 51, 234, 0.08), 0 12px 32px rgba(147, 51, 234, 0.08);
+    transform: translateY(-1px);
+}
+
+.upload-icon { transition: transform 0.3s var(--ease-spring); }
+.upload-zone:hover .upload-icon { transform: translateY(-3px) scale(1.05); }
+
+/* ============ RECORD BUTTON — Ring expansivo en hover ============ */
+.record-btn {
+    width: 72px;
+    height: 72px;
+    transition: transform 0.3s var(--ease-spring),
+                box-shadow 0.3s var(--ease-out),
+                background 0.3s var(--ease-out);
+}
+
+.record-btn::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(239, 68, 68, 0.4);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.record-btn:hover::before {
+    opacity: 1;
+    animation: ring-pulse 1.6s var(--ease-out) infinite;
+}
+
+@keyframes ring-pulse {
+    0% { transform: scale(0.95); opacity: 0.7; }
+    100% { transform: scale(1.25); opacity: 0; }
+}
+
+.record-btn.recording {
+    box-shadow: 0 0 0 12px rgba(239, 68, 68, 0.1), 0 0 30px rgba(239, 68, 68, 0.6);
+}
+
+/* ============ PREDICTION RING — más grande + smoother ============ */
+.prediction-display {
+    width: 200px;
+    height: 200px;
+    margin: 2.4rem auto 1.6rem;
+}
+
+.progress-ring {
+    width: 200px !important;
+    height: 200px !important;
+}
+
+.progress-ring-bg {
+    stroke: rgba(255, 255, 255, 0.04) !important;
+}
+
+.progress-ring-bar {
+    transition: stroke-dashoffset 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+    filter: drop-shadow(0 0 8px currentColor);
+}
+
+.prediction-value {
+    font-size: 2.9rem;
+}
+
+/* ============ PROB BARS — stagger + dot al final ============ */
+.prob-item { animation: fade-up 0.45s var(--ease-out) both; }
+.prob-item:nth-child(1) { animation-delay: 0.08s; }
+.prob-item:nth-child(2) { animation-delay: 0.14s; }
+.prob-item:nth-child(3) { animation-delay: 0.20s; }
+.prob-item:nth-child(4) { animation-delay: 0.26s; }
+
+@keyframes fade-up {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.progress-track {
+    overflow: visible;
+}
+
+.progress-fill {
+    position: relative;
+    box-shadow: 0 0 10px currentColor;
+    transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px currentColor;
+    opacity: 0;
+    transition: opacity 0.4s ease 0.6s;
+}
+
+.prob-item:hover .progress-fill::after { opacity: 0.9; }
+
+/* ============ METRICS GRID — 4 columnas con bordes interiores ============ */
+.metrics-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+@media (max-width: 720px) {
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.metric-card {
+    background: transparent;
+    border: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 0;
+    padding: 1rem 1.1rem;
+}
+
+.metrics-grid .metric-card:nth-child(4n) { border-right: none; }
+.metrics-grid .metric-card:nth-child(n+3) { border-bottom: none; }
+
+@media (max-width: 720px) {
+    .metrics-grid .metric-card:nth-child(2n) { border-right: none; }
+    .metrics-grid .metric-card:nth-child(4n+1),
+    .metrics-grid .metric-card:nth-child(4n+2) { border-right: none; }
+    .metrics-grid .metric-card:nth-child(2n+1) { border-right: 1px solid rgba(255, 255, 255, 0.05); }
+}
+
+/* ============ MODEL GRID — lift hover (acc verde queda del CSS base) ============ */
+.model-option {
+    transition: all 0.2s var(--ease-out);
+}
+
+.model-option:hover {
+    transform: translateY(-1px);
+    border-color: rgba(147, 51, 234, 0.3);
+}
+
+.model-option.active {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.18) 0%, rgba(37, 99, 235, 0.12) 100%);
+    border-color: rgba(147, 51, 234, 0.5);
+    box-shadow: 0 0 0 1px rgba(147, 51, 234, 0.3), 0 8px 22px rgba(147, 51, 234, 0.18);
+}
+
+/* ============ COST MATRIX — color grouping por tipo ============ */
+.cost-cell {
+    transition: transform 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+}
+
+.cost-cell:hover { transform: translateY(-1px); }
+
+.cost-cell.cost-tp { background: rgba(16, 185, 129, 0.06); border-color: rgba(16, 185, 129, 0.25); }
+.cost-cell.cost-fn { background: rgba(239, 68, 68, 0.06); border-color: rgba(239, 68, 68, 0.25); }
+.cost-cell.cost-fp { background: rgba(245, 158, 11, 0.06); border-color: rgba(245, 158, 11, 0.22); }
+.cost-cell.cost-tn { background: rgba(255, 255, 255, 0.02); border-color: rgba(255, 255, 255, 0.08); }
+
+.cost-ratio-pill {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.15), rgba(37, 99, 235, 0.08));
+    border: 1px solid rgba(147, 51, 234, 0.3);
+}
+
+/* ============ SLIDERS — thumb más visible con halo glow ============ */
+.sim-slider {
+    height: 5px;
+    background: linear-gradient(90deg,
+        rgba(147, 51, 234, 0.5) 0%,
+        rgba(147, 51, 234, 0.2) 100%);
+    border-radius: 999px;
+}
+
+.sim-slider::-webkit-slider-thumb {
+    width: 22px;
+    height: 22px;
+    background: #fff;
+    border: 3px solid var(--primary);
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.15), 0 4px 12px rgba(0, 0, 0, 0.4);
+    cursor: grab;
+    transition: transform 0.15s var(--ease-spring);
+}
+
+.sim-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.sim-slider::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.05); }
+
+.sim-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    background: #fff;
+    border: 3px solid var(--primary);
+    border-radius: 50%;
+    cursor: grab;
+}
+
+/* ============ VPN CARD — gradient + impacto ============ */
+.vpn-card {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.08) 0%, rgba(0, 0, 0, 0.4) 100%);
+    border: 1px solid rgba(147, 51, 234, 0.2);
+}
+
+.vpn-value {
+    text-shadow: 0 0 40px rgba(255, 255, 255, 0.12);
+}
+
+/* ============ CONFUSION MATRIX hover ============ */
+.cm-cell {
+    transition: transform 0.2s var(--ease-out);
+}
+
+.cm-cell:hover { transform: translateY(-1px); }
+
+/* ============ TORNADO — barra con glow morado ============ */
+.tornado-bar {
+    background: linear-gradient(90deg, var(--primary) 0%, #7e22ce 100%);
+    box-shadow: 0 0 8px rgba(147, 51, 234, 0.4);
+}
+
+/* ============ FINAL RECOMMENDATION — podium style ============ */
+.decision-recommendation-card {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(11, 7, 22, 0.95) 100%);
+    border: 1px solid rgba(147, 51, 234, 0.25);
+    overflow: hidden;
+    position: relative;
+}
+
+.decision-recommendation-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 50%;
+    height: 200%;
+    background: radial-gradient(ellipse at center, rgba(147, 51, 234, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.decision-recommendation-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.final-rec-main-card {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.12), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(147, 51, 234, 0.35);
+}
+
+.final-rec-badge {
+    background: linear-gradient(135deg, var(--primary) 0%, #7e22ce 100%);
+    box-shadow: 0 0 24px rgba(147, 51, 234, 0.5);
+}
+
+.final-rec-vpn-value {
+    text-shadow: 0 0 40px rgba(255, 255, 255, 0.15);
+}
+
+.final-rec-reason-card {
+    transition: border-color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+}
+
+.final-rec-reason-card:hover {
+    border-color: rgba(147, 51, 234, 0.3);
+    background: rgba(147, 51, 234, 0.04);
+}
+
+/* ============ VERDICT pills (GO / MID / NO) ============ */
+.verdict-go {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+    color: #6ee7b7;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.verdict-mid {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05));
+    color: #fcd34d;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.verdict-no {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.05));
+    color: #fca5a5;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ============ DROPDOWN del simulador ============ */
+.sim-dropdown-trigger {
+    transition: all 0.2s var(--ease-out);
+}
+
+.sim-dropdown-trigger:hover {
+    border-color: rgba(147, 51, 234, 0.4);
+}
+
+.sim-dropdown-menu {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(147, 51, 234, 0.2);
+}
+
+.sim-dropdown-menu li {
+    transition: background 0.15s ease;
+}
+
+.sim-dropdown-menu li:hover {
+    background: rgba(147, 51, 234, 0.08);
+}
+
+.sim-dropdown-menu li.selected {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(37, 99, 235, 0.1));
+}
+
+/* ============ SEGMENTED CONTROL ============ */
+.sim-seg-btn {
+    transition: all 0.2s var(--ease-out);
+}
+
+.sim-seg-btn.active {
+    background: linear-gradient(135deg, var(--primary), #7e22ce);
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* ============ EXPERIMENT SWITCHER ============ */
+.experiment-option {
+    transition: all 0.25s var(--ease-out);
+}
+
+.experiment-option:hover {
+    transform: translateY(-2px);
+    border-color: rgba(147, 51, 234, 0.3);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+}
+
+.experiment-option.active {
+    box-shadow: 0 0 0 1px rgba(147, 51, 234, 0.5), 0 14px 30px rgba(147, 51, 234, 0.2);
+}
+
+.analytics-pill {
+    transition: border-color 0.2s ease;
+}
+
+.analytics-pill:hover {
+    border-color: rgba(147, 51, 234, 0.3);
+}
+
+/* ============ DATASET TABLE / FIGURAS ============ */
+.dataset-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.custom-audio-btn {
+    transition: all 0.2s var(--ease-spring);
+}
+
+.custom-audio-btn:hover {
+    transform: scale(1.1);
+}
+
+.figure-wrapper {
+    transition: border-color 0.25s ease;
+}
+
+.figure-wrapper:hover {
+    border-color: rgba(147, 51, 234, 0.25);
+}
+
+/* ============ SCROLLBAR / SELECTION ============ */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+    background: rgba(147, 51, 234, 0.2);
+    border-radius: 6px;
+    border: 2px solid var(--bg-dark);
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(147, 51, 234, 0.4); }
+
+::selection {
+    background: rgba(147, 51, 234, 0.4);
+    color: #fff;
+}
+
+/* ============ TOAST ============ */
+.toast {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(147, 51, 234, 0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 720px) {
+    .prediction-display { width: 170px; height: 170px; margin: 1.6rem auto 1rem; }
+    .progress-ring { width: 170px !important; height: 170px !important; }
+    .prediction-value { font-size: 2.3rem; }
+    .nav-tabs { flex-wrap: wrap; }
+}
+
+/* ============ REDUCED MOTION ============ */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+

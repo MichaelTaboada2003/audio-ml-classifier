@@ -77,7 +77,7 @@ const progressCircle = document.getElementById('progress-bar-circle');
 const probBars = document.getElementById('prob-bars');
 
 // Initialize SVG circular progress bar circumference
-const progressCircumference = 2 * Math.PI * 64; // r=64 -> 402.12
+const progressCircumference = 2 * Math.PI * 88; // r=88 -> 552.92
 if (progressCircle) {
     progressCircle.style.strokeDasharray = `${progressCircumference}`;
     progressCircle.style.strokeDashoffset = `${progressCircumference}`;
@@ -1257,7 +1257,7 @@ function displayResults(data) {
     predictedEmotionBadge.textContent = pred;
     predictedEmotionBadge.className = `badge ${predStyle.slug}`;
     
-    predictionPercentage.textContent = `${confidence}%`;
+    animateCounter(predictionPercentage, confidence, { duration: 900, suffix: '%' });
     
     // Set dynamic SVG progress ring and glow
     if (progressCircle) {
@@ -1461,5 +1461,22 @@ if (experimentOptions.length > 0) {
 
 // Inicializa modulo de decisiones (Toma de Decisiones)
 initDecisionsModule();
+
+// ============== Helper: count-up animation ==============
+function animateCounter(el, to, { duration = 900, suffix = '%', from = 0 } = {}) {
+    if (!el) return;
+    const start = performance.now();
+    const startVal = Number.isFinite(from) ? from : 0;
+    const delta = to - startVal;
+    function tick(now) {
+        const t = Math.min(1, (now - start) / duration);
+        // ease-out quint
+        const eased = 1 - Math.pow(1 - t, 5);
+        const value = startVal + delta * eased;
+        el.textContent = `${Math.round(value)}${suffix}`;
+        if (t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+}
 
 renderDecisionScenarios();
