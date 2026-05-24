@@ -13,9 +13,13 @@ La capa de Toma de Decisiones **no modifica** la capa de ML: solo consume los em
 
 - [Resumen rápido](#resumen-rápido)
 - [Cómo se construyó el clasificador](#cómo-se-construyó-el-clasificador)
+- [Capturas de la aplicación](#capturas-de-la-aplicación)
 - [Aplicación web — pestañas disponibles](#aplicación-web--pestañas-disponibles)
 - [Capa 1 · Machine Learning](#capa-1--machine-learning)
 - [Capa 2 · Toma de Decisiones](#capa-2--toma-de-decisiones)
+- [Módulos compartidos: config.py y emotion_encoder.py](#módulos-compartidos-configpy-y-emotion_encoderpy)
+- [Scripts — referencia completa](#scripts--referencia-completa)
+- [Notebooks — iteraciones históricas](#notebooks--iteraciones-históricas)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Uso rápido](#uso-rápido)
 - [Dependencias](#dependencias)
@@ -58,7 +62,7 @@ El dataset es de **emoción actuada** por personas no entrenadas, y una fracció
 
 Para detectarlas, el script `auditar_etiquetas_ia.py` corre el modelo SER sobre cada audio, extrae A/V/D, mapea esos valores a las 4 clases mediante kernels gaussianos centrados en el punto teórico de cada emoción y compara con la etiqueta humana. La auditoría sirve como segunda opinión para identificar audios cuya etiqueta probablemente no corresponde al contenido. La inspección de los resultados se apoya en `mostrar_todos.py` (scores de todos los audios) y `mostrar_sospechosos.py` (solo los discrepantes).
 
-Una observación: un filtro acústico basado en 7 métricas globales (energía RMS, pitch, brillo espectral, etc.) resulta demasiado tosco para esta tarea — alguien puede hablar suave pero con tensión emocional, y la energía promedio no lo capta. El scoring acústico (`filtrar_audios.py`) se conserva como criterio de *ranking* dentro de clase, pero **no descarta audios**; la detección de etiquetas erróneas es responsabilidad del modelo SER.
+Una observación: un filtro acústico basado en métricas globales (energía RMS, pitch, brillo espectral, etc.) resulta demasiado tosco para esta tarea — alguien puede hablar suave pero con tensión emocional, y la energía promedio no lo capta. La detección de etiquetas erróneas es responsabilidad exclusiva del modelo SER.
 
 ### Localización de segmentos: refinamiento de etiqueta, no cherry-picking
 
@@ -84,6 +88,88 @@ La métrica oficial es **leave-one-audio-out** entrenando sobre el segmento y te
 3. **`wav2vec2-base` es ASR, no SER.** Para clasificación emocional, un encoder fine-tuneado para emoción cambia drásticamente el techo de desempeño en holdout.
 4. **Etiquetas humanas ≠ ground truth.** En datasets pequeños con actores no entrenados, una fracción grande de los audios puede no proyectar la emoción pedida. Auditar con un modelo SER pre-entrenado es trabajo previo a comparar algoritmos.
 5. **Localizar la emoción dentro de cada audio no es cherry-picking,** siempre que se conserven todos los audios y el holdout no se segmente. Es distinto de filtrar qué audios entran.
+
+---
+
+## Capturas de la aplicación
+
+### Vista general
+
+![Vista general de las 4 pestañas](imgs/secciones.png)
+
+La interfaz tiene 4 pestañas: Clasificador en Vivo, Explorador del Dataset, Análisis y Métricas, y Decisiones.
+
+---
+
+### Pestaña 1 · Clasificador en Vivo
+
+**Entrada de audio** — el usuario puede subir un archivo o grabar directamente desde el navegador.
+
+![Entrada de audio](imgs/entrada-audio.png)
+
+**Selector de modelo** — elige entre los 6 clasificadores entrenados, ordenados por balanced accuracy honesta.
+
+![Selector de modelo](imgs/escoger-modelo-clasificacion.png)
+
+**Resultado del análisis** — predicción con confianza, anillo de probabilidad, barras por clase y métricas (arousal / valence / dominance).
+
+![Resultado del análisis de emoción](imgs/resultado-analisis-emocion.png)
+
+---
+
+### Pestaña 2 · Explorador del Dataset
+
+**Explorador de audios holdout** — reproduce audios reservados (Tranquilidad / Tristeza) que nunca entraron al entrenamiento. Cada predicción es genuinamente out-of-sample.
+
+![Explorador del dataset](imgs/seccion-dataset.png)
+
+---
+
+### Pestaña 3 · Análisis y Métricas
+
+**Switcher de experimentos** — selecciona entre los escenarios de 2, 3 o 4 clases para ver la matriz de confusión y la separabilidad de embeddings.
+
+![Selección de experimento](imgs/experimento-seleccion.png)
+
+---
+
+### Pestaña 4 · Decisiones
+
+**Vista general del módulo de decisiones** — cuatro fases secuenciales y una recomendación final.
+
+![Sección de decisiones](imgs/seccion-decisiones.png)
+
+**Fase 1 · Matriz de costos editable** — el usuario parametriza el valor de cada tipo de resultado (TP / FP / FN / TN) en su negocio.
+
+![Matriz de costo-beneficio](imgs/matriz-costo-beneficio.png)
+
+**Fase 3 · Simulador de despliegue** — escenario, modelo, umbral, volumen y prevalencia. Matriz de confusión viva + curva ROC + VPN mensual.
+
+![Simulador de despliegue](imgs/simulador-despliegue.png)
+
+**Tarjetas de escenario** — comparativa de configuraciones disponibles (2, 3 y 4 clases).
+
+![Escenarios](imgs/escenarios.png)
+
+**Comparativa de escenarios** — tabla que contrasta métricas clave entre escenarios.
+
+![Comparativa de escenarios](imgs/comparativa-escenarios.png)
+
+**Métricas por escenario** — precision / recall / F1 detallado por clase.
+
+![Métricas por escenario](imgs/metricas-escenario.png)
+
+**Modelos por escenario** — balanced accuracy honesta de los 6 modelos en cada escenario.
+
+![Modelos por escenario](imgs/modelos-escenarios.png)
+
+**Fase 4 · Análisis de decisiones** — tornado de sensibilidad y Monte Carlo (2 000 escenarios).
+
+![Análisis de decisiones](imgs/analisis-decisiones.png)
+
+**Recomendación final** — veredicto GO / GO condicional / NO-GO con condiciones de validez.
+
+![Recomendación final](imgs/recomendacion.png)
 
 ---
 
@@ -140,20 +226,16 @@ Sobre los embeddings se entrenan 6 clasificadores clásicos: **SVM lineal, Regre
    python scripts/auditar_etiquetas_ia.py
    → A/V/D por audio, comparación con la etiqueta humana → audios_sospechosos_ia.csv
 
-2. Scoring acústico (criterio de ranking, no filtro hard)
-   python scripts/filtrar_audios.py
-   → outputs/reporte_filtrado_v2.csv
-
-3. Localización de segmentos
+2. Localización de segmentos
    python scripts/segmentar_rescate.py
    → recorta el mejor tramo de 10 s de cada audio → data/procesado/
 
-4. Entrenamiento + serialización + evaluación honesta
+3. Entrenamiento + serialización + evaluación honesta
    python scripts/entrenar_procesado.py --guardar --loco
    → outputs/modelos/*.joblib (6 modelos, sin el holdout del dashboard)
    → outputs/model_metrics.json (balanced accuracy honesta + leave-one-collector-out)
 
-5. Datos del dashboard
+4. Datos del dashboard
    python scripts/generar_datos_decisiones.py     # módulo Decisiones
    python scripts/build_experiment_history.py     # historial
    python scripts/regenerar_figuras.py            # figuras del dashboard
@@ -166,7 +248,7 @@ Sobre los embeddings se entrenan 6 clasificadores clásicos: **SVM lineal, Regre
 | **Encoder** | `audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim` | Fine-tuneado para SER; sus hidden_states son emocionales por diseño, no fonéticos. Volvió viables las 4 clases. |
 | **MAX_DURATION** | 10 s | Sweet spot empírico; audios largos diluyen la señal con el mean-pool. |
 | **Dataset** | Segmentos localizados de 10 s | Refinamiento de etiqueta débil sobre emoción actuada (sin segmentar el holdout). |
-| **Filtro acústico** | Solo ranking, sin descarte | Las métricas globales son demasiado toscas; la auditoría de etiquetas la hace el modelo SER. |
+| **Filtro de audios** | Ninguno — todos los audios entran | Las métricas globales son demasiado toscas; la auditoría de etiquetas la hace el modelo SER. |
 | **class_weight** | 'balanced' | Compensa el desbalance fuerte de clases. |
 | **Modelo desplegado** | Regresión Logística (4 clases) | Mejor balanced accuracy honesta (~0.86). |
 
@@ -308,31 +390,197 @@ El tornado de sensibilidad y el Monte Carlo existen precisamente para validar qu
 
 ---
 
+## Módulos compartidos: config.py y emotion_encoder.py
+
+Estos dos archivos no son scripts ejecutables — son módulos importados por casi todos los scripts del pipeline. Tocarlos tiene efecto cascada sobre entrenamiento, auditoría e inferencia.
+
+### `config.py` — fuente de verdad global
+
+```python
+N_PER_CLASS        = int(os.environ.get("N_PER_CLASS", 15))
+MIN_SCORE          = 0.0   # filtro acústico desactivado
+ACTIVE_CLASSES     = ["Enojo", "Feliz", "Tranquilidad", "Tristeza"]
+DASHBOARD_HOLDOUT  = {"Tranquilidad": 18, "Tristeza": 12}
+DASHBOARD_HOLDOUT_SEED = 42
+```
+
+| Parámetro | Efecto al cambiarlo |
+|---|---|
+| `N_PER_CLASS` | Cuántos audios por clase entran al entrenamiento. Soporta override por env var (`N_PER_CLASS=20 python ...`). |
+| `MIN_SCORE` | Umbral mínimo de score acústico para incluir un audio. En `0.0` todos los audios pasan (filtro desactivado). |
+| `ACTIVE_CLASSES` | Clases que participan en el entrenamiento y en la app. Quitar una clase y re-correr el pipeline actualiza modelos, métricas y dashboard automáticamente. |
+| `DASHBOARD_HOLDOUT` | Cuántos audios de cada clase se reservan para el Explorador del Dataset (nunca entran a training). |
+| `DASHBOARD_HOLDOUT_SEED` | Semilla de aleatoriedad para la selección del holdout. Fijada para reproducibilidad. |
+
+Cambiar cualquier parámetro y re-correr el pipeline completo (`segmentar_rescate.py` → `entrenar_procesado.py --guardar` → scripts de dashboard) regenera embeddings, modelos, métricas y dashboard de forma consistente.
+
+### `emotion_encoder.py` — encoder audeering compartido
+
+Importado por: `auditar_etiquetas_ia.py`, `exportar_modelos.py`, `segmentar_rescate.py`, `entrenar_procesado.py`, `app.py`. Las cinco capas ven exactamente las mismas representaciones porque todas pasan por este módulo.
+
+```python
+MODEL_ID      = "audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim"
+EMBEDDING_DIM = 1024
+```
+
+**Funciones exportadas:**
+
+| Función | Entrada | Salida | Uso |
+|---|---|---|---|
+| `load_encoder()` | — | `(processor, model, device)` | Se llama una vez al iniciar cualquier script que necesite el encoder. Mueve el modelo a `mps`/`cuda`/`cpu` según disponibilidad. |
+| `extract_embedding(audio, sr, processor, model, device)` | array de audio + sample rate | vector de 1024 dims (hidden state del encoder) | Entrenamiento e inferencia en producción. |
+| `extract_avd(audio, sr, processor, model, device)` | array de audio + sample rate | `(arousal, valence, dominance)` — floats en [0,1] | Auditoría de etiquetas y localización de segmentos. |
+
+`extract_embedding` y `extract_avd` usan el mismo forward pass pero devuelven salidas distintas del modelo: `extract_embedding` toma el `hidden_state` (1024-d, rico en representación emocional), mientras `extract_avd` toma la cabeza de regresión final (3 valores A/V/D, directamente interpretables).
+
+El modelo (~1.2 GB) se descarga la primera vez y se cachea en `~/.cache/huggingface/`.
+
+---
+
+## Scripts — referencia completa
+
+### Auditoría de etiquetas
+
+**`auditar_etiquetas_ia.py`**
+Recorre todos los audios originales (`data/AUDIOS MACHINE LEARNING/`), extrae A/V/D con `emotion_encoder.extract_avd()`, mapea esos valores a las 4 clases mediante kernels gaussianos y compara con la etiqueta humana del nombre del archivo. Escribe `outputs/audios_sospechosos_ia.csv` con la predicción del modelo, el delta de score y el campo `suena_a` (la clase a la que el modelo cree que suena). No modifica el dataset — es solo diagnóstico.
+
+```bash
+python scripts/auditar_etiquetas_ia.py
+```
+
+**`mostrar_todos.py`**
+Imprime en consola los scores audeering de **todos** los audios del dataset, ordenados por clase. Útil para inspección manual del estado completo antes de decidir qué audios revisar.
+
+```bash
+python scripts/mostrar_todos.py
+```
+
+**`mostrar_sospechosos.py`**
+Filtra y muestra solo los audios cuya etiqueta humana discrepa del predicho por el modelo SER (los que están en `audios_sospechosos_ia.csv`). Punto de partida para decidir si un audio debe excluirse o corregirse.
+
+```bash
+python scripts/mostrar_sospechosos.py
+```
+
+---
+
+### Localización de segmentos
+
+**`segmentar_rescate.py`**
+Aplica una ventana deslizante de 10 s sobre el audio completo (no solo los primeros 10 s), puntúa cada ventana con `emotion_encoder.extract_avd()` para la clase declarada y guarda el tramo de máximo score en `data/procesado/`. También escribe `outputs/mejores_segmentos.csv` con el offset y score del mejor tramo de cada audio.
+
+```bash
+python scripts/segmentar_rescate.py
+```
+
+Requiere que el directorio `data/AUDIOS MACHINE LEARNING/` tenga los audios originales (gitignored). El directorio `data/procesado/` resultante es el dataset de entrenamiento.
+
+---
+
+### Entrenamiento y serialización
+
+**`exportar_modelos.py`** *(módulo compartido, no ejecutar directamente)*
+Expone dos elementos compartidos que otros scripts importan:
+
+- `MODEL_SPECS` — diccionario con los 6 clasificadores y sus hiperparámetros (`LogisticRegression`, `SVC` lineal, `SVC` RBF, `RandomForestClassifier`, `KNeighborsClassifier` k=3 y k=5, todos con `class_weight='balanced'` donde aplica).
+- `extraer_embedding(path, processor, model, device)` — extrae el embedding de 1024 dims de un archivo de audio individual.
+
+Su bloque `__main__` es obsoleto (supersedido por `entrenar_procesado.py`). No ejecutar directamente.
+
+**`entrenar_procesado.py`** *(script principal de entrenamiento)*
+Lee los segmentos de `data/procesado/`, separa el holdout del dashboard (`DASHBOARD_HOLDOUT` de `config.py`) y entrena los 6 clasificadores con evaluación **leave-one-audio-out honesta** (train = segmento localizado del audio, test = audio crudo de los primeros 10 s del audio dejado fuera).
+
+```bash
+# Evaluar y serializar modelos + holdout del dashboard
+python scripts/entrenar_procesado.py --guardar
+
+# Además, correr leave-one-collector-out
+python scripts/entrenar_procesado.py --guardar --loco
+```
+
+Salidas con `--guardar`:
+- `outputs/modelos/*.joblib` — 6 clasificadores entrenados sobre todos los audios menos el holdout del dashboard
+- `outputs/model_metrics.json` — balanced accuracy honesta por modelo (LOAO) y leave-one-collector-out (LOCO)
+- `outputs/proc_embeddings.npz` — embeddings cacheados (segmento + crudo) para los scripts de dashboard
+- `outputs/holdout_dashboard.json` — metadatos de los audios reservados para el Explorador del Dataset
+
+---
+
+### Generación del dashboard
+
+**`generar_datos_decisiones.py`**
+Lee `proc_embeddings.npz` y los modelos `.joblib`, recalcula probabilidades LOO y matrices de confusión por escenario (2, 3 y 4 clases), y escribe `outputs/decisions_data.json`. Este JSON es el que consume el front para el simulador de decisiones — sin este archivo la pestaña Decisiones no carga.
+
+```bash
+python scripts/generar_datos_decisiones.py
+```
+
+**`build_experiment_history.py`**
+Construye `outputs/experiment_history.json` con el historial de experimentos que muestra el switcher de la pestaña Análisis y Métricas. Lee `proc_embeddings.npz` y los modelos `.joblib`.
+
+```bash
+python scripts/build_experiment_history.py
+```
+
+**`regenerar_figuras.py`**
+Genera los gráficos de PCA / t-SNE y matrices de confusión que se sirven desde `outputs/figuras/`. Requiere que `proc_embeddings.npz` esté actualizado.
+
+```bash
+python scripts/regenerar_figuras.py
+```
+
+---
+
+## Notebooks — iteraciones históricas
+
+Los notebooks en `notebooks/` documentan la evolución del clasificador. **No son la fuente de verdad del pipeline** — el pipeline canónico vive en `scripts/`. Son útiles para entender el razonamiento detrás de las decisiones de diseño.
+
+### `01_clasificador_v1_features.ipynb`
+Primer enfoque: features acústicas clásicas (MFCC, ZCR, energía RMS, centroide espectral, etc.) extraídas con librosa, sin ningún encoder de lenguaje. Los clasificadores aprenden sobre vectores compactos de ~30 dims. Establece el baseline y documenta por qué las features globales son insuficientes para esta tarea.
+
+### `02_clasificador_v1_embeddings.ipynb`
+Segundo enfoque: `facebook/wav2vec2-base` como encoder (embeddings de 768 dims, pre-entrenado para ASR). Documenta la brecha entre validación interna alta (~97 %) y holdout bajo (~50 %) que reveló que el modelo aprendía contenido lingüístico, no emoción. Esta observación motivó el cambio al encoder audeering.
+
+### `03_clasificador_v2_balanceado.ipynb`
+Experimentos de balance de clases y transición hacia el encoder audeering. Documenta las configuraciones intermedias probadas (N_PER_CLASS, class_weight, MAX_DURATION) y la mejora de holdout al cambiar el encoder. Es el puente entre los enfoques v1 y el pipeline actual.
+
+---
+
 ## Estructura del proyecto
 
 ```
 clasificador-audios/
 ├── app.py                                     # Flask backend (puerto 5001)
-├── config.py                                  # N_PER_CLASS, ACTIVE_CLASSES, MIN_SCORE, DASHBOARD_HOLDOUT
+├── config.py                                  # N_PER_CLASS, ACTIVE_CLASSES, DASHBOARD_HOLDOUT
 ├── emotion_encoder.py                         # Encoder audeering compartido (training + auditoría + inferencia)
 ├── templates/
 │   └── index.html                             # 4 pestañas
 ├── static/
-│   ├── css/style.css
+│   ├── css/
+│   │   ├── base.css                           # Variables CSS, reset, layout global
+│   │   ├── components.css                     # Header, nav, cards, botones, upload, recording
+│   │   ├── predictions.css                    # Panel de resultados, badges, barras, métricas
+│   │   ├── dataset.css                        # Tabla del explorador de dataset
+│   │   ├── analytics.css                      # Switcher de experimentos, figuras
+│   │   ├── decisions.css                      # Módulo de Toma de Decisiones (simulador, tornado, etc.)
+│   │   └── toast.css                          # Sistema de notificaciones
 │   └── js/main.js                             # Simulador de decisiones en cliente
 ├── notebooks/                                 # Iteraciones históricas (no son la fuente de verdad)
+│   ├── 01_clasificador_v1_features.ipynb      # Features acústicas clásicas (MFCC, ZCR, etc.)
+│   ├── 02_clasificador_v1_embeddings.ipynb    # Encoder wav2vec2-base (ASR, 768 dims)
+│   └── 03_clasificador_v2_balanceado.ipynb    # Balance + transición al encoder audeering
+├── imgs/                                      # Capturas de la interfaz para el README
 ├── scripts/
-│   ├── filtrar_audios.py                      # Scoring acústico (ranking, no filtro hard)
-│   ├── auditar_etiquetas_ia.py                # Auditoría de etiquetas con modelo SER (--data/--out)
+│   ├── auditar_etiquetas_ia.py                # Auditoría de etiquetas con modelo SER
 │   ├── mostrar_todos.py                       # Scores audeering de TODOS los audios
 │   ├── mostrar_sospechosos.py                 # Solo los audios cuya etiqueta discrepa de la IA
 │   ├── segmentar_rescate.py                   # Localización: mejor segmento de 10 s por audio
+│   ├── exportar_modelos.py                    # Módulo compartido: MODEL_SPECS + extraer_embedding()
 │   ├── entrenar_procesado.py                  # Entrena + serializa + evalúa honesto + leave-one-collector-out
 │   ├── generar_datos_decisiones.py            # Data del módulo Decisiones
 │   ├── build_experiment_history.py            # Historial para el dashboard
 │   └── regenerar_figuras.py                   # Regenera figuras del dashboard
 ├── outputs/
-│   ├── reporte_filtrado_v2.csv                # Scores acústicos por audio
 │   ├── audios_sospechosos_ia.csv              # Auditoría IA: A/V/D + delta + suena_a
 │   ├── mejores_segmentos.csv                  # Reporte de localización por audio
 │   ├── model_metrics.json                     # Balanced accuracy honesta + descripción por modelo
@@ -379,7 +627,7 @@ python app.py
 # http://127.0.0.1:5001
 ```
 
-`config.py` es la única fuente de verdad para `ACTIVE_CLASSES`, el holdout del dashboard y el scoring. Cambiar esos parámetros y re-correr el pipeline regenera embeddings, modelos, métricas y dashboard de forma consistente.
+`config.py` es la única fuente de verdad para `ACTIVE_CLASSES`, el holdout del dashboard y los parámetros de selección. Cambiar esos parámetros y re-correr el pipeline regenera embeddings, modelos, métricas y dashboard de forma consistente.
 
 ---
 
