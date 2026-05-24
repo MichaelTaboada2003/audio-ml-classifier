@@ -33,8 +33,10 @@ TARGET_CLASS = "Enojo"  # clase positiva para la decision de "flag/escalar"
 # Escenarios a publicar en el simulador. El front (toggle de Decisiones) usa estas keys.
 # "actual" = escenario por defecto; "archivado" = se conserva con sus metricas.
 SCENARIOS_DEF = {
+    "4clases": {"name": "4 emociones", "subtitle": "Enojo / Feliz / Tranquilidad / Tristeza",
+                "classes": ["Enojo", "Feliz", "Tranquilidad", "Tristeza"], "status": "actual"},
     "3clases": {"name": "3 emociones", "subtitle": "Enojo / Feliz / Tristeza",
-                "classes": ["Enojo", "Feliz", "Tristeza"], "status": "actual"},
+                "classes": ["Enojo", "Feliz", "Tristeza"], "status": "archivado"},
     "2clases": {"name": "2 emociones", "subtitle": "Enojo / Tranquilidad",
                 "classes": ["Enojo", "Tranquilidad"], "status": "archivado"},
 }

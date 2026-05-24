@@ -36,6 +36,7 @@ MODEL_ORDER = ["svm_lineal", "logreg", "svm_rbf", "rf", "knn_k5", "knn_k3"]
 SCENARIOS = {
     "2clases": ["Enojo", "Tranquilidad"],
     "3clases": ["Enojo", "Feliz", "Tristeza"],
+    "4clases": ["Enojo", "Feliz", "Tranquilidad", "Tristeza"],
 }
 
 

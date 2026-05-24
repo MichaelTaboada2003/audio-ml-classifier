@@ -1,5 +1,5 @@
 {
-  "default_experiment_id": "3clases",
+  "default_experiment_id": "4clases",
   "experiments": [
     {
       "id": "2clases",
@@ -95,8 +95,8 @@
     {
       "id": "3clases",
       "name": "3 emociones",
-      "subtitle": "Enojo / Feliz / Tristeza · actual",
-      "status": "actual",
+      "subtitle": "Enojo / Feliz / Tristeza · archivado",
+      "status": "archivado",
       "classes": [
         "Enojo",
         "Feliz",
@@ -188,6 +188,113 @@
           "image": "/outputs/figuras/separabilidad_3clases.png",
           "description": "Proyección PCA y t-SNE de los embeddings emocionales (audeering, 1024d) de los segmentos localizados de las 3 clases.",
           "observation": "Tristeza forma un cúmulo nítido; Enojo y Feliz comparten una región de alta activación, consistente con la confusión residual en esa frontera."
+        }
+      ]
+    },
+    {
+      "id": "4clases",
+      "name": "4 emociones",
+      "subtitle": "Enojo / Feliz / Tranquilidad / Tristeza · actual",
+      "status": "actual",
+      "classes": [
+        "Enojo",
+        "Feliz",
+        "Tranquilidad",
+        "Tristeza"
+      ],
+      "class_counts": {
+        "Enojo": 13,
+        "Feliz": 11,
+        "Tranquilidad": 89,
+        "Tristeza": 33
+      },
+      "dataset_size": 146,
+      "chance_accuracy": 0.25,
+      "metric": "balanced_accuracy = LOO honesto (train=segmento, test=audio crudo 10 s)",
+      "metrics": {
+        "knn_k3": {
+          "label": "KNN (k=3)",
+          "accuracy": 0.7877,
+          "balanced_accuracy": 0.6966,
+          "recall_por_clase": {
+            "Enojo": 0.5385,
+            "Feliz": 0.6364,
+            "Tranquilidad": 0.8539,
+            "Tristeza": 0.7576
+          }
+        },
+        "knn_k5": {
+          "label": "KNN (k=5)",
+          "accuracy": 0.8219,
+          "balanced_accuracy": 0.7249,
+          "recall_por_clase": {
+            "Enojo": 0.5385,
+            "Feliz": 0.6364,
+            "Tranquilidad": 0.8764,
+            "Tristeza": 0.8485
+          }
+        },
+        "svm_lineal": {
+          "label": "SVM lineal",
+          "accuracy": 0.8836,
+          "balanced_accuracy": 0.8549,
+          "recall_por_clase": {
+            "Enojo": 0.8462,
+            "Feliz": 0.7273,
+            "Tranquilidad": 0.8764,
+            "Tristeza": 0.9697
+          }
+        },
+        "svm_rbf": {
+          "label": "SVM RBF",
+          "accuracy": 0.8973,
+          "balanced_accuracy": 0.8406,
+          "recall_por_clase": {
+            "Enojo": 0.8462,
+            "Feliz": 0.6364,
+            "Tranquilidad": 0.9101,
+            "Tristeza": 0.9697
+          }
+        },
+        "logreg": {
+          "label": "Reg. Logística",
+          "accuracy": 0.8767,
+          "balanced_accuracy": 0.8556,
+          "recall_por_clase": {
+            "Enojo": 0.7692,
+            "Feliz": 0.8182,
+            "Tranquilidad": 0.8652,
+            "Tristeza": 0.9697
+          }
+        },
+        "rf": {
+          "label": "Random Forest",
+          "accuracy": 0.8973,
+          "balanced_accuracy": 0.7783,
+          "recall_por_clase": {
+            "Enojo": 0.6923,
+            "Feliz": 0.5455,
+            "Tranquilidad": 0.9663,
+            "Tristeza": 0.9091
+          }
+        }
+      },
+      "best_model": "logreg",
+      "best_balanced_accuracy": 0.8556,
+      "cards": [
+        {
+          "key": "performance",
+          "title": "Desempeño honesto (test = audio crudo)",
+          "image": "/outputs/figuras/resultados_4clases.png",
+          "description": "Matriz de confusión y comparativa de modelos bajo LOO honesto (entrena=segmento localizado, test=audio crudo) sobre las 4 emociones. Modelos con class_weight='balanced'.",
+          "observation": "Las 4 clases alcanzan ~86% balanced accuracy sobre audio crudo no visto — viable donde antes (iteración 6, encoder fonético) colapsaba a 42%. Tranquilidad y Tristeza son sólidas; Enojo y Feliz son las más difíciles por pocos audios (13 y 11)."
+        },
+        {
+          "key": "separability",
+          "title": "Separabilidad en 2D",
+          "image": "/outputs/figuras/separabilidad_4clases.png",
+          "description": "Proyección PCA y t-SNE de los embeddings emocionales (audeering, 1024d) de los segmentos localizados de las 4 clases.",
+          "observation": "Tranquilidad y Tristeza ocupan la zona de baja activación (cercanas entre sí); Enojo y Feliz la de alta activación. Las dos fronteras difusas (calma↔tristeza y enojo↔feliz) explican la confusión residual."
         }
       ]
     }

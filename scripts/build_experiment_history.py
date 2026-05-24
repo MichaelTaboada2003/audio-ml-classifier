@@ -66,8 +66,8 @@ SCENARIOS = [
     {
         "id": "3clases",
         "name": "3 emociones",
-        "subtitle": "Enojo / Feliz / Tristeza · actual",
-        "status": "actual",
+        "subtitle": "Enojo / Feliz / Tristeza · archivado",
+        "status": "archivado",
         "classes": ["Enojo", "Feliz", "Tristeza"],
         "cards": [
             {
@@ -83,6 +83,29 @@ SCENARIOS = [
                 "image": "/outputs/figuras/separabilidad_3clases.png",
                 "description": "Proyección PCA y t-SNE de los embeddings emocionales (audeering, 1024d) de los segmentos localizados de las 3 clases.",
                 "observation": "Tristeza forma un cúmulo nítido; Enojo y Feliz comparten una región de alta activación, consistente con la confusión residual en esa frontera.",
+            },
+        ],
+    },
+    {
+        "id": "4clases",
+        "name": "4 emociones",
+        "subtitle": "Enojo / Feliz / Tranquilidad / Tristeza · actual",
+        "status": "actual",
+        "classes": ["Enojo", "Feliz", "Tranquilidad", "Tristeza"],
+        "cards": [
+            {
+                "key": "performance",
+                "title": "Desempeño honesto (test = audio crudo)",
+                "image": "/outputs/figuras/resultados_4clases.png",
+                "description": "Matriz de confusión y comparativa de modelos bajo LOO honesto (entrena=segmento localizado, test=audio crudo) sobre las 4 emociones. Modelos con class_weight='balanced'.",
+                "observation": "Las 4 clases alcanzan ~86% balanced accuracy sobre audio crudo no visto — viable donde antes (iteración 6, encoder fonético) colapsaba a 42%. Tranquilidad y Tristeza son sólidas; Enojo y Feliz son las más difíciles por pocos audios (13 y 11).",
+            },
+            {
+                "key": "separability",
+                "title": "Separabilidad en 2D",
+                "image": "/outputs/figuras/separabilidad_4clases.png",
+                "description": "Proyección PCA y t-SNE de los embeddings emocionales (audeering, 1024d) de los segmentos localizados de las 4 clases.",
+                "observation": "Tranquilidad y Tristeza ocupan la zona de baja activación (cercanas entre sí); Enojo y Feliz la de alta activación. Las dos fronteras difusas (calma↔tristeza y enojo↔feliz) explican la confusión residual.",
             },
         ],
     },
@@ -121,7 +144,7 @@ def build_history():
     Xseg, Xraw, y_all = cache["Xseg"], cache["Xraw"], cache["y"]
     disponibles = set(y_all.tolist())
 
-    payload = {"default_experiment_id": "3clases", "experiments": []}
+    payload = {"default_experiment_id": "4clases", "experiments": []}
     for scn in SCENARIOS:
         clases = sorted(scn["classes"])
         if not set(clases).issubset(disponibles):
