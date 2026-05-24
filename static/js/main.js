@@ -283,55 +283,119 @@ function renderROC(scenario, modelKey, currentThr, optimalThr) {
     if (!svg) return;
     const model = scenario.models[modelKey];
     if (!model || !model.roc) {
-        svg.innerHTML = '<text x="160" y="120" fill="#94a3b8" text-anchor="middle" font-size="12">Curva ROC no disponible</text>';
+        svg.innerHTML = '<text x="175" y="130" fill="#94a3b8" text-anchor="middle" font-size="12">Curva ROC no disponible</text>';
         return;
     }
-    const W = 320, H = 240, PAD_L = 40, PAD_B = 30, PAD_T = 12, PAD_R = 12;
+
+    const W = 355, H = 295;
+    const PAD_L = 54, PAD_B = 52, PAD_T = 22, PAD_R = 18;
     const innerW = W - PAD_L - PAD_R;
     const innerH = H - PAD_B - PAD_T;
-    const xs = model.roc.fpr.map(v => PAD_L + v * innerW);
-    const ys = model.roc.tpr.map(v => H - PAD_B - v * innerH);
-    const path = xs.map((x, i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
 
-    // AUC aproximada (trapecio)
+    const px = fpr => PAD_L + fpr * innerW;
+    const py = tpr => H - PAD_B - tpr * innerH;
+
+    // Curva + área bajo la curva
+    const path = model.roc.fpr.map((fpr, i) =>
+        `${i === 0 ? 'M' : 'L'}${px(fpr).toFixed(1)},${py(model.roc.tpr[i]).toFixed(1)}`
+    ).join(' ');
+    const areaPath = path + ` L${px(1).toFixed(1)},${py(0).toFixed(1)} L${px(0).toFixed(1)},${py(0).toFixed(1)} Z`;
+
+    // AUC (trapecio)
     let auc = 0;
     for (let i = 1; i < model.roc.fpr.length; i++) {
         auc += (model.roc.fpr[i] - model.roc.fpr[i - 1]) * (model.roc.tpr[i] + model.roc.tpr[i - 1]) / 2;
     }
     auc = Math.abs(auc);
 
-    // Punto actual y optimo
+    // Puntos operativos
     const cmA = computeBinaryCM(scenario, modelKey, currentThr);
     const cmO = computeBinaryCM(scenario, modelKey, optimalThr);
-    const ptA = cmA ? [PAD_L + cmA.fpr * innerW, H - PAD_B - cmA.tpr * innerH] : null;
-    const ptO = cmO ? [PAD_L + cmO.fpr * innerW, H - PAD_B - cmO.tpr * innerH] : null;
 
-    let gridLines = '';
-    for (let g = 0; g <= 4; g++) {
-        const x = PAD_L + (g / 4) * innerW;
-        const y = H - PAD_B - (g / 4) * innerH;
-        gridLines += `<line x1="${x}" y1="${PAD_T}" x2="${x}" y2="${H - PAD_B}" stroke="rgba(255,255,255,0.05)"/>`;
-        gridLines += `<line x1="${PAD_L}" y1="${y}" x2="${W - PAD_R}" y2="${y}" stroke="rgba(255,255,255,0.05)"/>`;
+    // Grid + ticks
+    const ticks = [0, 0.25, 0.5, 0.75, 1.0];
+    let gridLines = '', xTicks = '', yTicks = '';
+    for (const t of ticks) {
+        const x = px(t), y = py(t);
+        gridLines += `<line x1="${x}" y1="${PAD_T}" x2="${x}" y2="${H - PAD_B}" stroke="rgba(255,255,255,0.08)"/>`;
+        gridLines += `<line x1="${PAD_L}" y1="${y}" x2="${W - PAD_R}" y2="${y}" stroke="rgba(255,255,255,0.08)"/>`;
+        xTicks += `<line x1="${x}" y1="${H - PAD_B}" x2="${x}" y2="${H - PAD_B + 4}" stroke="#475569"/>`;
+        xTicks += `<text x="${x}" y="${H - PAD_B + 15}" fill="#64748b" font-size="9.5" text-anchor="middle">${t.toFixed(2)}</text>`;
+        yTicks += `<line x1="${PAD_L - 4}" y1="${y}" x2="${PAD_L}" y2="${y}" stroke="#475569"/>`;
+        yTicks += `<text x="${PAD_L - 7}" y="${y + 3.5}" fill="#64748b" font-size="9.5" text-anchor="end">${t.toFixed(2)}</text>`;
     }
 
+    // Etiqueta de punto con posición adaptativa para no salirse del área
+    function pointLabel(fpr, tpr, thr, color, isStar) {
+        const x = px(fpr), y = py(tpr);
+        // Decidir lado del label: si el punto está en la mitad derecha, etiquetar a la izquierda
+        const goLeft = fpr > 0.55;
+        const goDown = tpr > 0.85;
+        const lx = goLeft ? x - 9 : x + 9;
+        const ly = goDown ? y + 18 : y - 9;
+        const anchor = goLeft ? 'end' : 'start';
+        const marker = isStar
+            ? `<text x="${x}" y="${y + 5}" fill="${color}" font-size="18" text-anchor="middle" dominant-baseline="middle">★</text>`
+            : `<circle cx="${x}" cy="${y}" r="7" fill="${color}" stroke="#0f172a" stroke-width="2"/>`;
+        const label = `<text x="${lx}" y="${ly}" fill="${color}" font-size="9.5" text-anchor="${anchor}" font-weight="600">thr ${thr.toFixed(2)}</text>`;
+        return marker + label;
+    }
+
+    const pointsSVG = [
+        cmO ? pointLabel(cmO.fpr, cmO.tpr, optimalThr, '#fbbf24', true) : '',
+        cmA ? pointLabel(cmA.fpr, cmA.tpr, currentThr, '#22c55e', false) : '',
+    ].join('');
+
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     svg.innerHTML = `
-        ${gridLines}
-        <line x1="${PAD_L}" y1="${H - PAD_B}" x2="${W - PAD_R}" y2="${PAD_T}" stroke="rgba(255,255,255,0.18)" stroke-dasharray="3 3"/>
-        <path d="${path}" fill="none" stroke="url(#roc-grad)" stroke-width="2.4"/>
         <defs>
             <linearGradient id="roc-grad" x1="0" y1="1" x2="1" y2="0">
                 <stop offset="0" stop-color="#6366f1"/>
                 <stop offset="1" stop-color="#22d3ee"/>
             </linearGradient>
         </defs>
-        ${ptA ? `<circle cx="${ptA[0]}" cy="${ptA[1]}" r="6" fill="#22c55e" stroke="#0f172a" stroke-width="2"/>` : ''}
-        ${ptO ? `<text x="${ptO[0]}" y="${ptO[1] - 8}" fill="#fbbf24" text-anchor="middle" font-size="14">★</text>` : ''}
-        <text x="${PAD_L}" y="${H - 6}" fill="#94a3b8" font-size="10">0</text>
-        <text x="${W - PAD_R}" y="${H - 6}" fill="#94a3b8" font-size="10" text-anchor="end">FPR=1</text>
-        <text x="6" y="${H - PAD_B}" fill="#94a3b8" font-size="10">0</text>
-        <text x="6" y="${PAD_T + 8}" fill="#94a3b8" font-size="10">TPR=1</text>
-        <text x="${W - PAD_R - 4}" y="${PAD_T + 12}" fill="#cbd5e1" font-size="11" text-anchor="end">AUC=${auc.toFixed(2)}</text>
+        ${gridLines}
+        <!-- Diagonal: clasificador aleatorio -->
+        <line x1="${px(0)}" y1="${py(0)}" x2="${px(1)}" y2="${py(1)}"
+              stroke="rgba(255,255,255,0.15)" stroke-dasharray="5 4"/>
+        <text x="${px(0.72)}" y="${py(0.67)}" fill="rgba(255,255,255,0.2)"
+              font-size="9" text-anchor="start"
+              transform="rotate(-37,${px(0.72)},${py(0.67)})">Aleatorio</text>
+        <!-- Área y curva -->
+        <path d="${areaPath}" fill="url(#roc-grad)" opacity="0.1"/>
+        <path d="${path}" fill="none" stroke="url(#roc-grad)" stroke-width="2.5" stroke-linejoin="round"/>
+        <!-- Ejes -->
+        <line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${H - PAD_B}" stroke="#334155" stroke-width="1.2"/>
+        <line x1="${PAD_L}" y1="${H - PAD_B}" x2="${W - PAD_R}" y2="${H - PAD_B}" stroke="#334155" stroke-width="1.2"/>
+        ${xTicks}
+        ${yTicks}
+        <!-- Títulos de ejes -->
+        <text x="${PAD_L + innerW / 2}" y="${H - 4}" fill="#94a3b8" font-size="10.5" text-anchor="middle">Tasa de Falsos Positivos (FPR)</text>
+        <text x="11" y="${PAD_T + innerH / 2}" fill="#94a3b8" font-size="10.5" text-anchor="middle"
+              transform="rotate(-90,11,${PAD_T + innerH / 2})">Recall / TPR</text>
+        <!-- AUC -->
+        <text x="${W - PAD_R - 4}" y="${PAD_T + 14}" fill="#e2e8f0" font-size="12.5"
+              text-anchor="end" font-weight="700">AUC = ${auc.toFixed(3)}</text>
+        <!-- Puntos operativos (estrella debajo del círculo para que el verde quede visible) -->
+        ${pointsSVG}
     `;
+
+    // Actualizar leyenda con valores reales
+    const setLegendRow = (id, cm, thr) => {
+        const el = document.getElementById(id);
+        if (!el || !cm) return;
+        el.textContent = `thr ${thr.toFixed(2)}  ·  TPR ${(cm.tpr * 100).toFixed(0)}%  ·  FPR ${(cm.fpr * 100).toFixed(0)}%  ·  Prec ${(cm.precision * 100).toFixed(0)}%`;
+    };
+    setLegendRow('roc-current-values', cmA, currentThr);
+    setLegendRow('roc-optimal-values', cmO, optimalThr);
+
+    // Frase de interpretación en lenguaje natural
+    const reading = document.getElementById('roc-reading');
+    if (reading && cmA) {
+        const det  = Math.round(cmA.tpr * 100);
+        const falso = Math.round(cmA.fpr * 100);
+        reading.textContent = `Con umbral ${currentThr.toFixed(2)}: el modelo detecta el ${det}% de los casos de ${decisionState.targetClass} (TPR) y genera alertas falsas en el ${falso}% de los casos que no lo son (FPR).`;
+    }
 }
 
 // ============== Render: VPN y desglose ==============

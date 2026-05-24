@@ -419,12 +419,21 @@
 
                             <!-- Curva ROC con punto de operacion -->
                             <div class="sim-output-card">
-                                <h3>Curva ROC + punto óptimo</h3>
-                                <p class="sim-output-subtitle">Verde = umbral actual · Estrella = umbral óptimo en costo.</p>
-                                <svg id="roc-curve" viewBox="0 0 320 240" class="roc-svg"></svg>
+                                <h3>Curva ROC</h3>
+                                <p class="sim-output-subtitle">Cada punto de la curva es un umbral diferente. Mover el slider desplaza el punto verde por la curva.</p>
+                                <svg id="roc-curve" viewBox="0 0 355 295" class="roc-svg"></svg>
                                 <div class="roc-legend">
-                                    <span><i class="dot dot-active"></i> Operación actual</span>
-                                    <span><i class="dot dot-optimal"></i> Óptimo en costo</span>
+                                    <div class="roc-legend-row">
+                                        <i class="dot dot-active"></i>
+                                        <span class="roc-legend-label">Umbral actual</span>
+                                        <code id="roc-current-values" class="roc-values">—</code>
+                                    </div>
+                                    <div class="roc-legend-row">
+                                        <i class="dot dot-optimal"></i>
+                                        <span class="roc-legend-label">Óptimo en VPN</span>
+                                        <code id="roc-optimal-values" class="roc-values">—</code>
+                                    </div>
+                                    <p id="roc-reading" class="roc-reading"></p>
                                 </div>
                             </div>
 
