@@ -3,52 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EmotiSpeech Classifier | Reconocimiento Acústico de Emociones</title>
-    <!-- Google Fonts -->
+    <title>EmotiSpeech · Estudio sobre Clasificación Acústica de Emociones</title>
+    <!-- Google Fonts: Fraunces (display serif), Inter Tight (sans), JetBrains Mono (datos) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome (legacy — algunos botones aún lo usan internamente) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="glow-bg"></div>
     <div class="container">
-        <!-- Header -->
+        <!-- Masthead — header tipo revista científica -->
         <header class="app-header">
             <div class="logo">
                 <i class="fa-solid fa-microphone-lines logo-icon"></i>
                 <div class="brand">
                     <h1>EmotiSpeech</h1>
-                    <span class="subtitle">Speech Emotion Classification</span>
+                    <span class="subtitle">A study on the acoustic morphology of voice</span>
                 </div>
+            </div>
+            <div class="masthead-edition">
+                Vol. IV · No. 016<br>
+                <strong>Mayo MMXXVI</strong>
             </div>
             <div class="model-badge">
                 <span class="status-dot"></span>
                 <span>
-                    audeering + {{ best_model_label }}
+                    audeering · {{ best_model_label }}
                     {% if best_bal_acc is not none %}
-                    ({{ '%.1f'|format(best_bal_acc * 100) }}% BalAcc)
+                    · {{ '%.1f'|format(best_bal_acc * 100) }}% BalAcc
                     {% endif %}
                 </span>
             </div>
         </header>
 
-        <!-- Navigation Tabs -->
+        <!-- Capítulos del estudio -->
         <nav class="nav-tabs">
             <button class="tab-btn active" data-tab="live-predictor">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> Clasificador en Vivo
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                Clasificador<br>en vivo
             </button>
             <button class="tab-btn" data-tab="dataset-explorer">
-                <i class="fa-solid fa-database"></i> Explorador del Dataset
+                <i class="fa-solid fa-database"></i>
+                Explorador<br>del corpus
             </button>
             <button class="tab-btn" data-tab="decisions">
-                <i class="fa-solid fa-scale-balanced"></i> Decisiones
+                <i class="fa-solid fa-scale-balanced"></i>
+                Análisis<br>de decisiones
             </button>
             <button class="tab-btn" data-tab="analytics">
-                <i class="fa-solid fa-chart-line"></i> Análisis y Métricas
+                <i class="fa-solid fa-chart-line"></i>
+                Métricas<br>y figuras
             </button>
         </nav>
 
@@ -613,6 +620,19 @@
                 </div>
             </section>
         </main>
+
+        <!-- Footer marginalia -->
+        <footer class="app-footer">
+            <div>
+                <p>※ Estudio académico<br>Universidad &middot; Machine Learning</p>
+            </div>
+            <div class="app-footer-center">
+                — Hecho a mano con tinta y código —
+            </div>
+            <div class="app-footer-right">
+                <p>wav2vec2-large · audeering<br>Embeddings 1024d &middot; 16 kHz mono</p>
+            </div>
+        </footer>
     </div>
 
     <!-- Toast notifications container -->

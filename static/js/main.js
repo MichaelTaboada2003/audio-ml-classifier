@@ -283,7 +283,7 @@ function renderROC(scenario, modelKey, currentThr, optimalThr) {
     if (!svg) return;
     const model = scenario.models[modelKey];
     if (!model || !model.roc) {
-        svg.innerHTML = '<text x="160" y="120" fill="#94a3b8" text-anchor="middle" font-size="12">Curva ROC no disponible</text>';
+        svg.innerHTML = '<text x="160" y="120" fill="#5C5246" text-anchor="middle" font-size="12">Curva ROC no disponible</text>';
         return;
     }
     const W = 320, H = 240, PAD_L = 40, PAD_B = 30, PAD_T = 12, PAD_R = 12;
@@ -310,27 +310,21 @@ function renderROC(scenario, modelKey, currentThr, optimalThr) {
     for (let g = 0; g <= 4; g++) {
         const x = PAD_L + (g / 4) * innerW;
         const y = H - PAD_B - (g / 4) * innerH;
-        gridLines += `<line x1="${x}" y1="${PAD_T}" x2="${x}" y2="${H - PAD_B}" stroke="rgba(255,255,255,0.05)"/>`;
-        gridLines += `<line x1="${PAD_L}" y1="${y}" x2="${W - PAD_R}" y2="${y}" stroke="rgba(255,255,255,0.05)"/>`;
+        gridLines += `<line x1="${x}" y1="${PAD_T}" x2="${x}" y2="${H - PAD_B}" stroke="rgba(14,11,7,0.12)"/>`;
+        gridLines += `<line x1="${PAD_L}" y1="${y}" x2="${W - PAD_R}" y2="${y}" stroke="rgba(14,11,7,0.12)"/>`;
     }
 
     svg.innerHTML = `
         ${gridLines}
-        <line x1="${PAD_L}" y1="${H - PAD_B}" x2="${W - PAD_R}" y2="${PAD_T}" stroke="rgba(255,255,255,0.18)" stroke-dasharray="3 3"/>
-        <path d="${path}" fill="none" stroke="url(#roc-grad)" stroke-width="2.4"/>
-        <defs>
-            <linearGradient id="roc-grad" x1="0" y1="1" x2="1" y2="0">
-                <stop offset="0" stop-color="#6366f1"/>
-                <stop offset="1" stop-color="#22d3ee"/>
-            </linearGradient>
-        </defs>
-        ${ptA ? `<circle cx="${ptA[0]}" cy="${ptA[1]}" r="6" fill="#22c55e" stroke="#0f172a" stroke-width="2"/>` : ''}
-        ${ptO ? `<text x="${ptO[0]}" y="${ptO[1] - 8}" fill="#fbbf24" text-anchor="middle" font-size="14">★</text>` : ''}
-        <text x="${PAD_L}" y="${H - 6}" fill="#94a3b8" font-size="10">0</text>
-        <text x="${W - PAD_R}" y="${H - 6}" fill="#94a3b8" font-size="10" text-anchor="end">FPR=1</text>
-        <text x="6" y="${H - PAD_B}" fill="#94a3b8" font-size="10">0</text>
-        <text x="6" y="${PAD_T + 8}" fill="#94a3b8" font-size="10">TPR=1</text>
-        <text x="${W - PAD_R - 4}" y="${PAD_T + 12}" fill="#cbd5e1" font-size="11" text-anchor="end">AUC=${auc.toFixed(2)}</text>
+        <line x1="${PAD_L}" y1="${H - PAD_B}" x2="${W - PAD_R}" y2="${PAD_T}" stroke="rgba(14,11,7,0.35)" stroke-dasharray="3 3"/>
+        <path d="${path}" fill="none" stroke="#D63D28" stroke-width="2.4"/>
+        ${ptA ? `<circle cx="${ptA[0]}" cy="${ptA[1]}" r="6" fill="#3E5B3A" stroke="#F4EFE6" stroke-width="2"/>` : ''}
+        ${ptO ? `<text x="${ptO[0]}" y="${ptO[1] - 8}" fill="#CC9224" text-anchor="middle" font-size="14" font-weight="700">★</text>` : ''}
+        <text x="${PAD_L}" y="${H - 6}" fill="#5C5246" font-size="10" font-family="JetBrains Mono, monospace">0</text>
+        <text x="${W - PAD_R}" y="${H - 6}" fill="#5C5246" font-size="10" font-family="JetBrains Mono, monospace" text-anchor="end">FPR=1</text>
+        <text x="6" y="${H - PAD_B}" fill="#5C5246" font-size="10" font-family="JetBrains Mono, monospace">0</text>
+        <text x="6" y="${PAD_T + 8}" fill="#5C5246" font-size="10" font-family="JetBrains Mono, monospace">TPR=1</text>
+        <text x="${W - PAD_R - 4}" y="${PAD_T + 12}" fill="#0E0B07" font-size="11" font-family="JetBrains Mono, monospace" font-weight="600" text-anchor="end">AUC=${auc.toFixed(2)}</text>
     `;
 }
 
@@ -342,7 +336,7 @@ function renderVPN(cm, value) {
     if (!el || !value) return;
 
     el.textContent = fmtUSD(value.net);
-    el.style.color = value.net >= 0 ? '#22c55e' : '#ef4444';
+    el.style.color = value.net >= 0 ? '#9CC196' : '#ECB8AD';
 
     if (baseline) {
         baseline.textContent = value.net >= 0
@@ -549,21 +543,21 @@ function renderMonteCarlo() {
         const h = (c / maxCount) * innerH;
         const y = H - PAD - h;
         const cx = min + (i + 0.5) * binSize;
-        const fill = cx >= 0 ? '#22c55e' : '#ef4444';
-        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(innerW / bins - 1).toFixed(1)}" height="${h.toFixed(1)}" fill="${fill}" fill-opacity="0.6"/>`;
+        const fill = cx >= 0 ? '#3E5B3A' : '#A82D1C';
+        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(innerW / bins - 1).toFixed(1)}" height="${h.toFixed(1)}" fill="${fill}" fill-opacity="0.7"/>`;
     }).join('');
 
     let zeroLine = '';
     if (xZero >= PAD && xZero <= PAD + innerW) {
-        zeroLine = `<line x1="${xZero}" y1="${PAD}" x2="${xZero}" y2="${H - PAD}" stroke="#facc15" stroke-dasharray="4 3" stroke-width="1.5"/>
-                    <text x="${xZero}" y="${PAD - 4}" fill="#facc15" font-size="10" text-anchor="middle">VPN=0</text>`;
+        zeroLine = `<line x1="${xZero}" y1="${PAD}" x2="${xZero}" y2="${H - PAD}" stroke="#0E0B07" stroke-dasharray="4 3" stroke-width="1.5"/>
+                    <text x="${xZero}" y="${PAD - 4}" fill="#0E0B07" font-family="JetBrains Mono, monospace" font-weight="600" font-size="10" text-anchor="middle">VPN=0</text>`;
     }
 
     svg.innerHTML = `
         ${bars}
         ${zeroLine}
-        <text x="${PAD}" y="${H - 6}" fill="#94a3b8" font-size="10">${fmtUSD(min)}</text>
-        <text x="${W - PAD}" y="${H - 6}" fill="#94a3b8" font-size="10" text-anchor="end">${fmtUSD(max)}</text>
+        <text x="${PAD}" y="${H - 6}" fill="#5C5246" font-family="JetBrains Mono, monospace" font-size="10">${fmtUSD(min)}</text>
+        <text x="${W - PAD}" y="${H - 6}" fill="#5C5246" font-family="JetBrains Mono, monospace" font-size="10" text-anchor="end">${fmtUSD(max)}</text>
     `;
 
     if (stats) {
@@ -891,26 +885,26 @@ function getClassStyle(name) {
     return classStyles[name] || {
         slug: slugifyEmotion(name),
         label: name,
-        accent: '#a855f7',
-        accent_dark: '#7e22ce'
+        accent: '#D63D28',
+        accent_dark: '#A82D1C'
     };
 }
 
 function getRingVisual(name) {
     const slug = getClassStyle(name).slug;
     if (slug === 'enojo') {
-        return { stroke: 'url(#gradient-enojo)', glow: 'drop-shadow(0 0 10px rgba(239, 68, 68, 0.5))' };
+        return { stroke: '#D63D28', glow: 'none' };
     }
     if (slug === 'tristeza') {
-        return { stroke: 'url(#gradient-tristeza)', glow: 'drop-shadow(0 0 10px rgba(6, 182, 212, 0.5))' };
+        return { stroke: '#1F3D6E', glow: 'none' };
     }
     if (slug === 'feliz') {
-        return { stroke: 'url(#gradient-feliz)', glow: 'drop-shadow(0 0 10px rgba(245, 158, 11, 0.45))' };
+        return { stroke: '#CC9224', glow: 'none' };
     }
     if (slug === 'tranquilidad') {
-        return { stroke: 'url(#gradient-tranquilidad)', glow: 'drop-shadow(0 0 10px rgba(34, 197, 94, 0.45))' };
+        return { stroke: '#3E5B3A', glow: 'none' };
     }
-    return { stroke: 'url(#gradient-default)', glow: 'none' };
+    return { stroke: '#0E0B07', glow: 'none' };
 }
 
 function renderProbabilityBars(probabilities) {
@@ -1315,7 +1309,7 @@ function loadDataset() {
         .catch(err => {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="6" style="text-align: center; color: #ef4444; padding: 2rem;">
+                    <td colspan="6" style="text-align: center; color: #A82D1C; padding: 2rem;">
                         <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
                         <p>Error al cargar el dataset: ${err.message}</p>
                     </td>
