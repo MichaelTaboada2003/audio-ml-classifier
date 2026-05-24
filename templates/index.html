@@ -28,7 +28,7 @@
             <div class="model-badge">
                 <span class="status-dot"></span>
                 <span>
-                    wav2vec2 + {{ best_model_label }}
+                    audeering + {{ best_model_label }}
                     {% if best_bal_acc is not none %}
                     ({{ '%.1f'|format(best_bal_acc * 100) }}% BalAcc)
                     {% endif %}
@@ -208,7 +208,7 @@
                         <!-- Loader overlay -->
                         <div class="loader-overlay" id="loader" style="display: none;">
                             <div class="spinner"></div>
-                            <p>Procesando audio y extrayendo embeddings de wav2vec2...</p>
+                            <p>Procesando audio y extrayendo embeddings emocionales...</p>
                         </div>
                     </div>
                 </div>
@@ -583,59 +583,31 @@
                 </div>
 
                 <div class="analytics-grid">
-                    <!-- Figure 1: Confusion matrix + LOOCV comparison -->
+                    <!-- Figura 1: Matriz de confusión + comparativa (evaluación honesta) -->
                     <div class="card glass-card img-card">
                         <div class="card-header">
-                            <h2 id="analytics-card-1-title">1. Desempeño y Matriz de Confusión (LOOCV)</h2>
-                            <p id="analytics-card-1-description">Matriz de confusión del mejor modelo y comparativa Balanced Accuracy por clasificador, evaluados con Leave-One-Audio-Out.</p>
+                            <h2 id="analytics-card-1-title">1. Desempeño y matriz de confusión</h2>
+                            <p id="analytics-card-1-description">Matriz de confusión del mejor modelo y comparativa de Balanced Accuracy por clasificador, con evaluación honesta: se entrena sobre el segmento localizado y se prueba sobre el audio crudo.</p>
                         </div>
                         <div class="figure-wrapper">
-                            <img src="/outputs/figuras/resultados_v2.png" alt="Matriz de Confusión" class="figura-img" id="analytics-card-1-image">
+                            <img src="/outputs/figuras/resultados_4clases.png" alt="Matriz de confusión" class="figura-img" id="analytics-card-1-image">
                         </div>
                         <div class="card-footer">
-                            <p id="analytics-card-1-observation"><strong>Observación:</strong> Esta cifra mide generalización a audios nuevos del mismo recolector. Para audios menos expresivos, ver la tarjeta de holdout.</p>
+                            <p id="analytics-card-1-observation"><strong>Observación:</strong> La cifra refleja generalización a audio no visto durante el entrenamiento.</p>
                         </div>
                     </div>
 
-                    <!-- Figure 2: Holdout generalization -->
+                    <!-- Figura 2: Separabilidad -->
                     <div class="card glass-card img-card">
                         <div class="card-header">
-                            <h2 id="analytics-card-2-title">2. Generalización a holdout</h2>
-                            <p id="analytics-card-2-description">Recall por modelo y clase sobre audios que el modelo desplegado NUNCA vio en training.</p>
+                            <h2 id="analytics-card-2-title">2. Separabilidad en 2D (PCA vs. t-SNE)</h2>
+                            <p id="analytics-card-2-description">Proyección bidimensional de los embeddings emocionales de 1024 dimensiones (modelo audeering).</p>
                         </div>
                         <div class="figure-wrapper">
-                            <img src="/outputs/figuras/holdout_por_modelo.png" alt="Generalización a holdout" class="figura-img" id="analytics-card-2-image">
+                            <img src="/outputs/figuras/separabilidad_4clases.png" alt="Separabilidad PCA y t-SNE" class="figura-img" id="analytics-card-2-image">
                         </div>
                         <div class="card-footer">
-                            <p id="analytics-card-2-observation"><strong>Observación:</strong> Métrica honestamente out-of-sample. Caída vs LOOCV refleja distribution shift entre training (audios top-score) y holdout (audios mid-score).</p>
-                        </div>
-                    </div>
-
-                    <!-- Figure 3: Separability -->
-                    <div class="card glass-card img-card">
-                        <div class="card-header">
-                            <h2 id="analytics-card-3-title">3. Separabilidad en 2D (PCA vs. t-SNE)</h2>
-                            <p id="analytics-card-3-description">Proyección bidimensional de los embeddings de 768 dimensiones extraídos de wav2vec2.</p>
-                        </div>
-                        <div class="figure-wrapper">
-                            <img src="/outputs/figuras/separabilidad_v2.png" alt="Separabilidad PCA y t-SNE" class="figura-img" id="analytics-card-3-image">
-                        </div>
-                        <div class="card-footer">
-                            <p id="analytics-card-3-observation"><strong>Observación:</strong> Esta proyección muestra si las emociones activas forman grupos diferenciables en el espacio de embeddings.</p>
-                        </div>
-                    </div>
-
-                    <!-- Figure 4: Filtering -->
-                    <div class="card glass-card img-card">
-                        <div class="card-header">
-                            <h2 id="analytics-card-4-title">4. Distribución de Calidad Acústica</h2>
-                            <p id="analytics-card-4-description">Histograma de scores del dataset completo que guió el filtrado inicial.</p>
-                        </div>
-                        <div class="figure-wrapper">
-                            <img src="/outputs/figuras/reporte_filtrado_v2.png" alt="Reporte de Filtrado" class="figura-img" id="analytics-card-4-image">
-                        </div>
-                        <div class="card-footer">
-                            <p id="analytics-card-4-observation"><strong>Observación:</strong> Esta vista ayuda a detectar qué clases siguen siendo cuello de botella por calidad de actuación o consistencia acústica.</p>
+                            <p id="analytics-card-2-observation"><strong>Observación:</strong> Muestra si las emociones forman grupos diferenciables en el espacio de embeddings.</p>
                         </div>
                     </div>
                 </div>
