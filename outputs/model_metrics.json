@@ -6,15 +6,15 @@
     "Tristeza"
   ],
   "dataset_source": "data/procesado (segmentos localizados de 10 s)",
-  "metric": "balanced_accuracy = holdout honesto (train=segmento, test=audio crudo 10 s, LOOCV)",
-  "class_counts": {
+  "metric": "balanced_accuracy = LOO honesto (train=segmento, test=audio crudo 10 s) estimado sobre todos los segmentos",
+  "class_counts_train": {
     "Enojo": 13,
     "Feliz": 11,
-    "Tranquilidad": 89,
-    "Tristeza": 33
+    "Tranquilidad": 71,
+    "Tristeza": 21
   },
-  "samples_per_class": 11,
-  "dataset_size": 146,
+  "dataset_size_train": 116,
+  "holdout_dashboard": 30,
   "chance_accuracy": 0.25,
   "models": {
     "svm_lineal": {

@@ -28,3 +28,12 @@ MIN_SCORE = 0.0
 # Arrancamos con 2 clases (Enojo vs Tristeza) como baseline limpio. Chance=50%.
 # Despues escalamos a 3 (+ Feliz) y a 4 (+ Tranquilidad).
 ACTIVE_CLASSES = ["Enojo", "Feliz", "Tranquilidad", "Tristeza"]
+
+# Holdout para el "Explorador del Dataset" del front: audios reservados que NO
+# entran al entrenamiento del modelo desplegado (.joblib), para que predecir
+# sobre ellos en el dashboard sea genuinamente out-of-sample.
+# Solo clases con datos de sobra (Enojo/Feliz son escasas -> 0; usar el microfono).
+# Las metricas honestas de Analisis (LOO/leave-one-collector-out) se siguen
+# estimando sobre TODOS los segmentos; esto solo afecta al .joblib y al explorador.
+DASHBOARD_HOLDOUT = {"Tranquilidad": 18, "Tristeza": 12}
+DASHBOARD_HOLDOUT_SEED = 42

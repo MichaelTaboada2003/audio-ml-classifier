@@ -40,7 +40,7 @@ from sklearn.model_selection import LeaveOneOut
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
-from config import ACTIVE_CLASSES
+from config import ACTIVE_CLASSES, DASHBOARD_HOLDOUT, DASHBOARD_HOLDOUT_SEED
 from emotion_encoder import load_encoder
 from exportar_modelos import MODEL_SPECS, extraer_embedding
 
@@ -50,6 +50,7 @@ CACHE = ROOT / "outputs" / "proc_embeddings.npz"
 MODEL_DIR = ROOT / "outputs" / "modelos"
 METRICS_PATH = ROOT / "outputs" / "model_metrics.json"
 V2_CACHE = ROOT / "outputs" / "embeddings_v2.npz"   # cache que lee app.py (TRAINING_FILES)
+HOLDOUT_JSON = ROOT / "outputs" / "holdout_dashboard.json"  # audios reservados para el explorador
 EXTS = {".ogg", ".mp3", ".mp4", ".mpeg", ".wav", ".flac", ".m4a"}
 
 
@@ -154,34 +155,41 @@ def leave_one_collector_out(builder, Xseg, Xraw, y, recs, collectors, clases):
     return bal, dict(zip(clases, rec))
 
 
-def guardar_artefactos(Xseg, y, files_rel, clases, resultados):
-    """Serializa los 6 modelos (entrenados con TODOS los segmentos de las clases
-    activas), escribe model_metrics.json con la metrica HONESTA como headline, y
-    actualiza embeddings_v2.npz para que la app y el explorador holdout funcionen."""
+def guardar_artefactos(Xseg, y, files_rel, clases, resultados, holdout_mask=None):
+    """Serializa los 6 modelos, escribe model_metrics.json y actualiza
+    embeddings_v2.npz. El modelo desplegado se entrena SIN el holdout del
+    dashboard (DASHBOARD_HOLDOUT), para que el explorador pueda testear sobre
+    audios genuinamente no vistos. Las metricas de model_metrics son la estimacion
+    LOO honesta sobre TODOS los segmentos (CV); el holdout es un test set aparte."""
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    if holdout_mask is None:
+        holdout_mask = np.zeros(len(y), dtype=bool)
+    train = ~holdout_mask
+    Xtr, ytr, files_tr = Xseg[train], y[train], files_rel[train]
+
     modelos = {}
     for key, spec in MODEL_SPECS.items():
         pipe = spec["builder"]()
-        pipe.fit(Xseg, y)
+        pipe.fit(Xtr, ytr)                              # entrena SIN el holdout del dashboard
         joblib.dump(pipe, MODEL_DIR / f"{key}.joblib")
-        r = resultados[key]
+        r = resultados[key]                             # metricas = LOO honesto sobre TODOS (estimacion CV)
         modelos[key] = {
             "label": spec["label"],
             "description": spec["description"],
-            "accuracy": round(r["acc_h"], 4),               # honesta (test = audio crudo)
+            "accuracy": round(r["acc_h"], 4),
             "balanced_accuracy": round(r["bal_h"], 4),       # honesta = headline
-            "balanced_accuracy_loocv_seg": round(r["bal_s"], 4),  # LOOCV sobre segmentos (optimista)
+            "balanced_accuracy_loocv_seg": round(r["bal_s"], 4),
             "recall_por_clase": {c: round(v, 4) for c, v in r["rec_h"].items()},
         }
     best = max(modelos, key=lambda k: modelos[k]["balanced_accuracy"])
-    counts = {c: int(np.sum(y == c)) for c in clases}
+    counts_train = {c: int(np.sum(ytr == c)) for c in clases}
     metrics = {
         "active_classes": list(clases),
         "dataset_source": "data/procesado (segmentos localizados de 10 s)",
-        "metric": "balanced_accuracy = holdout honesto (train=segmento, test=audio crudo 10 s, LOOCV)",
-        "class_counts": counts,
-        "samples_per_class": int(min(counts.values())),
-        "dataset_size": int(len(y)),
+        "metric": "balanced_accuracy = LOO honesto (train=segmento, test=audio crudo 10 s) estimado sobre todos los segmentos",
+        "class_counts_train": counts_train,
+        "dataset_size_train": int(len(ytr)),
+        "holdout_dashboard": int(holdout_mask.sum()),
         "chance_accuracy": round(1.0 / len(clases), 4),
         "models": modelos,
         "best_model": best,
@@ -190,15 +198,26 @@ def guardar_artefactos(Xseg, y, files_rel, clases, resultados):
         json.dump(metrics, f, indent=2, ensure_ascii=False)
         f.write("\n")
 
-    # Cache que lee app.py: nombres de SEGMENTO (los originales no coinciden -> el
-    # explorador muestra todos los audios crudos como holdout testeable).
-    files_base = np.array([rel.split("/", 1)[1] for rel in files_rel])
+    # Cache que lee app.py: segmentos de TRAINING (sin holdout).
+    files_base = np.array([rel.split("/", 1)[1] for rel in files_tr])
     rec = np.array([fb[:2] for fb in files_base])
-    np.savez(V2_CACHE, X=Xseg, y=y, rec=rec, files=files_base)
+    np.savez(V2_CACHE, X=Xtr, y=ytr, rec=rec, files=files_base)
 
-    print(f"\nGuardado: {len(MODEL_SPECS)} modelos en {MODEL_DIR.relative_to(ROOT)}/")
+    # holdout_dashboard.json: audios CRUDOS reservados que sirve el explorador.
+    holdout_originales = {}
+    for i in np.where(holdout_mask)[0]:
+        clase = str(y[i])
+        stem = files_rel[i].split("/", 1)[1].rsplit("_top", 1)[0]
+        orig = original_de(stem, clase)
+        if orig is not None:
+            holdout_originales.setdefault(clase, []).append(orig.name)
+    with open(HOLDOUT_JSON, "w", encoding="utf-8") as f:
+        json.dump(holdout_originales, f, indent=2, ensure_ascii=False)
+
+    print(f"\nGuardado: {len(MODEL_SPECS)} modelos en {MODEL_DIR.relative_to(ROOT)}/  (entrenados con {len(ytr)} segmentos)")
     print(f"          {METRICS_PATH.relative_to(ROOT)}  (best={best}, bal_acc honesta={modelos[best]['balanced_accuracy']})")
-    print(f"          {V2_CACHE.relative_to(ROOT)}  ({len(y)} embeddings de segmento)")
+    print(f"          {V2_CACHE.relative_to(ROOT)}  ({len(ytr)} segmentos de training)")
+    print(f"          {HOLDOUT_JSON.relative_to(ROOT)}  (holdout explorador: {dict((k, len(v)) for k, v in holdout_originales.items())})")
 
 
 def main():
@@ -266,7 +285,22 @@ def main():
         print("─" * 92)
 
     if args.guardar:
-        guardar_artefactos(Xseg, y, files, clases, resultados)
+        # Holdout del dashboard: reserva audios de las clases abundantes para que el
+        # explorador del front sea genuinamente out-of-sample (no entran al .joblib).
+        import random
+        holdout_mask = np.zeros(len(y), dtype=bool)
+        rng = random.Random(DASHBOARD_HOLDOUT_SEED)
+        for clase, k in DASHBOARD_HOLDOUT.items():
+            if clase not in clases:
+                continue
+            idxs = [i for i in range(len(y)) if y[i] == clase]
+            rng.shuffle(idxs)
+            for i in idxs[:k]:
+                holdout_mask[i] = True
+        if holdout_mask.any():
+            print(f"\nHoldout dashboard: {int(holdout_mask.sum())} audios reservados "
+                  f"(no entran al modelo activo): {DASHBOARD_HOLDOUT}")
+        guardar_artefactos(Xseg, y, files, clases, resultados, holdout_mask)
 
 
 if __name__ == "__main__":

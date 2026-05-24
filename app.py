@@ -21,6 +21,7 @@ REPORTE = os.path.join("outputs", "reporte_filtrado_v2.csv")
 MODEL_METRICS_PATH = os.path.join("outputs", "model_metrics.json")
 EXPERIMENT_HISTORY_PATH = os.path.join("outputs", "experiment_history.json")
 DECISIONS_DATA_PATH = os.path.join("outputs", "decisions_data.json")
+HOLDOUT_DASHBOARD_PATH = os.path.join("outputs", "holdout_dashboard.json")
 
 # Audios usados en training (se cargan desde el cache al arrancar)
 TRAINING_FILES = set()
@@ -131,9 +132,16 @@ def index():
     best_model_label = MODEL_MAPPING.get(best_model_key, best_model_key)
     best_bal_acc = model_metrics.get(best_model_key, {}).get("balanced_accuracy")
 
+    # Clases con holdout en el explorador (las que tienen audios genuinamente no vistos)
+    holdout_classes = []
+    if os.path.exists(HOLDOUT_DASHBOARD_PATH):
+        with open(HOLDOUT_DASHBOARD_PATH, encoding="utf-8") as f:
+            holdout_classes = list(json.load(f).keys())
+
     return render_template(
         "index.html",
         active_classes=ACTIVE_CLASSES,
+        holdout_classes=holdout_classes,
         class_styles={clase: get_class_style(clase) for clase in ACTIVE_CLASSES},
         top_n_dataset=TOP_N_DATASET,
         model_mapping=MODEL_MAPPING,
@@ -164,51 +172,43 @@ def serve_figuras(filename):
 
 @app.route("/api/dataset", methods=["GET"])
 def get_dataset():
-    """Sirve audios HOLDOUT: los que NO entraron al training del modelo desplegado.
+    """Sirve audios HOLDOUT del dashboard: grabaciones reservadas que NO entraron
+    al training del modelo desplegado (definidas en outputs/holdout_dashboard.json).
+    Predecir cualquiera de estos es una evaluación genuinamente out-of-sample.
 
-    Excluye explícitamente los archivos en TRAINING_FILES (cargados desde el cache).
-    Predecir cualquiera de estos audios es una evaluación honesta out-of-sample.
+    Solo incluye clases con holdout (Tranquilidad / Tristeza, las abundantes). Para
+    Enojo / Feliz (escasas, todas en training) se usa el Clasificador en Vivo (mic).
     """
-    if not os.path.exists(REPORTE):
-        return jsonify({"error": "Report CSV not found"}), 404
-
-    df_rep = pd.read_csv(REPORTE)
-    df_rep = df_rep[~df_rep["archivo"].isin(TRAINING_FILES)]  # holdout puro
-
-    frames = []
-    for clase in ACTIVE_CLASSES:
-        score_col = SCORE_COLUMNS.get(clase)
-        if not score_col or score_col not in df_rep.columns:
-            continue
-        frames.append(
-            df_rep[df_rep["clase_original"] == clase]
-            .sort_values(score_col, ascending=False)
-            .head(TOP_N_DATASET)
-        )
-
-    if not frames:
+    if not os.path.exists(HOLDOUT_DASHBOARD_PATH):
         return jsonify([])
 
-    df_balanced = pd.concat(frames, ignore_index=True)
+    with open(HOLDOUT_DASHBOARD_PATH, encoding="utf-8") as f:
+        holdout = json.load(f)  # {clase: [archivo_original, ...]}
+
+    # Scores acústicos (opcional) para ordenar/mostrar
+    scores_lookup = {}
+    if os.path.exists(REPORTE):
+        df_rep = pd.read_csv(REPORTE)
+        for _, row in df_rep.iterrows():
+            scores_lookup[(row["clase_original"], row["archivo"])] = row
 
     records = []
-    for _, row in df_balanced.iterrows():
-        archivo = row["archivo"]
-        clase = row["clase_original"]
+    for clase, archivos in holdout.items():
         score_col = SCORE_COLUMNS.get(clase)
-        score = row[score_col] if score_col in row else None
-        recolector = archivo[:2]
-        style = get_class_style(clase)
+        for archivo in archivos:
+            row = scores_lookup.get((clase, archivo))
+            score = float(row[score_col]) if (row is not None and score_col in row) else 0.0
+            style = get_class_style(clase)
+            records.append({
+                "archivo": archivo,
+                "clase": clase,
+                "slug": style["slug"],
+                "recolector": archivo[:2],
+                "score": score,
+                "url": f"/data/audio/{clase}/{archivo}",
+            })
 
-        records.append({
-            "archivo": archivo,
-            "clase": clase,
-            "slug": style["slug"],
-            "recolector": recolector,
-            "score": float(score) if score is not None else 0.0,
-            "url": f"/data/audio/{clase}/{archivo}"
-        })
-
+    records.sort(key=lambda r: (r["clase"], -r["score"]))
     return jsonify(records)
 
 

@@ -1,0 +1,36 @@
+{
+  "Tranquilidad": [
+    "ED_02_TRA_S.ogg",
+    "MT_02_TRA.ogg",
+    "MT_05_TRA.ogg",
+    "MT_08_ENO.ogg",
+    "MT_11.mp3_TRI.mpeg",
+    "SG_05_ENO.ogg",
+    "VA_02_ENO.ogg",
+    "VA_02_TRI.ogg",
+    "VA_04_ENO.ogg",
+    "VA_06_ENO.ogg",
+    "VA_08_TRI.ogg",
+    "VA_10_ENO.ogg",
+    "VA_10_TRA.ogg",
+    "VA_12_ENO.ogg",
+    "VA_14_TRI.ogg",
+    "VA_15_FE.mp4",
+    "VZ_03_ENO.ogg",
+    "VZ_07_ENO.ogg"
+  ],
+  "Tristeza": [
+    "ED_01_TRI.ogg",
+    "ED_03_TRI_S.ogg",
+    "MT_01_TRI.ogg",
+    "MT_04_TRI.mp4",
+    "SG_03_TRI.ogg",
+    "SG_09_TRA.mp4",
+    "VA_10_TRI.ogg",
+    "VA_12_TRI.ogg",
+    "VZ_01_TRI.mp4",
+    "VZ_02_TRA.ogg",
+    "VZ_04_TRI.ogg",
+    "VZ_07_TRI.ogg"
+  ]
+}

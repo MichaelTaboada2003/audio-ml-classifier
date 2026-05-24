@@ -219,12 +219,12 @@
                 <div class="card glass-card">
                     <div class="card-header flex-header">
                         <div>
-                            <h2>Dataset de Experimentos</h2>
-                            <p>Explora y reproduce los audios mejor calificados por clase y evalúa el clasificador directamente sobre ellos.</p>
+                            <h2>Dataset de Experimentos — Holdout</h2>
+                            <p>Audios <strong>reservados que NO se usaron en el entrenamiento</strong> del modelo desplegado: predecir sobre ellos es una prueba genuina <em>out-of-sample</em>. Solo se muestran las clases con datos de sobra ({{ holdout_classes | join(' / ') }}); para Enojo / Feliz (pocos audios, todos en training) usá el <strong>Clasificador en Vivo</strong> con el micrófono.</p>
                         </div>
                         <div class="filter-controls">
                             <button class="btn btn-sm btn-filter active" data-filter="all">Todos</button>
-                            {% for clase in active_classes %}
+                            {% for clase in holdout_classes %}
                             <button class="btn btn-sm btn-filter" data-filter="{{ clase }}">{{ clase }}</button>
                             {% endfor %}
                         </div>
