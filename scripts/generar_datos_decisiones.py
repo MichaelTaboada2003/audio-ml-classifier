@@ -25,11 +25,19 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
 
-CACHE_3CL = os.path.join("outputs", "embeddings_v2.npz")
-CACHE_2CL = os.path.join("outputs", "embeddings_wav2vec2.npz")
+PROC_CACHE = os.path.join("outputs", "proc_embeddings.npz")  # Xseg + Xraw + y + files
 OUT = os.path.join("outputs", "decisions_data.json")
 
 TARGET_CLASS = "Enojo"  # clase positiva para la decision de "flag/escalar"
+
+# Escenarios a publicar en el simulador. El front (toggle de Decisiones) usa estas keys.
+# "actual" = escenario por defecto; "archivado" = se conserva con sus metricas.
+SCENARIOS_DEF = {
+    "3clases": {"name": "3 emociones", "subtitle": "Enojo / Feliz / Tristeza",
+                "classes": ["Enojo", "Feliz", "Tristeza"], "status": "actual"},
+    "2clases": {"name": "2 emociones", "subtitle": "Enojo / Tranquilidad",
+                "classes": ["Enojo", "Tranquilidad"], "status": "archivado"},
+}
 
 MODEL_SPECS = {
     "svm_lineal": ("SVM lineal", lambda: Pipeline([
@@ -59,8 +67,11 @@ MODEL_SPECS = {
 }
 
 
-def loocv_scenario(X, y, classes_order):
-    """Ejecuta LOOCV para cada modelo y devuelve probabilidades + metricas."""
+def loocv_scenario(Xseg, Xraw, y, classes_order):
+    """LOO HONESTO: en cada fold entrena con los SEGMENTOS de los otros audios y
+    predice sobre el AUDIO CRUDO (primeros 10 s) del que se deja fuera. Las probs y
+    metricas reflejan generalizacion real (no la prima de cherry-picking de medir
+    sobre los mismos segmentos curados). Ver [[project_localizacion_segmentos]]."""
     n = len(y)
     results = {}
     for key, (label, builder) in MODEL_SPECS.items():
@@ -68,16 +79,17 @@ def loocv_scenario(X, y, classes_order):
         prob_matrix = np.zeros((n, len(classes_order)), dtype=float)
         preds = np.empty(n, dtype=object)
 
-        for train_idx, test_idx in loo.split(X):
+        for train_idx, test_idx in loo.split(Xseg):
             pipe = builder()
-            pipe.fit(X[train_idx], y[train_idx])
-            proba = pipe.predict_proba(X[test_idx])[0]
+            pipe.fit(Xseg[train_idx], y[train_idx])
+            Xt = Xraw[test_idx]                      # test = audio crudo
+            proba = pipe.predict_proba(Xt)[0]
             model_classes = pipe.named_steps["c"].classes_
             # alinea columnas al orden global
             for c_idx, c in enumerate(classes_order):
                 if c in model_classes:
                     prob_matrix[test_idx[0], c_idx] = proba[list(model_classes).index(c)]
-            preds[test_idx[0]] = pipe.predict(X[test_idx])[0]
+            preds[test_idx[0]] = pipe.predict(Xt)[0]
 
         y_pred = np.array(preds.tolist())
         acc = float(np.mean(y_pred == y))
@@ -131,47 +143,38 @@ def loocv_scenario(X, y, classes_order):
 
 
 def main():
-    if not os.path.exists(CACHE_3CL):
-        raise FileNotFoundError(f"No existe {CACHE_3CL}. Corre exportar_modelos.py primero.")
+    if not os.path.exists(PROC_CACHE):
+        raise FileNotFoundError(
+            f"No existe {PROC_CACHE}. Corre scripts/entrenar_procesado.py primero "
+            f"(construye el cache de embeddings segmento+crudo)."
+        )
+
+    cache = np.load(PROC_CACHE, allow_pickle=True)
+    Xseg, Xraw, y_all = cache["Xseg"], cache["Xraw"], cache["y"]
+    disponibles = set(y_all.tolist())
 
     scenarios = {}
-
-    # Escenario 3 clases (multiclase con clase positiva = Enojo)
-    print(f"[3 clases] Cargando {CACHE_3CL}...")
-    c = np.load(CACHE_3CL, allow_pickle=True)
-    X3, y3 = c["X"], c["y"]
-    classes_3 = sorted(set(y3.tolist()))
-    print(f"  Clases: {classes_3} | n={len(y3)}")
-    scenarios["3clases"] = {
-        "id": "3clases",
-        "name": "3 emociones",
-        "subtitle": "Enojo / Tristeza / Feliz",
-        "classes": classes_3,
-        "n_total": int(len(y3)),
-        "class_counts": {c_: int(np.sum(y3 == c_)) for c_ in classes_3},
-        "target_class": TARGET_CLASS,
-        "models": loocv_scenario(X3, y3, classes_3),
-    }
-
-    # Escenario 2 clases
-    if os.path.exists(CACHE_2CL):
-        print(f"[2 clases] Cargando {CACHE_2CL}...")
-        c2 = np.load(CACHE_2CL, allow_pickle=True)
-        X2, y2 = c2["X"], c2["y"]
-        classes_2 = sorted(set(y2.tolist()))
-        print(f"  Clases: {classes_2} | n={len(y2)}")
-        scenarios["2clases"] = {
-            "id": "2clases",
-            "name": "2 emociones",
-            "subtitle": "Enojo / Tristeza",
-            "classes": classes_2,
-            "n_total": int(len(y2)),
-            "class_counts": {c_: int(np.sum(y2 == c_)) for c_ in classes_2},
+    for sid, sdef in SCENARIOS_DEF.items():
+        clases = sdef["classes"]
+        if not set(clases).issubset(disponibles):
+            print(f"[{sid}] OMITIDO: faltan clases {set(clases) - disponibles} en {PROC_CACHE}")
+            continue
+        mask = np.isin(y_all, clases)
+        Xs, Xr, y = Xseg[mask], Xraw[mask], y_all[mask]
+        classes_order = sorted(clases)
+        print(f"[{sid}] {sdef['subtitle']} | n={len(y)} | clases={classes_order}")
+        scenarios[sid] = {
+            "id": sid,
+            "name": sdef["name"],
+            "subtitle": sdef["subtitle"],
+            "status": sdef["status"],
+            "classes": classes_order,
+            "n_total": int(len(y)),
+            "class_counts": {c_: int(np.sum(y == c_)) for c_ in classes_order},
             "target_class": TARGET_CLASS,
-            "models": loocv_scenario(X2, y2, classes_2),
+            "metric": "LOO honesto (train=segmento, test=audio crudo 10 s)",
+            "models": loocv_scenario(Xs, Xr, y, classes_order),
         }
-    else:
-        print(f"[2 clases] Cache binaria no encontrada ({CACHE_2CL}), se omite.")
 
     # Defaults de negocio (call center: detectar Enojo para escalar a supervisor)
     business = {

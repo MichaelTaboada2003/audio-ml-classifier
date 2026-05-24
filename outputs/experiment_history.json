@@ -1,167 +1,195 @@
 {
-  "default_experiment_id": "3clases_15x15",
+  "default_experiment_id": "3clases",
   "experiments": [
     {
-      "id": "2clases_10x10",
+      "id": "2clases",
       "name": "2 emociones",
-      "subtitle": "Enojo vs Tristeza · 10x10",
+      "subtitle": "Enojo / Tranquilidad · baseline binario",
       "status": "archivado",
-      "classes": [
-        "Enojo",
-        "Tristeza"
-      ],
-      "dataset_size": 20,
-      "samples_per_class": 10,
-      "cards": [
-        {
-          "key": "comparison",
-          "title": "Comparativa de modelos",
-          "description": "Comparación entre clasificadores para el experimento binario de 2 emociones.",
-          "image": "/outputs/figuras/resultados_2clases.png",
-          "observation": "En el escenario binario la separación es más simple y varios modelos se mantienen competitivos."
-        },
-        {
-          "key": "performance",
-          "title": "Desempeño y matriz de confusión",
-          "description": "Resumen del rendimiento del mejor modelo sobre Enojo y Tristeza.",
-          "image": "/outputs/figuras/resultados_balanceado_10v10.png",
-          "observation": "Este experimento sirve como línea base histórica antes de agregar la emoción Feliz."
-        },
-        {
-          "key": "separability",
-          "title": "Separabilidad en 2D",
-          "description": "Proyección de embeddings para el escenario binario.",
-          "image": "/outputs/figuras/separabilidad_v2.png",
-          "observation": "La frontera binaria suele quedar mejor definida que en el caso multiclase."
-        },
-        {
-          "key": "filtering",
-          "title": "Distribución de calidad acústica",
-          "description": "Reporte de filtrado usado para escoger las muestras más expresivas.",
-          "image": "/outputs/figuras/reporte_filtrado_v2.png",
-          "observation": "El filtrado ayuda a aislar audios con una firma emocional más clara."
-        }
-      ],
-      "metrics": {
-        "knn_k3": {
-          "label": "KNN (k=3)",
-          "accuracy": 0.75,
-          "balanced_accuracy": 0.75
-        },
-        "knn_k5": {
-          "label": "KNN (k=5)",
-          "accuracy": 0.85,
-          "balanced_accuracy": 0.85
-        },
-        "svm_lineal": {
-          "label": "SVM lineal",
-          "accuracy": 0.8,
-          "balanced_accuracy": 0.8
-        },
-        "svm_rbf": {
-          "label": "SVM RBF",
-          "accuracy": 0.85,
-          "balanced_accuracy": 0.85
-        },
-        "logreg": {
-          "label": "Reg. Logística",
-          "accuracy": 0.8,
-          "balanced_accuracy": 0.8
-        },
-        "rf": {
-          "label": "Random Forest",
-          "accuracy": 0.85,
-          "balanced_accuracy": 0.85
-        }
-      },
-      "best_model": "svm_rbf",
-      "best_balanced_accuracy": 0.85,
-      "chance_accuracy": 0.5,
-      "class_counts": {
-        "Enojo": 10,
-        "Tristeza": 10
-      }
-    },
-    {
-      "id": "3clases_15x15",
-      "name": "3 emociones",
-      "subtitle": "Enojo / Tristeza / Feliz · Enojo 15, Tranquilidad 15",
-      "status": "actual",
       "classes": [
         "Enojo",
         "Tranquilidad"
       ],
-      "samples_per_class": 15,
+      "class_counts": {
+        "Enojo": 13,
+        "Tranquilidad": 89
+      },
+      "dataset_size": 102,
+      "chance_accuracy": 0.5,
+      "metric": "balanced_accuracy = LOO honesto (train=segmento, test=audio crudo 10 s)",
+      "metrics": {
+        "knn_k3": {
+          "label": "KNN (k=3)",
+          "accuracy": 0.951,
+          "balanced_accuracy": 0.8077,
+          "recall_por_clase": {
+            "Enojo": 0.6154,
+            "Tranquilidad": 1.0
+          }
+        },
+        "knn_k5": {
+          "label": "KNN (k=5)",
+          "accuracy": 0.9412,
+          "balanced_accuracy": 0.7692,
+          "recall_por_clase": {
+            "Enojo": 0.5385,
+            "Tranquilidad": 1.0
+          }
+        },
+        "svm_lineal": {
+          "label": "SVM lineal",
+          "accuracy": 0.9804,
+          "balanced_accuracy": 0.9231,
+          "recall_por_clase": {
+            "Enojo": 0.8462,
+            "Tranquilidad": 1.0
+          }
+        },
+        "svm_rbf": {
+          "label": "SVM RBF",
+          "accuracy": 0.9804,
+          "balanced_accuracy": 0.9231,
+          "recall_por_clase": {
+            "Enojo": 0.8462,
+            "Tranquilidad": 1.0
+          }
+        },
+        "logreg": {
+          "label": "Reg. Logística",
+          "accuracy": 0.9706,
+          "balanced_accuracy": 0.9175,
+          "recall_por_clase": {
+            "Enojo": 0.8462,
+            "Tranquilidad": 0.9888
+          }
+        },
+        "rf": {
+          "label": "Random Forest",
+          "accuracy": 0.9706,
+          "balanced_accuracy": 0.8846,
+          "recall_por_clase": {
+            "Enojo": 0.7692,
+            "Tranquilidad": 1.0
+          }
+        }
+      },
+      "best_model": "svm_lineal",
+      "best_balanced_accuracy": 0.9231,
       "cards": [
         {
           "key": "performance",
-          "title": "Desempeño y matriz de confusión (LOOCV)",
-          "description": "Matriz de confusión y comparativa LOOCV del mejor modelo. Entrenado con cap N=20 por clase (Feliz limitado a 15 por disponibilidad) y class_weight='balanced'.",
-          "image": "/outputs/figuras/resultados_v2.png",
-          "observation": "La mayor confusión persiste entre Enojo↔Feliz por su activación acústica similar. Tristeza se separa mejor. Esta cifra LOOCV (~67% LogReg) mide generalización a audios nuevos del mismo recolector — ver tarjeta de holdout para generalización a audios de menor expresividad."
-        },
-        {
-          "key": "holdout",
-          "title": "Generalización a holdout (NUEVA)",
-          "description": "Recall por modelo y clase sobre audios que el modelo desplegado NUNCA vio en training (excluidos del cache de embeddings).",
-          "image": "/outputs/figuras/holdout_por_modelo.png",
-          "observation": "Antes de expandir el training a N=20, SVM lineal acertaba solo 9% de los Enojo holdout. Con N=20 sube a 59%. La mejora confirma que el training previo (N=14, solo audios EXCELENTE) era demasiado homogéneo en expresividad. Feliz holdout=0 porque los 15 audios disponibles ya están todos en training."
+          "title": "Desempeño honesto (test = audio crudo)",
+          "image": "/outputs/figuras/resultados_2clases.png",
+          "description": "Matriz de confusión y comparativa de modelos bajo LOO honesto: se entrena con los segmentos localizados y se predice sobre el audio crudo del audio dejado fuera.",
+          "observation": "Baseline binario Enojo vs Tranquilidad: SVM lineal alcanza ~92% balanced accuracy sobre audio crudo no visto. Es la línea base antes de subir a 3 emociones."
         },
         {
           "key": "separability",
           "title": "Separabilidad en 2D",
-          "description": "Proyección PCA y t-SNE de los embeddings wav2vec2 actualmente en cache.",
-          "image": "/outputs/figuras/separabilidad_v2.png",
-          "observation": "Tristeza tiende a separarse mejor del resto. Feliz y Enojo comparten una región más cercana, consistente con la confusión observada en la matriz de confusión y con la sobreposición de scores acústicos (score_enojo a menudo > score_feliz en los audios Feliz del dataset)."
-        },
-        {
-          "key": "filtering",
-          "title": "Distribución de calidad acústica",
-          "description": "Distribución de scores por clase calculados sobre los primeros 10s de cada audio. Guía la selección del training set.",
-          "image": "/outputs/figuras/reporte_filtrado_v2.png",
-          "observation": "Visualiza por qué Feliz es el cuello de botella (solo 15 audios totales) y muestra el rango de scores que el modelo ve en training vs el que aparece en producción."
+          "image": "/outputs/figuras/separabilidad_2clases.png",
+          "description": "Proyección PCA y t-SNE de los embeddings emocionales (audeering, 1024d) de los segmentos.",
+          "observation": "Enojo y Tranquilidad ocupan regiones bien separadas en el espacio emocional: la frontera binaria es la más limpia."
         }
+      ]
+    },
+    {
+      "id": "3clases",
+      "name": "3 emociones",
+      "subtitle": "Enojo / Feliz / Tristeza · actual",
+      "status": "actual",
+      "classes": [
+        "Enojo",
+        "Feliz",
+        "Tristeza"
       ],
+      "class_counts": {
+        "Enojo": 13,
+        "Feliz": 11,
+        "Tristeza": 33
+      },
+      "dataset_size": 57,
+      "chance_accuracy": 0.3333,
+      "metric": "balanced_accuracy = LOO honesto (train=segmento, test=audio crudo 10 s)",
       "metrics": {
         "knn_k3": {
           "label": "KNN (k=3)",
-          "accuracy": 0.8333,
-          "balanced_accuracy": 0.8333
+          "accuracy": 0.9474,
+          "balanced_accuracy": 0.9231,
+          "recall_por_clase": {
+            "Enojo": 0.7692,
+            "Feliz": 1.0,
+            "Tristeza": 1.0
+          }
         },
         "knn_k5": {
           "label": "KNN (k=5)",
-          "accuracy": 0.8333,
-          "balanced_accuracy": 0.8333
+          "accuracy": 0.9474,
+          "balanced_accuracy": 0.9231,
+          "recall_por_clase": {
+            "Enojo": 0.7692,
+            "Feliz": 1.0,
+            "Tristeza": 1.0
+          }
         },
         "svm_lineal": {
           "label": "SVM lineal",
-          "accuracy": 0.9333,
-          "balanced_accuracy": 0.9333
+          "accuracy": 0.9825,
+          "balanced_accuracy": 0.9744,
+          "recall_por_clase": {
+            "Enojo": 0.9231,
+            "Feliz": 1.0,
+            "Tristeza": 1.0
+          }
         },
         "svm_rbf": {
           "label": "SVM RBF",
-          "accuracy": 0.9667,
-          "balanced_accuracy": 0.9667
+          "accuracy": 0.9825,
+          "balanced_accuracy": 0.9744,
+          "recall_por_clase": {
+            "Enojo": 0.9231,
+            "Feliz": 1.0,
+            "Tristeza": 1.0
+          }
         },
         "logreg": {
           "label": "Reg. Logística",
-          "accuracy": 0.9667,
-          "balanced_accuracy": 0.9667
+          "accuracy": 0.9649,
+          "balanced_accuracy": 0.9487,
+          "recall_por_clase": {
+            "Enojo": 0.8462,
+            "Feliz": 1.0,
+            "Tristeza": 1.0
+          }
         },
         "rf": {
           "label": "Random Forest",
-          "accuracy": 0.9333,
-          "balanced_accuracy": 0.9333
+          "accuracy": 0.9649,
+          "balanced_accuracy": 0.9441,
+          "recall_por_clase": {
+            "Enojo": 0.9231,
+            "Feliz": 0.9091,
+            "Tristeza": 1.0
+          }
         }
       },
-      "best_model": "svm_rbf",
-      "best_balanced_accuracy": 0.9667,
-      "chance_accuracy": 0.5,
-      "class_counts": {
-        "Enojo": 15,
-        "Tranquilidad": 15
-      },
-      "dataset_size": 30
+      "best_model": "svm_lineal",
+      "best_balanced_accuracy": 0.9744,
+      "cards": [
+        {
+          "key": "performance",
+          "title": "Desempeño honesto (test = audio crudo)",
+          "image": "/outputs/figuras/resultados_3clases.png",
+          "description": "Matriz de confusión y comparativa de modelos bajo LOO honesto (entrena=segmento localizado, test=audio crudo). Modelos con class_weight='balanced'.",
+          "observation": "SVM lineal/RBF llegan a ~97% balanced accuracy sobre audio crudo no visto. Feliz y Tristeza se clasifican casi perfecto; Enojo es la clase más difícil por tener solo 13 audios y solaparse acústicamente con Feliz."
+        },
+        {
+          "key": "separability",
+          "title": "Separabilidad en 2D",
+          "image": "/outputs/figuras/separabilidad_3clases.png",
+          "description": "Proyección PCA y t-SNE de los embeddings emocionales (audeering, 1024d) de los segmentos localizados de las 3 clases.",
+          "observation": "Tristeza forma un cúmulo nítido; Enojo y Feliz comparten una región de alta activación, consistente con la confusión residual en esa frontera."
+        }
+      ]
     }
   ]
 }
