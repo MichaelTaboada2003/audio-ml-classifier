@@ -15,7 +15,9 @@
     --accent-tristeza-glow: rgba(6, 182, 212, 0.4);
     --accent-feliz: #f59e0b;
     --accent-feliz-glow: rgba(245, 158, 11, 0.4);
-    
+    --accent-tranquilidad: #22c55e;
+    --accent-tranquilidad-glow: rgba(34, 197, 94, 0.4);
+
     --text-main: #f3f4f6;
     --text-muted: #9ca3af;
     --transition-speed: 0.3s;
@@ -505,6 +507,11 @@ body {
 .badge.feliz {
     background-color: var(--accent-feliz) !important;
     box-shadow: 0 0 12px var(--accent-feliz-glow) !important;
+}
+
+.badge.tranquilidad {
+    background-color: var(--accent-tranquilidad) !important;
+    box-shadow: 0 0 12px var(--accent-tranquilidad-glow) !important;
 }
 
 /* Big Prediction Meter */

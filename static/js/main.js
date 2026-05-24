@@ -102,7 +102,7 @@ function formatPercent(value) {
 const decisionsData = appConfig.decisionsData || null;
 
 const decisionState = {
-    scenarioId: '3clases',
+    scenarioId: '4clases',
     modelKey: 'svm_lineal',
     threshold: 0.50,
     targetClass: 'Enojo',
