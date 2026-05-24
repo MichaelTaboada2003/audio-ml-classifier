@@ -1,0 +1,254 @@
+/* =====================================================================
+   PREDICTIONS — Panel de resultados, prediction ring, barras de probabilidad, métricas
+   ===================================================================== */
+
+.results-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+}
+
+.wave-placeholder {
+    font-size: 3.5rem;
+    color: var(--border-color);
+    margin-bottom: 1.5rem;
+    animation: float 4s infinite ease-in-out;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-8px); }
+}
+
+.empty-state h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.results-layout {
+    animation: fadeIn var(--transition-speed) ease;
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.result-header h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.15rem;
+}
+
+/* Badge */
+.badge {
+    background-color: var(--primary);
+    padding: 0.35rem 0.8rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 0 10px rgba(147, 51, 234, 0.4);
+}
+
+.badge.enojo        { background-color: var(--accent-enojo);       box-shadow: 0 0 12px var(--accent-enojo-glow); }
+.badge.tristeza     { background-color: var(--accent-tristeza);     box-shadow: 0 0 12px var(--accent-tristeza-glow); }
+.badge.feliz        { background-color: var(--accent-feliz);        box-shadow: 0 0 12px var(--accent-feliz-glow); }
+.badge.tranquilidad { background-color: var(--accent-tranquilidad); box-shadow: 0 0 12px var(--accent-tranquilidad-glow); }
+
+/* Prediction Ring */
+.prediction-display {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 2.4rem auto 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+    width: 200px !important;
+    height: 200px !important;
+}
+
+.progress-ring-bg {
+    stroke: rgba(255, 255, 255, 0.04) !important;
+}
+
+.progress-ring-bar {
+    transition: stroke-dashoffset 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: 50% 50%;
+    filter: drop-shadow(0 0 8px currentColor);
+}
+
+.prediction-center {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 2;
+}
+
+.prediction-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.9rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #fff;
+    letter-spacing: -1.5px;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+}
+
+.prediction-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 0.3rem;
+}
+
+/* Probability Bars */
+.prob-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.prob-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    animation: fade-up 0.45s var(--ease-out) both;
+}
+
+.prob-item:nth-child(1) { animation-delay: 0.08s; }
+.prob-item:nth-child(2) { animation-delay: 0.14s; }
+.prob-item:nth-child(3) { animation-delay: 0.20s; }
+.prob-item:nth-child(4) { animation-delay: 0.26s; }
+
+@keyframes fade-up {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.prob-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.progress-track {
+    width: 100%;
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 9999px;
+    overflow: visible;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 9999px;
+    position: relative;
+    box-shadow: 0 0 10px currentColor;
+    background: linear-gradient(90deg, var(--emotion-color, #a855f7) 0%, var(--emotion-color-dark, #7e22ce) 100%);
+    transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px currentColor;
+    opacity: 0;
+    transition: opacity 0.4s ease 0.6s;
+}
+
+.prob-item:hover .progress-fill::after { opacity: 0.9; }
+
+/* Metrics Grid */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.metric-card {
+    background: transparent;
+    border: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 0;
+    padding: 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.metrics-grid .metric-card:nth-child(4n)  { border-right: none; }
+.metrics-grid .metric-card:nth-child(n+3) { border-bottom: none; }
+
+.metric-card i {
+    font-size: 1rem;
+    color: var(--primary);
+    margin-bottom: 0.3rem;
+}
+
+.metric-val {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+}
+
+.metric-lbl {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 720px) {
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    .metrics-grid .metric-card:nth-child(2n)   { border-right: none; }
+    .metrics-grid .metric-card:nth-child(4n+1),
+    .metrics-grid .metric-card:nth-child(4n+2) { border-right: none; }
+    .metrics-grid .metric-card:nth-child(2n+1) { border-right: 1px solid rgba(255, 255, 255, 0.05); }
+
+    .prediction-display { width: 170px; height: 170px; margin: 1.6rem auto 1rem; }
+    .progress-ring      { width: 170px !important; height: 170px !important; }
+    .prediction-value   { font-size: 2.3rem; }
+}

@@ -1,0 +1,97 @@
+/* =====================================================================
+   DATASET — Tab 2: explorador de audios del dataset
+   ===================================================================== */
+
+.flex-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+.dataset-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.dataset-table th {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dataset-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.dataset-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.dataset-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.dataset-table tr.hidden {
+    display: none;
+}
+
+.recolector-tag {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-color);
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.audio-cell {
+    width: 200px;
+}
+
+.custom-audio-btn {
+    background: rgba(147, 51, 234, 0.1);
+    border: 1px solid rgba(147, 51, 234, 0.3);
+    color: var(--primary);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s var(--ease-spring);
+}
+
+.custom-audio-btn:hover {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 0 10px var(--primary-glow);
+    transform: scale(1.1);
+}
+
+.custom-audio-btn.playing {
+    background: var(--secondary);
+    border-color: rgba(37, 99, 235, 0.5);
+    color: #fff;
+    box-shadow: 0 0 10px var(--secondary-glow);
+}
