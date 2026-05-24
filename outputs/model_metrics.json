@@ -1,48 +1,92 @@
 {
   "active_classes": [
     "Enojo",
-    "Tranquilidad"
+    "Feliz",
+    "Tristeza"
   ],
-  "samples_per_class": 15,
-  "dataset_size": 30,
-  "chance_accuracy": 0.5,
+  "dataset_source": "data/procesado (segmentos localizados de 10 s)",
+  "metric": "balanced_accuracy = holdout honesto (train=segmento, test=audio crudo 10 s, LOOCV)",
+  "class_counts": {
+    "Enojo": 13,
+    "Feliz": 11,
+    "Tristeza": 33
+  },
+  "samples_per_class": 11,
+  "dataset_size": 57,
+  "chance_accuracy": 0.3333,
   "models": {
     "svm_lineal": {
       "label": "SVM lineal",
       "description": "Excelente separabilidad lineal en el espacio de embeddings.",
-      "accuracy": 0.9333,
-      "balanced_accuracy": 0.9333
+      "accuracy": 0.9825,
+      "balanced_accuracy": 0.9744,
+      "balanced_accuracy_loocv_seg": 1.0,
+      "recall_por_clase": {
+        "Enojo": 0.9231,
+        "Feliz": 1.0,
+        "Tristeza": 1.0
+      }
     },
     "logreg": {
       "label": "Reg. Logística",
       "description": "Clasificador probabilístico de entropía máxima.",
-      "accuracy": 0.9667,
-      "balanced_accuracy": 0.9667
+      "accuracy": 0.9649,
+      "balanced_accuracy": 0.9487,
+      "balanced_accuracy_loocv_seg": 1.0,
+      "recall_por_clase": {
+        "Enojo": 0.8462,
+        "Feliz": 1.0,
+        "Tristeza": 1.0
+      }
     },
     "svm_rbf": {
       "label": "SVM RBF",
       "description": "Captura fronteras no lineales entre emociones.",
-      "accuracy": 0.9667,
-      "balanced_accuracy": 0.9667
+      "accuracy": 0.9825,
+      "balanced_accuracy": 0.9744,
+      "balanced_accuracy_loocv_seg": 1.0,
+      "recall_por_clase": {
+        "Enojo": 0.9231,
+        "Feliz": 1.0,
+        "Tristeza": 1.0
+      }
     },
     "rf": {
       "label": "Random Forest",
       "description": "Ensemble robusto basado en árboles de decisión.",
-      "accuracy": 0.9333,
-      "balanced_accuracy": 0.9333
+      "accuracy": 0.9649,
+      "balanced_accuracy": 0.9441,
+      "balanced_accuracy_loocv_seg": 0.9697,
+      "recall_por_clase": {
+        "Enojo": 0.9231,
+        "Feliz": 0.9091,
+        "Tristeza": 1.0
+      }
     },
     "knn_k5": {
       "label": "KNN (k=5)",
       "description": "Votación por 5 vecinos más cercanos.",
-      "accuracy": 0.8333,
-      "balanced_accuracy": 0.8333
+      "accuracy": 0.9474,
+      "balanced_accuracy": 0.9231,
+      "balanced_accuracy_loocv_seg": 0.9744,
+      "recall_por_clase": {
+        "Enojo": 0.7692,
+        "Feliz": 1.0,
+        "Tristeza": 1.0
+      }
     },
     "knn_k3": {
       "label": "KNN (k=3)",
       "description": "Votación por 3 vecinos más cercanos.",
-      "accuracy": 0.8333,
-      "balanced_accuracy": 0.8333
+      "accuracy": 0.9474,
+      "balanced_accuracy": 0.9231,
+      "balanced_accuracy_loocv_seg": 0.9441,
+      "recall_por_clase": {
+        "Enojo": 0.7692,
+        "Feliz": 1.0,
+        "Tristeza": 1.0
+      }
     }
   },
-  "best_model": "logreg"
+  "best_model": "svm_lineal"
 }

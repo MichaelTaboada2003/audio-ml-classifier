@@ -27,4 +27,4 @@ MIN_SCORE = 0.0
 # Clases activas del experimento actual.
 # Arrancamos con 2 clases (Enojo vs Tristeza) como baseline limpio. Chance=50%.
 # Despues escalamos a 3 (+ Feliz) y a 4 (+ Tranquilidad).
-ACTIVE_CLASSES = ["Enojo", "Tranquilidad"]
+ACTIVE_CLASSES = ["Enojo", "Feliz", "Tristeza"]
