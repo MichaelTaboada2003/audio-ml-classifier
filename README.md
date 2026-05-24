@@ -19,7 +19,7 @@ La capa de Toma de Decisiones **no modifica** la capa de ML: solo consume los em
 - [Capa 2 · Toma de Decisiones](#capa-2--toma-de-decisiones)
 - [Módulos compartidos: config.py y emotion_encoder.py](#módulos-compartidos-configpy-y-emotion_encoderpy)
 - [Scripts — referencia completa](#scripts--referencia-completa)
-- [Notebooks — iteraciones históricas](#notebooks--iteraciones-históricas)
+- [Notebook del pipeline](#notebook-del-pipeline)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Uso rápido](#uso-rápido)
 - [Dependencias](#dependencias)
@@ -531,18 +531,21 @@ python scripts/regenerar_figuras.py
 
 ---
 
-## Notebooks — iteraciones históricas
+## Notebook del pipeline
 
-Los notebooks en `notebooks/` documentan la evolución del clasificador. **No son la fuente de verdad del pipeline** — el pipeline canónico vive en `scripts/`. Son útiles para entender el razonamiento detrás de las decisiones de diseño.
+### `EmotiSpeech_pipeline.ipynb`
+Notebook principal del proyecto. Ejecuta el pipeline completo de extremo a extremo llamando a cada script, y ofrece visualizaciones en cada paso:
 
-### `01_clasificador_v1_features.ipynb`
-Primer enfoque: features acústicas clásicas (MFCC, ZCR, energía RMS, centroide espectral, etc.) extraídas con librosa, sin ningún encoder de lenguaje. Los clasificadores aprenden sobre vectores compactos de ~30 dims. Establece el baseline y documenta por qué las features globales son insuficientes para esta tarea.
+1. **Auditoría de etiquetas** — corre `auditar_etiquetas_ia.py`, visualiza la distribución A/V/D en el espacio circumplex, box plots por clase y tabla de audios sospechosos.
+2. **Localización de segmentos** — corre `segmentar_rescate.py`, muestra la distribución de estados (OK / RESCATADO / SIN_RESCATE) y el histograma de mejoras de score.
+3. **Exploración del dataset** — distribución de segmentos por clase y por recolector.
+4. **Entrenamiento** — corre `entrenar_procesado.py --guardar --loco`, muestra la tabla comparativa (LOOCV sobre segmentos vs honesto) y el gráfico de balanced accuracy por modelo.
+5. **Exploración de embeddings** — PCA 2D, t-SNE 2D, y comparación del espacio de segmentos vs audio crudo.
+6. **Evaluación detallada** — LOOCV honesto en memoria, matriz de confusión del mejor modelo y heatmap de recall por clase × modelo.
+7. **Dashboard** — corre los 3 scripts de dashboard y muestra las figuras generadas inline.
+8. **Inferencia de ejemplo** — predice sobre un audio del holdout con los 6 modelos serializados.
 
-### `02_clasificador_v1_embeddings.ipynb`
-Segundo enfoque: `facebook/wav2vec2-base` como encoder (embeddings de 768 dims, pre-entrenado para ASR). Documenta la brecha entre validación interna alta (~97 %) y holdout bajo (~50 %) que reveló que el modelo aprendía contenido lingüístico, no emoción. Esta observación motivó el cambio al encoder audeering.
-
-### `03_clasificador_v2_balanceado.ipynb`
-Experimentos de balance de clases y transición hacia el encoder audeering. Documenta las configuraciones intermedias probadas (N_PER_CLASS, class_weight, MAX_DURATION) y la mejora de holdout al cambiar el encoder. Es el puente entre los enfoques v1 y el pipeline actual.
+Las celdas pesadas (requieren el encoder ~1.2 GB) saltan la ejecución si el output ya existe. Poner `FORCE_RERUN = True` en la celda de setup para forzar re-ejecución.
 
 ---
 
@@ -565,10 +568,8 @@ clasificador-audios/
 │   │   ├── decisions.css                      # Módulo de Toma de Decisiones (simulador, tornado, etc.)
 │   │   └── toast.css                          # Sistema de notificaciones
 │   └── js/main.js                             # Simulador de decisiones en cliente
-├── notebooks/                                 # Iteraciones históricas (no son la fuente de verdad)
-│   ├── 01_clasificador_v1_features.ipynb      # Features acústicas clásicas (MFCC, ZCR, etc.)
-│   ├── 02_clasificador_v1_embeddings.ipynb    # Encoder wav2vec2-base (ASR, 768 dims)
-│   └── 03_clasificador_v2_balanceado.ipynb    # Balance + transición al encoder audeering
+├── notebooks/
+│   └── EmotiSpeech_pipeline.ipynb             # Pipeline completo: auditoría → segmentación → training → visualizaciones
 ├── imgs/                                      # Capturas de la interfaz para el README
 ├── scripts/
 │   ├── auditar_etiquetas_ia.py                # Auditoría de etiquetas con modelo SER
