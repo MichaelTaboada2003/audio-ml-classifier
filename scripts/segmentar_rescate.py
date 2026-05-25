@@ -23,8 +23,8 @@ Por defecto se recorta el mejor segmento de 10 s de TODOS los audios. El estado
 solo informa cuanto aporta segmentar respecto a usar los primeros 10 s.
 
 Salida:
-  - outputs/mejores_segmentos.csv            (un row por audio)
-  - outputs/mejores_segmentos/<Clase>/*.wav  (mejor segmento de 10 s; no toca originales)
+  - outputs/mejores_segmentos.csv      (un row por audio; reporte)
+  - data/procesado/<Clase>/*.wav       (mejor segmento de 10 s; dataset de entrenamiento, no toca originales)
 
 Uso:
     python scripts/segmentar_rescate.py                      # Enojo + Feliz, recorta el mejor 10s de cada uno
@@ -56,7 +56,7 @@ from auditar_etiquetas_ia import EMOTION_POINTS, score_clase  # noqa: E402
 
 DATA_DIR = ROOT / "data" / "AUDIOS MACHINE LEARNING"
 OUT_CSV = ROOT / "outputs" / "mejores_segmentos.csv"
-OUT_DIR = ROOT / "outputs" / "mejores_segmentos"
+OUT_DIR = ROOT / "data" / "procesado"   # dataset de entrenamiento (lo lee entrenar_procesado.py)
 SR = 16000
 MAX_DURATION = 10.0   # baseline: lo que ve el pipeline actual (primeros 10 s)
 MIN_SEG = 1.0         # un segmento mas corto que esto no se scorea (el encoder necesita senal)
