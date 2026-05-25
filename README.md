@@ -433,6 +433,21 @@ EMBEDDING_DIM = 1024
 
 `extract_embedding` y `extract_avd` usan el mismo forward pass pero devuelven salidas distintas del modelo: `extract_embedding` toma el `hidden_state` (1024-d, rico en representación emocional), mientras `extract_avd` toma la cabeza de regresión final (3 valores A/V/D, directamente interpretables).
 
+**Qué captura el modelo fine-tuneado:**
+
+`audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim` es un `wav2vec2-large` (1024 dims) pre-entrenado en audio de habla y luego fine-tuneado en MSP-Podcast para predecir tres dimensiones del espacio emocional continuo. El fine-tuning hace que sus representaciones internas pasen de capturar fonemas (tarea del modelo base) a capturar señales prosódicas y paralinguísticas que distinguen estados emocionales:
+
+| Característica capturada | Descripción |
+|---|---|
+| **Arousal** (activación) | Energía general del habla — cuánto esfuerzo/intensidad hay en la voz. Separa emociones de alta energía (Enojo, Feliz) de las de baja energía (Tristeza, Tranquilidad). |
+| **Valence** (valencia) | Polaridad positiva/negativa del estado emocional. Distingue emociones agradables (Feliz, Tranquilidad) de desagradables (Enojo, Tristeza). |
+| **Dominance** (dominancia) | Percepción de control o poder en la voz. Separa Enojo (alta dominancia) de Tristeza y Tranquilidad (baja dominancia). |
+| **Prosodia** | Variaciones de tono (F0), ritmo y velocidad de habla. El fine-tuning en SER preserva estas señales que el modelo ASR base desechaba. |
+| **Textura de la voz** | Patrones espectrales ligados a tensión muscular (voz tensa en Enojo, voz suave en Tranquilidad) y energía por banda de frecuencia. |
+| **Dinámica temporal** | Cómo cambian las características anteriores a lo largo del segmento de audio. El mean-pool sobre los hidden states integra esta dinámica en el vector de 1024 dims. |
+
+El vector de 1024 dims que produce `extract_embedding` condensa todas estas señales en una representación densa que los clasificadores clásicos (SVM, LogReg, etc.) consumen directamente. `extract_avd` expone solo los 3 valores finales de la cabeza de regresión, útiles para diagnóstico e inspección humana.
+
 El modelo (~1.2 GB) se descarga la primera vez y se cachea en `~/.cache/huggingface/`.
 
 ---
