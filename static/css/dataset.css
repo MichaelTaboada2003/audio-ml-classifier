@@ -1,0 +1,124 @@
+/* ============================================================================
+   DATASET TABLE
+   ============================================================================ */
+.filter-controls {
+    display: flex;
+    gap: 0;
+    flex-wrap: wrap;
+    border: var(--rule-thin) solid var(--ink-rule);
+}
+
+.btn-filter {
+    background: var(--paper);
+    border: none;
+    border-right: var(--rule-thin) solid var(--ink-rule);
+    border-radius: 0;
+    margin: 0;
+}
+
+.btn-filter:last-child {
+    border-right: none;
+}
+
+.btn-filter.active {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: var(--space-4);
+    border: var(--rule-thin) solid var(--ink-rule);
+}
+
+.dataset-table,
+.breakeven-table,
+.evidence-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+}
+
+.dataset-table th,
+.breakeven-table th,
+.evidence-table th {
+    text-align: left;
+    padding: var(--space-3) var(--space-4);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink);
+    background: var(--paper-3);
+    border-bottom: var(--rule-med) solid var(--ink-rule);
+}
+
+.dataset-table td,
+.breakeven-table td,
+.evidence-table td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: var(--rule-thin) solid var(--paper-3);
+    color: var(--ink-2);
+    vertical-align: middle;
+}
+
+.dataset-table tr:hover td {
+    background: var(--paper-3);
+}
+
+.audio-row.hidden {
+    display: none;
+}
+
+.audio-cell {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink);
+    font-weight: 500;
+}
+
+.recolector-tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 2px 6px;
+    border: var(--rule-thin) solid var(--ink-rule);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.custom-audio-btn {
+    width: 32px;
+    height: 32px;
+    border: var(--rule-thin) solid var(--ink-rule);
+    background: var(--paper);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    font-size: 0.7rem;
+    transition: all 0.12s ease;
+}
+
+.custom-audio-btn:hover,
+.custom-audio-btn.playing {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+.test-model-btn {
+    background: transparent;
+    color: var(--ink);
+}
+
+.test-model-btn:hover {
+    background: var(--vermilion);
+    color: var(--paper);
+    border-color: var(--vermilion);
+}
+

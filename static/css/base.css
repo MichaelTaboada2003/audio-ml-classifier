@@ -1,0 +1,314 @@
+/* ============================================================================
+   EMOTISPEECH · EDITORIAL BRUTALIST DESIGN SYSTEM
+   Inspirado en revistas científicas tipo Werkplaats Typografie + Pentagram.
+   Paleta de tinta, tipografías expresivas, layouts asimétricos.
+   ============================================================================ */
+
+/* ---------- TOKENS ---------- */
+:root {
+    /* Paleta — papel y tinta */
+    --paper:        #F4EFE6;
+    --paper-2:      #ECE4D2;
+    --paper-3:      #DBD0B7;
+    --paper-shadow: #C7BB9C;
+
+    --ink:          #0E0B07;
+    --ink-2:        #2A241D;
+    --ink-3:        #5C5246;
+    --ink-4:        #8C8170;
+    --ink-rule:     #1A140C;
+
+    /* Acentos */
+    --vermilion:       #D63D28;
+    --vermilion-deep:  #A82D1C;
+    --vermilion-soft:  #ECB8AD;
+
+    /* Color por emoción — saturados pero con sustancia, no neón */
+    --c-enojo:       #D63D28;
+    --c-enojo-deep:  #A82D1C;
+    --c-tristeza:    #1F3D6E;
+    --c-tristeza-deep: #15294A;
+    --c-feliz:       #CC9224;
+    --c-feliz-deep:  #94681A;
+    --c-tranquilidad: #3E5B3A;
+    --c-tranquilidad-deep: #2A3F27;
+
+    --c-positive:    #3E5B3A;
+    --c-negative:    #A82D1C;
+    --c-neutral:     #8C8170;
+
+    /* Tipografía */
+    --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+    --font-body:    'Inter Tight', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --font-mono:    'JetBrains Mono', 'SF Mono', Menlo, monospace;
+
+    /* Spacing — escala basada en 8px pero con incrementos editoriales */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+    --space-8: 64px;
+    --space-9: 96px;
+    --space-10: 128px;
+
+    /* Rule weights — siempre nítidas */
+    --rule-thin: 1px;
+    --rule-med:  2px;
+    --rule-bold: 4px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    font-feature-settings: 'ss01', 'ss02', 'cv11';
+    /* Textura de papel sutil — ruido CSS */
+    background-image:
+        radial-gradient(circle at 0% 0%, rgba(20, 16, 10, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 100% 100%, rgba(20, 16, 10, 0.025) 0%, transparent 50%);
+}
+
+/* Textura de grano */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05 0 0 0 0 0.04 0 0 0 0 0.03 0 0 0 0.5 0'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.55'/></svg>");
+    mix-blend-mode: multiply;
+}
+
+/* Compatibilidad con elementos legacy (glow-bg ya no se usa, lo neutralizamos) */
+.glow-bg { display: none !important; }
+
+/* ---------- CONTAINER ---------- */
+.container {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-6) var(--space-9);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================================================
+   MASTHEAD — Header tipo periódico/revista científica
+   ============================================================================ */
+.app-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: end;
+    gap: var(--space-6);
+    padding: var(--space-5) 0 var(--space-4);
+    border-top: var(--rule-bold) solid var(--ink-rule);
+    border-bottom: var(--rule-thin) solid var(--ink-rule);
+    position: relative;
+}
+
+/* Línea doble inferior */
+.app-header::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -5px;
+    height: var(--rule-thin);
+    background: var(--ink-rule);
+}
+
+.logo {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-4);
+}
+
+.logo-icon {
+    display: none;
+}
+
+.brand h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 5vw, 3.75rem);
+    font-weight: 700;
+    font-style: italic;
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 144, 'SOFT' 30;
+    /* Pseudo-elemento para la "n" cursiva */
+    background: none;
+    -webkit-background-clip: initial;
+    -webkit-text-fill-color: initial;
+}
+
+.brand .subtitle {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-3);
+    margin-top: var(--space-2);
+    font-weight: 500;
+}
+
+/* Edition number — centro del masthead */
+.masthead-edition {
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-3);
+    padding-bottom: var(--space-2);
+    line-height: 1.4;
+}
+
+.masthead-edition strong {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+    text-transform: none;
+    font-style: italic;
+}
+
+.model-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border: var(--rule-thin) solid var(--ink);
+    border-radius: 0;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--vermilion);
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* ============================================================================
+   TAB PANES
+   ============================================================================ */
+.tab-pane {
+    display: none;
+    animation: fade-in 0.4s ease both;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================================
+   SCROLLBARS
+   ============================================================================ */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--paper); }
+::-webkit-scrollbar-thumb { background: var(--ink-rule); border: 2px solid var(--paper); }
+::-webkit-scrollbar-thumb:hover { background: var(--vermilion); }
+
+/* ============================================================================
+   SELECTION
+   ============================================================================ */
+::selection { background: var(--vermilion); color: var(--paper); }
+::-moz-selection { background: var(--vermilion); color: var(--paper); }
+
+/* ============================================================================
+   FOOTER MARGINALIA
+   ============================================================================ */
+.app-footer {
+    margin-top: var(--space-9);
+    padding-top: var(--space-5);
+    border-top: var(--rule-thin) solid var(--ink-rule);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--space-5);
+    align-items: end;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-3);
+}
+
+.app-footer-center {
+    text-align: center;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--ink);
+    text-transform: none;
+    letter-spacing: -0.01em;
+}
+
+.app-footer-right {
+    text-align: right;
+}
+
+.app-footer p {
+    line-height: 1.6;
+}
+
+/* ============================================================================
+   RESPONSIVE — shell (masthead / contenedor)
+   ============================================================================ */
+@media (max-width: 720px) {
+    .container { padding: var(--space-4); }
+    .app-header {
+        grid-template-columns: 1fr;
+        gap: var(--space-3);
+    }
+    .masthead-edition,
+    .model-badge {
+        justify-self: start;
+    }
+}
+

@@ -5,20 +5,22 @@ los audios (bien etiquetados, borderline y sospechosos por igual), agrupados por
 etiqueta actual (la carpeta donde viven) y mostrando los 4 scores por clase del modelo
 emocional audeering, los valores AVD crudos, lo que "suena_a" la IA y el delta.
 
-Por defecto lee el dataset de segmentos localizados (outputs/mejores_segmentos +
-outputs/mejores_segmentos_auditoria.csv). Para ver el dataset original usa los
-flags --csv y --data. El CSV contiene un row por audio (generado por
+Por defecto lee el dataset original (data/AUDIOS MACHINE LEARNING +
+outputs/audios_sospechosos_ia.csv). El CSV contiene un row por audio (generado por
 scripts/auditar_etiquetas_ia.py). Si el CSV no coincide con las carpetas, lo avisa.
 
+Para ver otro dataset (p. ej. segmentos localizados) pasa --csv y --data apuntando
+a su CSV de auditoria y a su carpeta raiz de clases.
+
 Uso:
-    python scripts/mostrar_todos.py                    # segmentos localizados (default)
+    python scripts/mostrar_todos.py                    # dataset original (default)
     python scripts/mostrar_todos.py --clase Tristeza   # solo la carpeta Tristeza
     python scripts/mostrar_todos.py --orden delta      # ordenar cada grupo por delta desc
 
-    # Dataset original (sin recortar):
+    # Otro dataset (p. ej. segmentos recortados):
     python scripts/mostrar_todos.py \\
-        --csv outputs/audios_sospechosos_ia.csv \\
-        --data "data/AUDIOS MACHINE LEARNING"
+        --csv outputs/mi_auditoria.csv \\
+        --data outputs/mi_carpeta_segmentos
 """
 from __future__ import annotations
 
@@ -28,8 +30,8 @@ from pathlib import Path
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
-CSV_PATH = ROOT / "outputs" / "mejores_segmentos_auditoria.csv"
-DATA_DIR = ROOT / "outputs" / "mejores_segmentos"
+CSV_PATH = ROOT / "outputs" / "audios_sospechosos_ia.csv"
+DATA_DIR = ROOT / "data" / "AUDIOS MACHINE LEARNING"
 EXTS = {".ogg", ".mp3", ".mp4", ".mpeg", ".wav", ".flac", ".m4a"}
 
 

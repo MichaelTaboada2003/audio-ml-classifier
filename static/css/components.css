@@ -1,0 +1,398 @@
+/* ============================================================================
+   NAVIGATION — Capítulos romanos
+   ============================================================================ */
+.nav-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin: var(--space-7) 0 var(--space-7);
+    border-bottom: var(--rule-thin) solid var(--ink-rule);
+    counter-reset: chapter;
+}
+
+.tab-btn {
+    counter-increment: chapter;
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    border-right: var(--rule-thin) solid var(--ink-rule);
+    background: transparent;
+    padding: var(--space-5) var(--space-5) var(--space-5);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-3);
+    text-align: left;
+    position: relative;
+    transition: color 0.15s ease, background 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    line-height: 1.2;
+}
+
+.tab-btn:last-child {
+    border-right: none;
+}
+
+/* El número romano gigante */
+.tab-btn::before {
+    content: counter(chapter, upper-roman);
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 400;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    color: var(--ink-4);
+    line-height: 0.9;
+    transition: color 0.15s ease;
+    font-variation-settings: 'opsz' 144;
+}
+
+/* Ocultar los iconos de FontAwesome originales */
+.tab-btn > i {
+    display: none;
+}
+
+.tab-btn:hover {
+    color: var(--ink);
+    background: var(--paper-2);
+}
+
+.tab-btn:hover::before {
+    color: var(--vermilion);
+}
+
+.tab-btn.active {
+    color: var(--ink);
+    background: var(--paper);
+}
+
+.tab-btn.active::before {
+    color: var(--ink);
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: var(--rule-bold);
+    background: var(--vermilion);
+}
+
+/* ============================================================================
+   CARDS — Sin glassmorphism. Bordes de tinta.
+   ============================================================================ */
+.card,
+.glass-card {
+    background: var(--paper-2);
+    border: var(--rule-thin) solid var(--ink-rule);
+    border-radius: 0;
+    padding: var(--space-6);
+    position: relative;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+}
+
+@media (max-width: 980px) {
+    .grid-2col {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Card header con drop cap */
+.card-header {
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-4);
+    border-bottom: var(--rule-thin) solid var(--ink-rule);
+}
+
+.card-header h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+    font-weight: 600;
+    font-style: italic;
+    line-height: 1.0;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: var(--space-3);
+    font-variation-settings: 'opsz' 96, 'SOFT' 20;
+}
+
+.card-header h3 {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink);
+    margin-bottom: var(--space-3);
+}
+
+.card-header p {
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 64ch;
+}
+
+.card-header p strong {
+    color: var(--ink);
+    font-weight: 600;
+    background: rgba(214, 61, 40, 0.08);
+    padding: 0 3px;
+}
+
+.card-header p em {
+    font-style: italic;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-weight: 500;
+}
+
+.flex-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-5);
+    flex-wrap: wrap;
+}
+
+.flex-header > div:first-child {
+    flex: 1;
+    min-width: 280px;
+}
+
+.card-footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: var(--rule-thin) dashed var(--ink-4);
+    font-size: 0.85rem;
+    color: var(--ink-2);
+    line-height: 1.6;
+}
+
+.card-footer strong {
+    color: var(--ink);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+}
+
+/* ============================================================================
+   MODEL GRID — Selector de clasificador
+   ============================================================================ */
+.model-select-container {
+    margin-bottom: var(--space-5);
+}
+
+.model-select-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink);
+    margin-bottom: var(--space-3);
+}
+
+.model-select-label i {
+    display: none;
+}
+
+.model-select-label::before {
+    content: '§';
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--vermilion);
+    margin-right: var(--space-2);
+}
+
+.model-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0;
+    border: var(--rule-thin) solid var(--ink-rule);
+}
+
+.model-option {
+    padding: var(--space-3);
+    cursor: pointer;
+    background: var(--paper);
+    border-right: var(--rule-thin) solid var(--ink-rule);
+    border-bottom: var(--rule-thin) solid var(--ink-rule);
+    transition: background 0.12s ease;
+    position: relative;
+}
+
+.model-option:last-child {
+    border-right: none;
+}
+
+.model-option:hover {
+    background: var(--paper-3);
+}
+
+.model-option.active {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+.model-option.active .model-acc {
+    color: var(--vermilion-soft);
+}
+
+.model-option.active .model-desc {
+    color: var(--paper-3);
+}
+
+.model-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--space-2);
+    gap: var(--space-2);
+}
+
+.model-name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-style: italic;
+    font-size: 0.92rem;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+}
+
+.model-acc {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--vermilion);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-feature-settings: 'tnum';
+    white-space: nowrap;
+}
+
+.model-desc {
+    font-size: 0.72rem;
+    color: var(--ink-3);
+    line-height: 1.4;
+}
+
+/* ============================================================================
+   BUTTONS
+   ============================================================================ */
+.btn {
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border: var(--rule-thin) solid var(--ink-rule);
+    cursor: pointer;
+    background: var(--paper);
+    color: var(--ink);
+    transition: background 0.12s ease, color 0.12s ease, transform 0.08s ease;
+    border-radius: 0;
+    line-height: 1.2;
+}
+
+.btn:hover {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn-secondary {
+    background: var(--paper);
+}
+
+.btn-primary,
+.btn-vermilion {
+    background: var(--vermilion);
+    color: var(--paper);
+    border-color: var(--vermilion-deep);
+}
+
+.btn-primary:hover {
+    background: var(--vermilion-deep);
+}
+
+.btn-sm {
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+}
+
+.btn i {
+    font-size: 0.85em;
+}
+
+/* ============================================================================
+   DIVIDER
+   ============================================================================ */
+.divider {
+    display: flex;
+    align-items: center;
+    margin: var(--space-5) 0;
+    gap: var(--space-3);
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: var(--rule-thin);
+    background: var(--ink-rule);
+}
+
+.divider span {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--ink-3);
+    padding: 0 var(--space-2);
+}
+
+/* ============================================================================
+   RESPONSIVE — navegación y cards
+   ============================================================================ */
+@media (max-width: 720px) {
+    .nav-tabs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .tab-btn {
+        border-bottom: var(--rule-thin) solid var(--ink-rule);
+    }
+    .tab-btn:nth-child(2n) { border-right: none; }
+    .tab-btn::before { font-size: 1.8rem; }
+    .card, .glass-card { padding: var(--space-4); }
+}
+

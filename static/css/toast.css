@@ -1,0 +1,70 @@
+/* ============================================================================
+   TOAST
+   ============================================================================ */
+.toast-container {
+    position: fixed;
+    top: var(--space-5);
+    right: var(--space-5);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: 380px;
+}
+
+.toast {
+    background: var(--paper);
+    border: var(--rule-thin) solid var(--ink);
+    padding: var(--space-3) var(--space-4);
+    box-shadow: 6px 6px 0 var(--ink);
+    display: flex;
+    gap: var(--space-3);
+    animation: toast-in 0.25s ease both;
+}
+
+.toast.removing {
+    animation: toast-out 0.2s ease forwards;
+}
+
+@keyframes toast-in {
+    from { transform: translateX(20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes toast-out {
+    to { transform: translateX(20px); opacity: 0; }
+}
+
+.toast-icon {
+    color: var(--vermilion);
+    font-size: 1.1rem;
+}
+
+.toast-title {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+}
+
+.toast-message {
+    font-size: 0.82rem;
+    color: var(--ink-2);
+    line-height: 1.45;
+}
+
+.toast-close {
+    background: transparent;
+    border: none;
+    color: var(--ink-3);
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.9rem;
+}
+
+.toast-close:hover {
+    color: var(--vermilion);
+}
+

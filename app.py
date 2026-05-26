@@ -17,7 +17,7 @@ MIN_AUDIO_DURATION = 4.0
 MAX_DURATION = 10.0        # debe coincidir con scripts/exportar_modelos.py
 DATA_DIR = os.path.join("data", "AUDIOS MACHINE LEARNING")
 CACHE = os.path.join("outputs", "embeddings_v2.npz")
-REPORTE = os.path.join("outputs", "reporte_filtrado_v2.csv")
+AUDIT_CSV = os.path.join("outputs", "audios_sospechosos_ia.csv")
 MODEL_METRICS_PATH = os.path.join("outputs", "model_metrics.json")
 EXPERIMENT_HISTORY_PATH = os.path.join("outputs", "experiment_history.json")
 DECISIONS_DATA_PATH = os.path.join("outputs", "decisions_data.json")
@@ -47,12 +47,6 @@ from config import N_PER_CLASS, ACTIVE_CLASSES as _ACTIVE_CLASSES
 
 ACTIVE_CLASSES = _ACTIVE_CLASSES
 TOP_N_DATASET = N_PER_CLASS
-SCORE_COLUMNS = {
-    "Enojo": "score_enojo",
-    "Tristeza": "score_tristeza",
-    "Feliz": "score_feliz",
-    "Tranquilidad": "score_tranquilidad",
-}
 CLASS_STYLES = {
     "Enojo": {"slug": "enojo", "label": "Enojo", "accent": "#ef4444", "accent_dark": "#b91c1c"},
     "Tristeza": {"slug": "tristeza", "label": "Tristeza", "accent": "#06b6d4", "accent_dark": "#0891b2"},
@@ -185,19 +179,19 @@ def get_dataset():
     with open(HOLDOUT_DASHBOARD_PATH, encoding="utf-8") as f:
         holdout = json.load(f)  # {clase: [archivo_original, ...]}
 
-    # Scores acústicos (opcional) para ordenar/mostrar
+    # Score emocional audeering: qué tan a su propia clase suena cada audio
+    # (score_propio del audit). Reemplaza al filtro acústico viejo (desactivado).
     scores_lookup = {}
-    if os.path.exists(REPORTE):
-        df_rep = pd.read_csv(REPORTE)
-        for _, row in df_rep.iterrows():
-            scores_lookup[(row["clase_original"], row["archivo"])] = row
+    if os.path.exists(AUDIT_CSV):
+        df_audit = pd.read_csv(AUDIT_CSV)
+        for _, row in df_audit.iterrows():
+            scores_lookup[(row["clase_etiqueta"], row["archivo"])] = row
 
     records = []
     for clase, archivos in holdout.items():
-        score_col = SCORE_COLUMNS.get(clase)
         for archivo in archivos:
             row = scores_lookup.get((clase, archivo))
-            score = float(row[score_col]) if (row is not None and score_col in row) else 0.0
+            score = float(row["score_propio"]) if (row is not None and "score_propio" in row) else 0.0
             style = get_class_style(clase)
             records.append({
                 "archivo": archivo,

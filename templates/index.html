@@ -11,7 +11,13 @@
     <!-- FontAwesome (legacy — algunos botones aún lo usan internamente) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/predictions.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dataset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/analytics.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/decisions.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toast.css') }}">
 </head>
 <body>
     <div class="container">
@@ -152,7 +158,7 @@
 
                             <!-- Big Prediction Meter -->
                             <div class="prediction-display">
-                                <svg class="progress-ring" width="150" height="150">
+                                <svg class="progress-ring" width="200" height="200" viewBox="0 0 200 200">
                                     <defs>
                                         <linearGradient id="gradient-enojo" x1="0%" y1="0%" x2="100%" y2="100%">
                                             <stop offset="0%" stop-color="#f87171" />
@@ -175,8 +181,8 @@
                                             <stop offset="100%" stop-color="#a855f7" />
                                         </linearGradient>
                                     </defs>
-                                    <circle class="progress-ring-bg" stroke="rgba(255,255,255,0.03)" stroke-width="8" fill="transparent" r="64" cx="75" cy="75" />
-                                    <circle id="progress-bar-circle" class="progress-ring-bar" stroke="url(#gradient-default)" stroke-width="8" stroke-linecap="round" fill="transparent" r="64" cx="75" cy="75" />
+                                    <circle class="progress-ring-bg" stroke="rgba(255,255,255,0.04)" stroke-width="6" fill="transparent" r="88" cx="100" cy="100" />
+                                    <circle id="progress-bar-circle" class="progress-ring-bar" stroke="url(#gradient-default)" stroke-width="6" stroke-linecap="round" fill="transparent" r="88" cx="100" cy="100" />
                                 </svg>
                                 <div class="prediction-center">
                                     <div class="prediction-value" id="prediction-percentage">0%</div>
@@ -243,8 +249,8 @@
                                 <tr>
                                     <th>Archivo</th>
                                     <th>Recolector</th>
-                                    <th>Clase Original</th>
-                                    <th>Score de Filtrado</th>
+                                    <th>Clase</th>
+                                    <th>Score emocional</th>
                                     <th>Reproducir</th>
                                     <th style="text-align: right;">Acción</th>
                                 </tr>
@@ -420,12 +426,21 @@
 
                             <!-- Curva ROC con punto de operacion -->
                             <div class="sim-output-card">
-                                <h3>Curva ROC + punto óptimo</h3>
-                                <p class="sim-output-subtitle">Verde = umbral actual · Estrella = umbral óptimo en costo.</p>
-                                <svg id="roc-curve" viewBox="0 0 320 240" class="roc-svg"></svg>
+                                <h3>Curva ROC</h3>
+                                <p class="sim-output-subtitle">Cada punto de la curva es un umbral diferente. Mover el slider desplaza el punto verde por la curva.</p>
+                                <svg id="roc-curve" viewBox="0 0 355 295" class="roc-svg"></svg>
                                 <div class="roc-legend">
-                                    <span><i class="dot dot-active"></i> Operación actual</span>
-                                    <span><i class="dot dot-optimal"></i> Óptimo en costo</span>
+                                    <div class="roc-legend-row">
+                                        <i class="dot dot-active"></i>
+                                        <span class="roc-legend-label">Umbral actual</span>
+                                        <code id="roc-current-values" class="roc-values">—</code>
+                                    </div>
+                                    <div class="roc-legend-row">
+                                        <i class="dot dot-optimal"></i>
+                                        <span class="roc-legend-label">Óptimo en VPN</span>
+                                        <code id="roc-optimal-values" class="roc-values">—</code>
+                                    </div>
+                                    <p id="roc-reading" class="roc-reading"></p>
                                 </div>
                             </div>
 
